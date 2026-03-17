@@ -41,7 +41,7 @@ This workflow describes how to find and filter job opportunities using the Talen
     - If a job passes the filter:
         - Add it to [jobs_to_review.md](file:///d:/DevWorkspace/TalentScout/jobs_to_review.md).
         - Include the match score, missing/unfamiliar skills, and a link.
-        - **Update Spreadsheet**: Use the browser agent to append the URL to Column A and today's date to Column B of the [JobTracker sheet](https://docs.google.com/spreadsheets/d/13PxGYoeWj366dgIvlG9CulLlsErRnSGSbXt29B-9Stg/edit?usp=sharing).
+        - **Update Spreadsheet**: Use the browser agent to append the URL to Column A and today's date to Column B of the A job tracking sheet of your choice.
 
 13. **Notify User**
     - Once the scour is complete, notify the user with a summary of findings and a link to the review file.
