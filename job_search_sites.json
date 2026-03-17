@@ -1,0 +1,401 @@
+{
+  "job_search_sites": [
+    {
+      "name": "LinkedIn",
+      "url": "https://www.linkedin.com/jobs/",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Senior Test Engineer",
+        "QA Lead",
+        "Automation Engineer",
+        "Agentic AI QA",
+        "Karate Framework",
+        "Quality Assurance Manager"
+      ],
+      "locations": [
+        "Seattle",
+        "Redmond",
+        "Remote"
+      ],
+      "filters": {
+        "experience_level": "Mid-Senior level",
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "Indeed",
+      "url": "https://www.indeed.com/",
+      "search_terms": [
+        "Senior Quality Assurance Engineer",
+        "Software Development Engineer in Test",
+        "QA Automation Lead",
+        "Test Automation Architect"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Redmond, WA"
+      ],
+      "filters": {
+        "salary_estimate": "$140,000+",
+        "job_type": "fulltime"
+      }
+    },
+    {
+      "name": "BuiltIn",
+      "url": "https://builtin.com/jobs/seattle",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Automation",
+        "Testing"
+      ],
+      "locations": [
+        "Seattle"
+      ],
+      "filters": {
+        "category": "QA"
+      }
+    },
+    {
+      "name": "Dice",
+      "url": "https://www.dice.com/",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Automation Tester"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Redmond, WA"
+      ],
+      "filters": {
+        "employment_type": "FULL_TIME"
+      }
+    },
+    {
+      "name": "Glassdoor",
+      "url": "https://www.glassdoor.com/Job/index.htm",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "QA Lead"
+      ],
+      "locations": [
+        "Seattle, WA"
+      ],
+      "filters": {
+        "salary_range": "140k-*"
+      }
+    },
+    {
+      "name": "Outscal (AI/Games)",
+      "url": "https://ai.outscal.com/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Game Development",
+        "AI Testing"
+      ],
+      "locations": [
+        "Remote",
+        "Seattle"
+      ],
+      "filters": {
+        "experience": "Senior",
+        "category": "Engineering"
+      }
+    },
+    {
+      "name": "CareerBuilder",
+      "url": "https://www.careerbuilder.com/",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "QA Manager"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Redmond, WA"
+      ],
+      "filters": {
+        "salary": "$140,000+",
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "SimplyHired",
+      "url": "https://www.simplyhired.com/",
+      "search_terms": [
+        "Senior Quality Assurance",
+        "SDET",
+        "Automation Lead"
+      ],
+      "locations": [
+        "Seattle, WA"
+      ],
+      "filters": {
+        "minimum_salary": "140000"
+      }
+    },
+    {
+      "name": "Monster",
+      "url": "https://www.monster.com/",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "QA Lead"
+      ],
+      "locations": [
+        "Seattle, WA"
+      ],
+      "filters": {
+        "experience_level": "Senior"
+      }
+    },
+    {
+      "name": "Hiring Cafe",
+      "url": "https://hiring.cafe/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Automation Engineer"
+      ],
+      "locations": [
+        "Seattle",
+        "Remote"
+      ],
+      "filters": {
+        "min_salary": "140k",
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "DevJobsScanner",
+      "url": "https://www.devjobsscanner.com/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Automation"
+      ],
+      "locations": [
+        "Remote",
+        "USA"
+      ],
+      "filters": {
+        "min_salary": "140000"
+      }
+    },
+    {
+      "name": "ZipRecruiter",
+      "url": "https://www.ziprecruiter.com/jobseeker/home",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation Architect"
+      ],
+      "locations": [
+        "Seattle, WA"
+      ],
+      "filters": {
+        "salary": "140000+"
+      }
+    },
+    {
+      "name": "DailyRemote",
+      "url": "https://dailyremote.com/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Quality Assurance"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "salary": "140k+",
+        "experience": "10+ years"
+      }
+    },
+    {
+      "name": "JobLeads",
+      "url": "https://www.jobleads.com/home",
+      "search_terms": [
+        "Senior QA Engineer",
+        "QA Manager",
+        "Director of Quality"
+      ],
+      "locations": [
+        "USA"
+      ],
+      "filters": {
+        "salary_expectation": "140000+"
+      }
+    },
+    {
+      "name": "Remote Game Jobs",
+      "url": "https://remotegamejobs.com/",
+      "search_terms": [
+        "QA",
+        "Quality Assurance",
+        "SDET"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "category": "Quality Assurance"
+      }
+    },
+    {
+      "name": "GameJobs.co",
+      "url": "https://gamejobs.co/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Quality Assurance Engineer"
+      ],
+      "locations": [
+        "Seattle",
+        "Redmond",
+        "USA"
+      ],
+      "filters": {
+        "job_function": "Quality Assurance"
+      }
+    },
+    {
+      "name": "Jobscan",
+      "url": "https://app.jobscan.co/jobs",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET"
+      ],
+      "locations": [
+        "Seattle, WA"
+      ],
+      "filters": {
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "Greenhouse Boards",
+      "url": "https://my.greenhouse.io/jobs",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Automation"
+      ],
+      "locations": [
+        "Seattle",
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Careerflow",
+      "url": "https://app.careerflow.ai/jobs",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Automation Lead"
+      ],
+      "locations": [
+        "Seattle",
+        "Remote"
+      ],
+      "filters": {
+        "salary": "140k+"
+      }
+    },
+    {
+      "name": "Microsoft Careers",
+      "url": "https://apply.careers.microsoft.com/careers",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Software Engineering: Test"
+      ],
+      "locations": [
+        "Redmond, WA",
+        "Seattle, WA"
+      ],
+      "filters": {
+        "profession": "Software Engineering"
+      }
+    },
+    {
+      "name": "Google Careers",
+      "url": "https://www.google.com/about/careers/applications/jobs/results",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Engineer"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Kirkland, WA",
+        "Remote"
+      ],
+      "filters": {
+        "experience_level": "Senior"
+      }
+    },
+    {
+      "name": "80,000 Hours",
+      "url": "https://jobs.80000hours.org/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Software Engineer"
+      ],
+      "locations": [
+        "Remote",
+        "USA"
+      ],
+      "filters": {
+        "role_type": "Software Engineering"
+      }
+    },
+    {
+      "name": "WorkSource WA",
+      "url": "https://www.worksourcewa.com/jobsearch/PowerSearch.aspx?tm=-1",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Redmond, WA"
+      ],
+      "filters": {
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "TechFetch",
+      "url": "https://www.techfetch.com/",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Quality Assurance Lead"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Redmond, WA",
+        "Remote"
+      ],
+      "filters": {}
+    }
+  ],
+  "global_keywords": [
+    "Karate Framework",
+    "API Testing",
+    "Mobile Testing",
+    "20+ years experience",
+    "Automation Management",
+    "Game Testing",
+    "Agentic AI"
+  ]
+}

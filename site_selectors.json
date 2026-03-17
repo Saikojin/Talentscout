@@ -1,0 +1,163 @@
+{
+    "LinkedIn": {
+        "search_url": "https://www.linkedin.com/jobs/search?keywords={search_term}&location={location}",
+        "job_card_selector": ".base-card",
+        "title_selector": ".base-search-card__title",
+        "company_selector": ".base-search-card__subtitle",
+        "job_url_selector": ".base-card__full-link"
+    },
+    "Indeed": {
+        "search_url": "https://www.indeed.com/jobs?q={search_term}&l={location}",
+        "job_card_selector": ".job_seen_beacon",
+        "title_selector": "h2.jobTitle",
+        "company_selector": "[data-testid='company-name']",
+        "job_url_selector": "h2.jobTitle a"
+    },
+    "BuiltIn": {
+        "search_url": "https://builtin.com/jobs/seattle?search={search_term}",
+        "job_card_selector": ".job-bounded-responsive",
+        "title_selector": "a.card-alias-after-overlay",
+        "company_selector": "a[href^='/company/'] span",
+        "job_url_selector": "a.card-alias-after-overlay"
+    },
+    "Dice": {
+        "search_url": "https://www.dice.com/jobs?q={search_term}&location={location}",
+        "job_card_selector": "div.flex.flex-col.gap-6.rounded-lg.border",
+        "title_selector": "a[href*='/job-detail/'][class*='font-semibold']",
+        "company_selector": "a[href*='/company-profile/'] p",
+        "job_url_selector": "a[href*='/job-detail/'][class*='font-semibold']"
+    },
+    "Glassdoor": {
+        "search_url": "https://www.glassdoor.com/Job/seattle-wa-us-senior-qa-engineer-jobs-SRCH_IL.0,13_IC1150505_KO14,32.htm",
+        "job_card_selector": "li[class*='jobListItem']",
+        "title_selector": "a[class*='jobTitle']",
+        "company_selector": "div[class*='employerName']",
+        "job_url_selector": "a[class*='jobTitle']"
+    },
+    "Outscal": {
+        "search_url": "https://outscal.com/jobs",
+        "job_card_selector": "a.block",
+        "title_selector": "h3",
+        "company_selector": "p:nth-of-type(1)",
+        "job_url_selector": "a.block"
+    },
+    "CareerBuilder": {
+        "search_url": "https://www.careerbuilder.com/jobs?keywords={search_term}&location={location}",
+        "job_card_selector": "article[data-testid='JobCard']",
+        "title_selector": "a.title-link",
+        "company_selector": "div[class*='Company']",
+        "job_url_selector": "a.title-link"
+    },
+    "SimplyHired": {
+        "search_url": "https://www.simplyhired.com/search?q={search_term}&l={location}",
+        "job_card_selector": "div[role='presentation']",
+        "title_selector": "h2 a",
+        "company_selector": "a[href*='/browse-jobs/companies/']",
+        "job_url_selector": "h2 a"
+    },
+    "Monster": {
+        "search_url": "https://www.monster.com/jobs/search?q={search_term}&where={location}",
+        "job_card_selector": "article[data-testid='JobCard']",
+        "title_selector": "a.title-link",
+        "company_selector": "div[class*='Company']",
+        "job_url_selector": "a.title-link"
+    },
+    "Hiring Cafe": {
+        "search_url": "https://hiring.cafe/?search={search_term}&location={location}",
+        "job_card_selector": "div.relative.bg-white.rounded-xl.border",
+        "title_selector": "div.font-medium.text-start",
+        "company_selector": "span.font-bold",
+        "job_url_selector": "a[href^='/viewjob/']"
+    },
+    "DevJobsScanner": {
+        "search_url": "https://www.devjobsscanner.com/jobs?query={search_term}",
+        "job_card_selector": "div.py-6",
+        "title_selector": "h2",
+        "company_selector": "a[href^='/company/']",
+        "job_url_selector": "a.jbs-text-hover-link"
+    },
+    "ZipRecruiter": {
+        "search_url": "https://www.ziprecruiter.com/Jobs/Search?search={search_term}&location={location}",
+        "job_card_selector": "div.job_result_two_pane_v2",
+        "title_selector": "h2",
+        "company_selector": "[class*='company_name']",
+        "job_url_selector": "a[class*='job_link']"
+    },
+    "DailyRemote": {
+        "search_url": "https://dailyremote.com/?search={search_term}",
+        "job_card_selector": "article",
+        "title_selector": "h2 a",
+        "company_selector": "span.company-name",
+        "job_url_selector": "h2 a"
+    },
+    "Remote Game Jobs": {
+        "search_url": "https://remotegamejobs.com/search?q={search_term}",
+        "job_card_selector": "a.has-text-black",
+        "title_selector": "strong",
+        "company_selector": "small",
+        "job_url_selector": "a.has-text-black"
+    },
+    "GameJobs.co": {
+        "search_url": "https://gamejobs.co/search?q={search_term}",
+        "job_card_selector": ".job",
+        "title_selector": "a.title",
+        "company_selector": "a.c",
+        "job_url_selector": "a.title"
+    },
+    "JobLeads": {
+        "search_url": "https://www.jobleads.com/jobs?keywords={search_term}",
+        "job_card_selector": "div.jlui-rounded-md.jlui-border",
+        "title_selector": "div.jlui-text-heading-7",
+        "company_selector": "div.jlui-text-body-3",
+        "job_url_selector": "a.absolute"
+    },
+    "Google Careers": {
+        "search_url": "https://www.google.com/about/careers/applications/jobs/results/?q={search_term}&location={location}",
+        "job_card_selector": "li.lLd3Je",
+        "title_selector": ".QJPWVe",
+        "company_selector": ".RP7SMd",
+        "job_url_selector": "a.WpHeLc"
+    },
+    "Microsoft Careers": {
+        "search_url": "https://jobs.careers.microsoft.com/global/en/search?q={search_term}",
+        "job_card_selector": "div[data-automation-id='job-card']",
+        "title_selector": "button[aria-label*='Job title']",
+        "company_selector": "div[aria-label*='Microsoft']",
+        "job_url_selector": "a[href*='/job/']"
+    },
+    "Greenhouse Boards (Classic)": {
+        "search_url": "https://boards.greenhouse.io/",
+        "job_card_selector": "div.opening",
+        "title_selector": "div.opening a",
+        "company_selector": ".logo, h1",
+        "job_url_selector": "div.opening a"
+    },
+    "Greenhouse Boards (NextGen)": {
+        "search_url": "https://job-boards.greenhouse.io/",
+        "job_card_selector": "a[href*='/jobs/']",
+        "title_selector": "a p:first-child",
+        "company_selector": "header h1",
+        "job_url_selector": "a[href*='/jobs/']"
+    },
+    "80,000 Hours": {
+        "search_url": "https://jobs.80000hours.org/",
+        "job_card_selector": "button.job-card",
+        "title_selector": ".job-card p span",
+        "company_selector": ".job-card div div span",
+        "job_url_selector": "a.view-details-button"
+    },
+    "WorkSource WA": {
+        "search_url": "https://www.worksourcewa.com/jobsearch/PowerSearch.aspx?tm=-1",
+        "job_card_selector": "h2.with-badge",
+        "title_selector": "a[id*='lnkTitle']",
+        "company_selector": "h2.with-badge + ul.list-inline li:first-child",
+        "job_url_selector": "a[id*='lnkTitle']"
+    },
+    "TechFetch": {
+        "search_url": "https://www.techfetch.com/",
+        "job_card_selector": "div.col-lg-6.col-md-12",
+        "title_selector": "a[title='View job details']",
+        "company_selector": "a[href*='/job-openings/']",
+        "job_url_selector": "a[title='View job details']"
+    }
+}

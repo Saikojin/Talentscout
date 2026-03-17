@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# Database
+*.sqlite3
+job_tracker.db
+
+# Logs and Outputs
+logs/
+tailored_outputs/
+dashboard.html
+jobs_to_review.md
+
+# Application Data
+all_collected_jobs.json
+collected_jobs_*.json
+base_skillset.json
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

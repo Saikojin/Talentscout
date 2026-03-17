@@ -1,0 +1,37 @@
+{
+  "BuiltIn": {
+    "domain": "builtin.com",
+    "job_card_selector": ".row",
+    "title_selector": ".font-barlow.fw-medium.fs-xl.fs-xl-2xl.mb-sm.mb-lg-0",
+    "company_selector": ".company-title-clamp",
+    "job_url_selector": ".card-alias-after-overlay.text-break"
+  },
+  "linkedin": {
+    "domain": "linkedin.com/jobs/search?keywords=&location=Redmond&geoId=&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0",
+    "job_card_selector": "#main-content > section > ul > li:nth-child(1) > div > a",
+    "title_selector": ".base-search-card__title",
+    "company_selector": "#main-content > section > ul > li:nth-child(3) > div > div.base-search-card__info > h4 > a",
+    "job_url_selector": ".base-search-card__title"
+  },
+  "indeed": {
+    "domain": "indeed.com/jobs?q=&l=Redmond%2C+WA&from=searchOnHP",
+    "job_card_selector": ".slider_container.css-weo834.eu4oa1w0",
+    "title_selector": ".jobTitle.css-1o1rnx9.eu4oa1w0",
+    "company_selector": "#mosaic-provider-jobcards > div > ul > li:nth-child(2) > div > div.slider_container.css-weo834.eu4oa1w0 > div > div.slider_item.css-17bghu4.eu4oa1w0 > div > div > table > tbody > tr > td > div.css-u74ql7.eu4oa1w0 > div.company_location.css-o9i1wn.e37uo190 > div > div.css-1afmp4o.e37uo190 > span",
+    "job_url_selector": ".jobTitle.css-1o1rnx9.eu4oa1w0"
+  },
+  "dice": {
+    "domain": "dice.com/jobs?radius=30&radiusUnit=mi",
+    "job_card_selector": ".flex.gap-4.flex-col",
+    "title_selector": "body > div:nth-child(5) > div.min-h-screen > div > div.m-px.mx-auto.max-w-screen-2xl.sm\\:px-6 > div > div:nth-child(1) > div > div > div > div > div.content > div.inline-flex.shrink.grow.basis-0.flex-col.items-center.justify-start.relative > div > a",
+    "company_selector": "body > div:nth-child(5) > div.min-h-screen > div > div.m-px.mx-auto.max-w-screen-2xl.sm\\:px-6 > div > div:nth-child(1) > div > div > div > div > div.header.-mb-2.flex.flex-row.justify-between > span.logo.inline-flex.w-auto.items-center.justify-start.gap-3 > a.outline-offset-2.outline-stroke-focus.forced-colors\\:outline-\\[Highlight\\].gap-1.text-interaction.visited\\:text-interaction-visited.outline-0.z-\\[1\\].flex.items-center.justify-center.no-underline",
+    "job_url_selector": "body > div:nth-child(5) > div.min-h-screen > div > div.m-px.mx-auto.max-w-screen-2xl.sm\\:px-6 > div > div:nth-child(1) > div > div > div > div > div.content > div.inline-flex.shrink.grow.basis-0.flex-col.items-center.justify-start.relative > div > a"
+  },
+  "glassdoor": {
+    "domain": "glassdoor.com/Job/index.htm",
+    "job_card_selector": "#left-column > div.JobsList_wrapper__EyUF6 > ul > li:nth-child(2) > div > div",
+    "title_selector": "#left-column > div.JobsList_wrapper__EyUF6 > ul > li.JobsList_jobListItem__wjTHv.JobsList_selected__nFuMW > div > div",
+    "company_selector": "#job-employer-*",
+    "job_url_selector": "#job-title-*"
+  }
+}

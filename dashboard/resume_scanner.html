@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentScout Resume Parser</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .upload-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--surface-color);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        #file-name {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pane-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .viewer {
+            flex: 1;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            color: #e2e8f0;
+        }
+
+        textarea.viewer {
+            resize: none;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        textarea.viewer:focus {
+            border-color: var(--accent-color);
+        }
+
+        .divider {
+            width: 4px;
+            background-color: var(--surface-color);
+            cursor: col-resize;
+            transition: background-color 0.2s;
+        }
+
+        .divider:hover {
+            background-color: var(--accent-color);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+        
+        /* Loader */
+        .loader {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TalentScout Parser</h1>
+        <div class="upload-controls">
+            <span id="file-name">No file selected</span>
+            <label for="file-input" class="btn btn-outline">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                Select Resume
+            </label>
+            <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md">
+            
+            <button id="btn-parse" class="btn" disabled>
+                <span class="loader" id="parse-loader"></span>
+                Parse Profile
+            </button>
+            
+            <button id="btn-save" class="btn btn-success" disabled>
+                Save base_skillset.json
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="pane">
+            <div class="pane-header">
+                <span class="pane-title">Extracted Raw Text</span>
+            </div>
+            <div id="text-preview" class="viewer">Upload a resume to see the extracted text here.</div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="pane">
+            <div class="pane-header">
+                <span class="pane-title">Generated base_skillset.json (Editable)</span>
+            </div>
+            <textarea id="json-editor" class="viewer" spellcheck="false" placeholder="Your drafted JSON config will appear here. Modify it as needed before saving."></textarea>
+        </div>
+    </main>
+
+    <div id="toast" class="toast">
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const btnParse = document.getElementById('btn-parse');
+        const btnSave = document.getElementById('btn-save');
+        const textPreview = document.getElementById('text-preview');
+        const jsonEditor = document.getElementById('json-editor');
+        const parseLoader = document.getElementById('parse-loader');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+
+        let selectedFile = null;
+
+        function showToast(message, type="info") {
+            toastMsg.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                fileNameDisplay.textContent = selectedFile.name;
+                btnParse.disabled = false;
+            } else {
+                selectedFile = null;
+                fileNameDisplay.textContent = 'No file selected';
+                btnParse.disabled = true;
+            }
+        });
+
+        btnParse.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            btnParse.disabled = true;
+            parseLoader.style.display = 'inline-block';
+            textPreview.textContent = 'Parsing...';
+            jsonEditor.value = '';
+
+            try {
+                // Ensure the path matches the FastAPI backend config
+                const response = await fetch('/api/parse', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || "Failed to parse document");
+                }
+
+                const data = await response.json();
+                
+                textPreview.textContent = data.text;
+                jsonEditor.value = JSON.stringify(data.draft_json, null, 4);
+                
+                btnSave.disabled = false;
+                showToast("Resume parsed successfully!", "success");
+
+            } catch (err) {
+                console.error(err);
+                textPreview.textContent = `Error: ${err.message}`;
+                showToast(err.message, "error");
+            } finally {
+                btnParse.disabled = false;
+                parseLoader.style.display = 'none';
+            }
+        });
+
+        btnSave.addEventListener('click', async () => {
+            const rawJson = jsonEditor.value;
+            let parsedJson;
+
+            try {
+                parsedJson = JSON.parse(rawJson);
+            } catch (err) {
+                showToast("Invalid JSON formatting. Please fix syntax errors.", "error");
+                return;
+            }
+
+            btnSave.disabled = true;
+
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ skillset: parsedJson })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || "Failed to save skillset");
+                }
+
+                showToast("base_skillset.json updated successfully!", "success");
+
+            } catch (err) {
+                console.error(err);
+                showToast(err.message, "error");
+            } finally {
+                btnSave.disabled = false;
+            }
+        });
+        
+        // Simple JSON formatting on blur to keep it clean
+        jsonEditor.addEventListener('blur', () => {
+             try {
+                if(jsonEditor.value.trim() !== '') {
+                    const obj = JSON.parse(jsonEditor.value);
+                    jsonEditor.value = JSON.stringify(obj, null, 4);
+                }
+            } catch(e) {}
+        });
+
+    </script>
+</body>
+</html>

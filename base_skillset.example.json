@@ -1,0 +1,22 @@
+{
+    "name": "Jane Doe",
+    "experience_years": 5,
+    "core_skills": [
+        "JavaScript",
+        "Python",
+        "React",
+        "Node.js",
+        "Agile",
+        "Scrum",
+        "Problem Solving"
+    ],
+    "disqualified_skills": [
+        "PHP",
+        "Ruby"
+    ],
+    "preferred_locations": [
+        "Seattle",
+        "Remote"
+    ],
+    "minimum_salary": 100000
+}
