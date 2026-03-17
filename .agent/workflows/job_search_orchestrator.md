@@ -23,15 +23,18 @@ This workflow manages the end-to-end job search process, spawning sub-agents and
 3.  **Spawn: The Tailor** (For Passing JDs)
     - **Action**: Create resume variation in `tailored_outputs/`.
     - **Action**: Write TEAR framework cover letter.
-4.  **Spawn: The Applicant**
-    - **Action**: Use browser to submit application.
-    - **Artifact**: Capture screenshot of submission to `logs/`.
+
 
 ## Phase 3: Clarification Loop
 The Orchestrator MUST pause and query the User (Thomas) via `notify_user` if:
 1.  **Ambiguity**: JD is unclear on FTE status or Salary.
 2.  **Skill Gap**: High-value role lists a critical required skill missing from the Skill Map.
 3.  **Priority**: Multiple high-value roles found simultaneously.
+
+## Phase 4: Application Submission
+1.  **Spawn: The Applicant**
+    - **Action**: Use browser to submit application.
+    - **Artifact**: Capture screenshot of submission to `logs/`.
 
 ## Execution Trigger
 - Run this workflow via the Agent Manager.
