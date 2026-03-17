@@ -27,3 +27,6 @@ base_skillset.json
 .vscode/
 .idea/
 .DS_Store
+
+# Personal Files
+base_materials/

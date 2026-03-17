@@ -1,6 +1,7 @@
 # TalentScout
 
 TalentScout is an automated agentic job scraper that utilizes Playwright to find, filter, and track relevant job postings across multiple job boards. It leverages search selectors and filtering keywords to narrow down job descriptions to ones that match your exact skill set and saves you from applying to duplicates by storing them in a local SQLite database.
+> **Note:** The configuration files in this repository contain example data from the project creator. To use this scraper effectively, you must edit these configurations to suit your specific job requirements and selectors. Additionally, this project presumes the user has access to an AI assistant (or agent) to help automate actions beyond the code execution itself.
 
 ## Features
 
@@ -8,6 +9,16 @@ TalentScout is an automated agentic job scraper that utilizes Playwright to find
 - **Skill Filtering**: Define your skills and disqualified keywords to automatically reject bad fits before you even see them.
 - **Local Database Tracking**: Uses a local SQLite database (`job_tracker.db`) to log scraped jobs and prevent re-evaluating the same URL twice.
 - **Dashboard Output**: Generates an integrated HTML dashboard and a Markdown list (`jobs_to_review.md`) of passing and failing jobs for easy review.
+
+## Tech Stack & Dependencies
+
+- **Python 3.8+**: Core language for all scripts and logic.
+- **Playwright** (`playwright`): Used for headless, Javascript-rendered, async web scraping.
+- **FastAPI & Uvicorn** (`fastapi`, `uvicorn`, `python-multipart`): Powers the local web server endpoint for the resume parser UI.
+- **BeautifulSoup4** (`beautifulsoup4`): HTML parsing for the visual learner tool.
+- **PyPDF & python-docx** (`pypdf`, `python-docx`): Extracts raw text from uploaded resumes.
+- **SQLite3**: Built-in Python library used for the local `job_tracker.db` deduplication database.
+- **Vanilla HTML/CSS/JS**: Used for the dashboard rendering, avoiding the need for heavy node/npm dependencies.
 
 ## Setup
 
