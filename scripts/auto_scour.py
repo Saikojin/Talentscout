@@ -179,7 +179,12 @@ async def main():
                     jd_text = await fetch_job_description(context, job["url"])
                     filter_results = filter_job(jd_text, SKILLSET_FILE)
                     job["filter_results"] = filter_results
-                    add_job(job["title"], job["company"], job["url"], matched_key)
+                    
+                    score = 75 # arbitrary default score
+                    missing_skills = filter_results.get("missing_skills", [])[:3]
+                    matched_skills = filter_results.get("matched_skills", [])[:5] # Take top 5 matched
+                    
+                    add_job(job["title"], job["company"], job["url"], matched_key, score, missing_skills, matched_skills)
                     new_jobs.append(job)
                         
                 all_results.extend(new_jobs)
@@ -198,7 +203,6 @@ async def main():
         print("\n[*] Results saved to logs/auto_scour_results.json")
         
         # Integrate with tracking files
-        dashboard_updates = []
         md_updates_passed = []
         md_updates_failed = []
         
@@ -213,19 +217,8 @@ async def main():
                 company = job['company']
                 url = job['url']
                 missing_str = ", ".join(fr.get("missing_skills", [])[:3]) if fr.get("missing_skills") else "None"
-                missing_arr_str = json.dumps(fr.get("missing_skills", [])[:3]) if fr.get("missing_skills") else "[]"
                 
                 md_updates_passed.append(f"| {score} | {title} | {company} | AutoScour | {missing_str} | [Apply]({url}) |")
-                # Safe serialization for JS
-                job_obj = {
-                    "score": score,
-                    "title": title.strip(),
-                    "company": company.strip(),
-                    "site": job.get("site", "AutoScour"),
-                    "missing": fr.get("missing_skills", [])[:3],
-                    "url": url
-                }
-                dashboard_updates.append(f"            {json.dumps(job_obj)}")
         
         # Update Markdown
         if os.path.exists("jobs_to_review.md"):
@@ -247,36 +240,6 @@ async def main():
             with open("jobs_to_review.md", "w", encoding="utf-8") as f:
                 f.write(md_content)
             print(f"[*] Appended {len(md_updates_passed)} passing and {len(md_updates_failed)} failing jobs to jobs_to_review.md")
-            
-        # Update HTML
-        if os.path.exists("dashboard.html") and dashboard_updates:
-            with open("dashboard.html", "r", encoding="utf-8") as f:
-                html_content = f.read()
-                
-            # Find the jobs array
-            import re
-            match = re.search(r'(const jobs = \[\n)([\s\S]*?)(\n        \];)', html_content)
-            if match:
-                prefix = match.group(1)
-                suffix = match.group(3)
-                
-                # Deduplicate based on URL
-                seen_urls = set()
-                unique_updates = []
-                for update in dashboard_updates:
-                    url_match = re.search(r'"url": "(.*?)"', update)
-                    if url_match:
-                        url = url_match.group(1)
-                        if url not in seen_urls:
-                            seen_urls.add(url)
-                            unique_updates.append(update)
-                
-                new_jobs_str = ",\n".join(unique_updates)
-                new_html = html_content[:match.start()] + prefix + new_jobs_str + suffix + html_content[match.end():]
-                
-                with open("dashboard.html", "w", encoding="utf-8") as f:
-                    f.write(new_html)
-                print(f"[*] Updated dashboard.html with {len(unique_updates)} unique new jobs (replaced old entries)")
 
 
 
