@@ -37,11 +37,18 @@ TalentScout is an automated agentic job scraper that utilizes Playwright to find
 ## Usage
 
 ### 1. Generate `base_skillset.json`
-If you do not have a `base_skillset.json` configured, use the built-in Resume Parser tool to generate one dynamically from your resume:
+If you do not have a `base_skillset.json` configured, use the built-in Resume Parser tool to generate one dynamically from your resume. 
+
+Start the server using the provided batch script:
 ```bash
-python scripts/resume_server.py
+.\start.bat
 ```
 Open your browser to `http://localhost:8000` to access the parser dashboard. Upload your resume (PDF, DOCX, TXT), verify the extracted text, tweak the drafted JSON on the right pane, and click "Save".
+
+When you're finished, you can stop the background server using:
+```bash
+.\stop.bat
+```
 
 ### 2. Run the Job Scraper
 To start scoring and filtering jobs:
