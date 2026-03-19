@@ -9,7 +9,7 @@ from playwright.async_api import async_playwright
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from scripts.filter_skills import filter_job
-    from scripts.database import is_duplicate, add_job
+    from scripts.database import is_duplicate, add_job, get_all_search_configs, get_all_companies
     from scripts.cleanup import clean_logs
 except ImportError:
     print("Error: Could not import local modules. Make sure you are running from the project root.")
@@ -25,6 +25,69 @@ def load_json(filepath):
             return json.load(f)
     print(f"Warning: {filepath} not found.")
     return {}
+
+async def scrape_company(page, company):
+    name = company["name"]
+    url = company["careers_url"]
+    print(f"\n[*] Scraping Company: {name}...")
+    
+    print(f"[*] Navigating to {url}")
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        await asyncio.sleep(2)
+    except Exception as e:
+        print(f"[!] Warning: Navigation to {url} timed out or failed. {e}")
+        
+    card_sel = company.get("job_card_selector")
+    if not card_sel: return []
+    
+    try:
+        await page.wait_for_selector(card_sel, timeout=10000)
+    except Exception:
+        print(f"[!] Could not find any job cards ('{card_sel}') on this page.")
+        return []
+
+    cards = await page.locator(card_sel).all()
+    print(f"[*] Found {len(cards)} job postings for {name}. Analyzing...")
+    
+    jobs = []
+    # Process up to 30 like job boards
+    for idx, card in enumerate(cards[:30]):
+        try:
+            title_el = card.locator(company.get("title_selector")).first
+            title = await title_el.text_content() if await title_el.count() else "Unknown Title"
+            
+            c_sel = company.get("company_selector")
+            if c_sel and await card.locator(c_sel).count():
+                company_text = await card.locator(c_sel).first.text_content()
+            else:
+                company_text = name # fallback to known company name
+                
+            job_href = None
+            url_el = card.locator(company.get("job_url_selector") or "a").first
+            if await url_el.count():
+                job_href = await url_el.get_attribute("href")
+            
+            if not job_href:
+                links = await card.locator("a").all()
+                for link in links:
+                    href = await link.get_attribute("href")
+                    if href:
+                        job_href = href
+                        break
+                        
+            if job_href and not job_href.startswith('http'):
+                job_href = urljoin(url, job_href)
+                
+            jobs.append({
+                "title": title.strip(),
+                "company": company_text.strip(),
+                "url": job_href or url
+            })
+        except Exception as e:
+            continue
+
+    return jobs
 
 async def scrape_site(page, site_name, site_info, config, search_term, location):
     print(f"\n[*] Scraping {site_name} with '{search_term}' in '{location}'...")
@@ -116,8 +179,6 @@ async def fetch_job_description(context, job_url):
     description = ""
     try:
         await page.goto(job_url, wait_until="domcontentloaded", timeout=20000)
-        # Try to extract text. If there's a specific JD selector we could use it, 
-        # but body text is usually good enough for keyword filtering.
         description = await page.evaluate("document.body.innerText")
     except Exception as e:
         print(f"  [!] Failed to load JD: {e}")
@@ -126,15 +187,13 @@ async def fetch_job_description(context, job_url):
     return description
 
 async def main():
-    configs = load_json(CONFIG_FILE)
-    sites_data = load_json(SITES_FILE)
+    search_configs = get_all_search_configs()
+    companies = get_all_companies()
     
-    if not configs:
-        print("[!] No site configurations found in site_configs.json. Run crawler_learner.py first.")
+    if not search_configs and not companies:
+        print("[!] No search configurations or companies found in the database. Please add some first.")
         return
         
-    sites_to_search = sites_data.get("job_search_sites", [])
-    
     # Clean logs before scraping
     clean_logs("logs")
     
@@ -147,49 +206,68 @@ async def main():
         
         all_results = []
         
-        for site in sites_to_search:
-            site_name = site["name"]
+        # 1. Scrape Job Board Search Configs
+        for config in search_configs:
+            site_name = config["site_name"]
             
-            # Match by name or fuzzy match
-            config = None
-            matched_key = None
-            for k, v in configs.items():
-                if k.lower() in site_name.lower() or site_name.lower() in k.lower():
-                    config = v
-                    matched_key = k
-                    break
-                        
-            if config:
-                search_term = site.get("search_terms", ["Senior QA Engineer"])[0]
-                location = site.get("locations", ["Seattle"])[0]
-                
-                jobs = await scrape_site(page, matched_key, site, config, search_term, location)
-                
-                # Fetch Descriptions and Filter
-                new_jobs = []
-                for job in jobs:
-                    job["site"] = matched_key # Use the config name as site source
-                    if not job["url"]:
-                        continue
-                        
-                    if is_duplicate(job["url"]):
-                        print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
-                        continue
-                        
-                    jd_text = await fetch_job_description(context, job["url"])
-                    filter_results = filter_job(jd_text, SKILLSET_FILE)
-                    job["filter_results"] = filter_results
+            search_terms = config.get("search_terms") or ["Senior QA Engineer"]
+            search_term = search_terms[0]
+            
+            locations = config.get("locations") or ["Seattle"]
+            location = locations[0]
+            
+            jobs = await scrape_site(page, site_name, config, config, search_term, location)
+            
+            new_jobs = []
+            for job in jobs:
+                job["site"] = site_name
+                if not job["url"]:
+                    continue
                     
-                    score = 75 # arbitrary default score
-                    missing_skills = filter_results.get("missing_skills", [])[:3]
-                    matched_skills = filter_results.get("matched_skills", [])[:5] # Take top 5 matched
+                if is_duplicate(job["url"]):
+                    print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
+                    continue
                     
-                    add_job(job["title"], job["company"], job["url"], matched_key, score, missing_skills, matched_skills)
-                    new_jobs.append(job)
-                        
-                all_results.extend(new_jobs)
-            else:
-                print(f"[!] No config found for {site_name}, skipping.")
+                jd_text = await fetch_job_description(context, job["url"])
+                filter_results = filter_job(jd_text, SKILLSET_FILE)
+                job["filter_results"] = filter_results
+                
+                score = 75 # arbitrary default score
+                missing_skills = filter_results.get("missing_skills", [])[:3]
+                matched_skills = filter_results.get("matched_skills", [])[:5] 
+                
+                add_job(job["title"], job["company"], job["url"], site_name, score, missing_skills, matched_skills)
+                new_jobs.append(job)
+                    
+            all_results.extend(new_jobs)
+            
+        # 2. Scrape Direct Company Sites
+        for company in companies:
+            site_name = company["name"]
+            jobs = await scrape_company(page, company)
+            
+            new_jobs = []
+            for job in jobs:
+                job["site"] = site_name
+                if not job["url"]:
+                    continue
+                    
+                if is_duplicate(job["url"]):
+                    print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
+                    continue
+                    
+                jd_text = await fetch_job_description(context, job["url"])
+                filter_results = filter_job(jd_text, SKILLSET_FILE)
+                job["filter_results"] = filter_results
+                
+                score = 75
+                missing_skills = filter_results.get("missing_skills", [])[:3]
+                matched_skills = filter_results.get("matched_skills", [])[:5] 
+                
+                add_job(job["title"], job["company"], job["url"], site_name, score, missing_skills, matched_skills)
+                new_jobs.append(job)
+                    
+            all_results.extend(new_jobs)
                 
         await browser.close()
         

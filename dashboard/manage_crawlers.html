@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentScout | Manage Crawlers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-blue: #38bdf8;
+            --accent-purple: #818cf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        /* Unified Navigation Styles */
+        .top-nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        .nav-link:hover {
+            color: var(--accent-blue);
+        }
+        .nav-link.active {
+            color: var(--text-primary);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            border-radius: 2px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.1) 0%, transparent 30%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 3rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-danger { background: var(--danger); }
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-blue);
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-blue); }
+        .form-row { display: flex; gap: 1rem; }
+        .form-row .form-group { flex: 1; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+
+        .pre-data {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<nav class="top-nav">
+    <div class="nav-container">
+        <a href="http://localhost:8001" class="nav-link">Dashboard</a>
+        <a href="http://localhost:8000" class="nav-link">Resume Scanner</a>
+        <a href="http://localhost:8000/manage" class="nav-link active">Manage Crawlers</a>
+    </div>
+</nav>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Crawler Management</h1>
+            <p class="subtitle">Configure site selectors and search targets</p>
+        </header>
+
+        <!-- SITES SECTION -->
+        <div class="section-header">
+            <h2>Site Selectors</h2>
+            <button class="btn" onclick="openSiteModal()">+ Add New Site</button>
+        </div>
+        <table id="sitesTable">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Search URL</th><th>Card Selector</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+        </table>
+
+        <!-- CONFIGS SECTION -->
+        <div class="section-header">
+            <h2>Search Configurations</h2>
+            <button class="btn" onclick="openConfigModal()">+ Add Search Target</button>
+        </div>
+        <table id="configsTable">
+            <thead>
+                <tr>
+                    <th>Site</th><th>Search Terms</th><th>Locations</th><th>Filters</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+        </table>
+        </table>
+
+        <!-- COMPANIES SECTION -->
+        <div class="section-header">
+            <h2>Companies</h2>
+            <button class="btn" style="background:var(--success)" onclick="openCompanyModal()">+ Add Company</button>
+        </div>
+        <table id="companiesTable">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Company Name</th><th>Career URL</th><th>Date Added</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody><tr><td colspan="5" style="text-align:center">Loading...</td></tr></tbody>
+        </table>
+    </div>
+
+    <!-- SITE MODAL -->
+    <div id="siteModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="siteModalTitle">Add New Site</h3>
+            <input type="hidden" id="siteId">
+            <div class="form-group">
+                <label>Site Name</label>
+                <input type="text" id="siteName" placeholder="e.g. LinkedIn">
+            </div>
+            <div class="form-group">
+                <label>Search URL Pattern (use {search_term} and {location})</label>
+                <input type="text" id="siteSearchUrl" placeholder="https://www.linkedin.com/jobs/search?keywords={search_term}&location={location}">
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Job Card Selector</label><input type="text" id="siteCard"></div>
+                <div class="form-group"><label>Title Selector</label><input type="text" id="siteTitle"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Company Selector</label><input type="text" id="siteCompany"></div>
+                <div class="form-group"><label>Job URL Selector</label><input type="text" id="siteUrl"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeModal('siteModal')">Cancel</button>
+                <button class="btn" onclick="saveSite()">Save Site</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIG MODAL -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="configModalTitle">Add Search Target</h3>
+            <input type="hidden" id="configId">
+            <div class="form-group">
+                <label>Site Platform</label>
+                <select id="configSiteId"></select>
+            </div>
+            <div class="form-group">
+                <label>Search Terms (JSON array)</label>
+                <input type="text" id="configTerms" value='["QA Engineer", "SDET"]'>
+            </div>
+            <div class="form-group">
+                <label>Locations (JSON array)</label>
+                <input type="text" id="configLocs" value='["Remote"]'>
+            </div>
+            <div class="form-group">
+                <label>Filters (JSON object)</label>
+                <input type="text" id="configFilters" value='{"experience_level": "Senior"}'>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeModal('configModal')">Cancel</button>
+                <button class="btn" onclick="saveConfig()">Save Config</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPANY MODAL -->
+    <div id="companyModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="companyModalTitle">Add New Company</h3>
+            <input type="hidden" id="companyId">
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g. Microsoft">
+            </div>
+            <div class="form-group">
+                <label>Careers URL</label>
+                <input type="text" id="companyCareersUrl" placeholder="https://careers.microsoft.com/">
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Job Card Selector</label><input type="text" id="companyCard"></div>
+                <div class="form-group"><label>Title Selector</label><input type="text" id="companyTitle"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Company Selector</label><input type="text" id="companySelector"></div>
+                <div class="form-group"><label>Job URL Selector</label><input type="text" id="companyUrl"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeModal('companyModal')">Cancel</button>
+                <button class="btn" onclick="saveCompany()">Save Company</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL (assuming running on localhost:8000 via resume_server.py)
+        const API_URL = 'http://localhost:8000/api';
+        
+        let sitesData = [];
+        let configsData = [];
+        let companiesData = [];
+
+        async function init() {
+            await loadSites();
+            await loadConfigs();
+            await loadCompanies();
+        }
+
+        async function loadSites() {
+            try {
+                const res = await fetch(`${API_URL}/sites`);
+                sitesData = await res.json();
+                
+                const tbody = document.querySelector('#sitesTable tbody');
+                tbody.innerHTML = '';
+                
+                // Update dropdown
+                const select = document.getElementById('configSiteId');
+                select.innerHTML = '';
+
+                if (sitesData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No sites found</td></tr>';
+                }
+                
+                sitesData.forEach(site => {
+                    // Table row
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${site.id}</td>
+                        <td style="font-weight:600; color:var(--accent-blue)">${site.name}</td>
+                        <td class="pre-data" style="max-width:300px">${site.search_url}</td>
+                        <td class="pre-data">${site.job_card_selector}</td>
+                        <td class="actions">
+                            <button class="btn btn-outline" onclick='editSite(${JSON.stringify(site)})'>Edit</button>
+                            <button class="btn btn-danger" onclick="deleteSite(${site.id})">Del</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+
+                    // Dropdown option
+                    const opt = document.createElement('option');
+                    opt.value = site.id;
+                    opt.textContent = site.name;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadConfigs() {
+            try {
+                const res = await fetch(`${API_URL}/configs`);
+                configsData = await res.json();
+                
+                const tbody = document.querySelector('#configsTable tbody');
+                tbody.innerHTML = '';
+                
+                if (configsData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No configs found</td></tr>';
+                }
+                
+                configsData.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight:600; color:var(--accent-purple)">${c.site_name}</td>
+                        <td class="pre-data">${JSON.stringify(c.search_terms)}</td>
+                        <td class="pre-data">${JSON.stringify(c.locations)}</td>
+                        <td class="pre-data">${JSON.stringify(c.filters)}</td>
+                        <td class="actions">
+                            <button class="btn btn-outline" onclick='editConfig(${JSON.stringify(c)})'>Edit</button>
+                            <button class="btn btn-danger" onclick="deleteConfig(${c.id})">Del</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // SITE LOGIC
+        function openSiteModal() {
+            document.getElementById('siteModalTitle').innerText = 'Add New Site';
+            document.getElementById('siteId').value = '';
+            document.getElementById('siteName').value = '';
+            document.getElementById('siteSearchUrl').value = '';
+            document.getElementById('siteCard').value = '';
+            document.getElementById('siteTitle').value = '';
+            document.getElementById('siteCompany').value = '';
+            document.getElementById('siteUrl').value = '';
+            openModal('siteModal');
+        }
+
+        function editSite(site) {
+            document.getElementById('siteModalTitle').innerText = 'Edit Site';
+            document.getElementById('siteId').value = site.id;
+            document.getElementById('siteName').value = site.name;
+            document.getElementById('siteSearchUrl').value = site.search_url;
+            document.getElementById('siteCard').value = site.job_card_selector;
+            document.getElementById('siteTitle').value = site.title_selector;
+            document.getElementById('siteCompany').value = site.company_selector;
+            document.getElementById('siteUrl').value = site.job_url_selector;
+            openModal('siteModal');
+        }
+
+        async function saveSite() {
+            const id = document.getElementById('siteId').value;
+            const payload = {
+                name: document.getElementById('siteName').value,
+                search_url: document.getElementById('siteSearchUrl').value,
+                job_card_selector: document.getElementById('siteCard').value,
+                title_selector: document.getElementById('siteTitle').value,
+                company_selector: document.getElementById('siteCompany').value,
+                job_url_selector: document.getElementById('siteUrl').value,
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const endpoint = id ? `${API_URL}/sites/${id}` : `${API_URL}/sites`;
+
+            try {
+                await fetch(endpoint, {
+                    method, headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                closeModal('siteModal');
+                loadSites();
+            } catch (err) { alert('Error saving site'); }
+        }
+
+        async function deleteSite(id) {
+            if(!confirm('Are you sure? This will delete associated search configs too.')) return;
+            await fetch(`${API_URL}/sites/${id}`, { method: 'DELETE' });
+            loadSites(); loadConfigs();
+        }
+
+        // CONFIG LOGIC
+        function openConfigModal() {
+            document.getElementById('configModalTitle').innerText = 'Add Search Target';
+            document.getElementById('configId').value = '';
+            document.getElementById('configSiteId').value = sitesData[0]?.id || '';
+            document.getElementById('configTerms').value = '["QA Engineer", "SDET"]';
+            document.getElementById('configLocs').value = '["Remote"]';
+            document.getElementById('configFilters').value = '{}';
+            openModal('configModal');
+        }
+
+        function editConfig(c) {
+            document.getElementById('configModalTitle').innerText = 'Edit Search Target';
+            document.getElementById('configId').value = c.id;
+            document.getElementById('configSiteId').value = c.site_id;
+            document.getElementById('configTerms').value = JSON.stringify(c.search_terms);
+            document.getElementById('configLocs').value = JSON.stringify(c.locations);
+            document.getElementById('configFilters').value = JSON.stringify(c.filters);
+            openModal('configModal');
+        }
+
+        async function saveConfig() {
+            const id = document.getElementById('configId').value;
+            let st, loc, fil;
+            try {
+                st = JSON.parse(document.getElementById('configTerms').value);
+                loc = JSON.parse(document.getElementById('configLocs').value);
+                fil = JSON.parse(document.getElementById('configFilters').value);
+            } catch (err) {
+                alert('Invalid JSON in fields!'); return;
+            }
+
+            const payload = {
+                site_id: parseInt(document.getElementById('configSiteId').value),
+                search_terms: st, locations: loc, filters: fil
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const endpoint = id ? `${API_URL}/configs/${id}` : `${API_URL}/configs`;
+
+            try {
+                await fetch(endpoint, {
+                    method, headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                closeModal('configModal');
+                loadConfigs();
+            } catch (err) { alert('Error saving config'); }
+        }
+
+        async function deleteConfig(id) {
+            if(!confirm('Are you sure?')) return;
+            await fetch(`${API_URL}/configs/${id}`, { method: 'DELETE' });
+            loadConfigs();
+        }
+
+        // COMPANY LOGIC
+        async function loadCompanies() {
+            try {
+                const res = await fetch(`${API_URL}/companies`);
+                companiesData = await res.json();
+                
+                const tbody = document.querySelector('#companiesTable tbody');
+                tbody.innerHTML = '';
+                
+                if (companiesData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No companies found</td></tr>';
+                }
+                
+                companiesData.forEach(c => {
+                    const tr = document.createElement('tr');
+                    const date_str = c.date_added ? new Date(c.date_added).toLocaleDateString() : '';
+                    tr.innerHTML = `
+                        <td>${c.id}</td>
+                        <td style="font-weight:600; color:var(--success)">${c.name}</td>
+                        <td class="pre-data" style="max-width:300px">${c.careers_url}</td>
+                        <td>${date_str}</td>
+                        <td class="actions">
+                            <button class="btn btn-outline" onclick='editCompany(${JSON.stringify(c)})'>Edit</button>
+                            <button class="btn btn-danger" onclick="deleteCompany(${c.id})">Del</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function openCompanyModal() {
+            document.getElementById('companyModalTitle').innerText = 'Add New Company';
+            document.getElementById('companyId').value = '';
+            document.getElementById('companyName').value = '';
+            document.getElementById('companyCareersUrl').value = '';
+            document.getElementById('companyCard').value = '';
+            document.getElementById('companyTitle').value = '';
+            document.getElementById('companySelector').value = '';
+            document.getElementById('companyUrl').value = '';
+            openModal('companyModal');
+        }
+
+        function editCompany(c) {
+            document.getElementById('companyModalTitle').innerText = 'Edit Company';
+            document.getElementById('companyId').value = c.id;
+            document.getElementById('companyName').value = c.name;
+            document.getElementById('companyCareersUrl').value = c.careers_url;
+            document.getElementById('companyCard').value = c.job_card_selector;
+            document.getElementById('companyTitle').value = c.title_selector;
+            document.getElementById('companySelector').value = c.company_selector || '';
+            document.getElementById('companyUrl').value = c.job_url_selector;
+            openModal('companyModal');
+        }
+
+        async function saveCompany() {
+            const id = document.getElementById('companyId').value;
+            const payload = {
+                name: document.getElementById('companyName').value,
+                careers_url: document.getElementById('companyCareersUrl').value,
+                job_card_selector: document.getElementById('companyCard').value,
+                title_selector: document.getElementById('companyTitle').value,
+                company_selector: document.getElementById('companySelector').value,
+                job_url_selector: document.getElementById('companyUrl').value,
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const endpoint = id ? `${API_URL}/companies/${id}` : `${API_URL}/companies`;
+
+            try {
+                await fetch(endpoint, {
+                    method, headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                closeModal('companyModal');
+                loadCompanies();
+            } catch (err) { alert('Error saving company'); }
+        }
+
+        async function deleteCompany(id) {
+            if(!confirm('Are you sure?')) return;
+            await fetch(`${API_URL}/companies/${id}`, { method: 'DELETE' });
+            loadCompanies();
+        }
+
+        init();
+    </script>
+</body>
+</html>
