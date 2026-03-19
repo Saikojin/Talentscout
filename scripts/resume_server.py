@@ -71,6 +71,109 @@ async def save_skillset(req: SaveRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from typing import List, Optional, Dict, Any
+from scripts.database import get_all_sites, add_site, update_site, delete_site, \
+    get_all_search_configs, add_search_config, update_search_config, delete_search_config, \
+    get_all_companies, add_company, update_company, delete_company
+
+class SiteConfig(BaseModel):
+    name: str
+    search_url: str
+    job_card_selector: str
+    title_selector: str
+    company_selector: str
+    job_url_selector: str
+    
+class CompanyConfig(BaseModel):
+    name: str
+    careers_url: str
+    job_card_selector: str
+    title_selector: str
+    company_selector: str
+    job_url_selector: str
+
+class SearchConfig(BaseModel):
+    site_id: int
+    search_terms: List[str]
+    locations: List[str]
+    filters: Dict[str, Any]
+
+@app.get("/manage", response_class=HTMLResponse)
+async def get_manage():
+    index_path = os.path.join(DASHBOARD_DIR, "manage_crawlers.html")
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>manage_crawlers.html not found.</h1>"
+
+@app.get("/api/sites")
+async def api_get_sites():
+    return get_all_sites()
+
+@app.post("/api/sites")
+async def api_add_site(site: SiteConfig):
+    sid = add_site(site.name, site.search_url, site.job_card_selector, 
+                   site.title_selector, site.company_selector, site.job_url_selector)
+    if sid: return {"status": "success", "id": sid}
+    raise HTTPException(status_code=500, detail="Failed to add site")
+
+@app.put("/api/sites/{site_id}")
+async def api_update_site(site_id: int, site: SiteConfig):
+    success = update_site(site_id, site.name, site.search_url, site.job_card_selector, 
+                          site.title_selector, site.company_selector, site.job_url_selector)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to update site")
+
+@app.delete("/api/sites/{site_id}")
+async def api_delete_site(site_id: int):
+    success = delete_site(site_id)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to delete site")
+
+@app.get("/api/configs")
+async def api_get_configs():
+    return get_all_search_configs()
+
+@app.post("/api/configs")
+async def api_add_config(c: SearchConfig):
+    cid = add_search_config(c.site_id, c.search_terms, c.locations, c.filters)
+    if cid: return {"status": "success", "id": cid}
+    raise HTTPException(status_code=500, detail="Failed to add config")
+
+@app.put("/api/configs/{config_id}")
+async def api_update_config(config_id: int, c: SearchConfig):
+    success = update_search_config(config_id, c.site_id, c.search_terms, c.locations, c.filters)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to update config")
+
+@app.delete("/api/configs/{config_id}")
+async def api_delete_config(config_id: int):
+    success = delete_search_config(config_id)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to delete config")
+
+@app.get("/api/companies")
+async def api_get_companies():
+    return get_all_companies()
+
+@app.post("/api/companies")
+async def api_add_company(c: CompanyConfig):
+    cid = add_company(c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector)
+    if cid: return {"status": "success", "id": cid}
+    raise HTTPException(status_code=500, detail="Failed to add company")
+
+@app.put("/api/companies/{company_id}")
+async def api_update_company(company_id: int, c: CompanyConfig):
+    success = update_company(company_id, c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to update company")
+
+@app.delete("/api/companies/{company_id}")
+async def api_delete_company(company_id: int):
+    success = delete_company(company_id)
+    if success: return {"status": "success"}
+    raise HTTPException(status_code=500, detail="Failed to delete company")
+
 if __name__ == "__main__":
     import uvicorn
     # Make sure we're running from the root of the project

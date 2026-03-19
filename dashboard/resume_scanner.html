@@ -15,6 +15,50 @@
             --border-color: #334155;
             --success-color: #10b981;
             --error-color: #ef4444;
+            --accent-purple: #818cf8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Unified Navigation Styles */
+        .top-nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            flex-shrink: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+        .nav-link.active {
+            color: var(--text-primary);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent-color), var(--accent-purple));
+            border-radius: 2px;
         }
 
         body {
@@ -213,6 +257,14 @@
         }
     </style>
 </head>
+<nav class="top-nav">
+    <div class="nav-container">
+        <a href="http://localhost:8001" class="nav-link">Dashboard</a>
+        <a href="http://localhost:8000" class="nav-link active">Resume Scanner</a>
+        <a href="http://localhost:8000/manage" class="nav-link">Manage Crawlers</a>
+    </div>
+</nav>
+
 <body>
 
     <header>
