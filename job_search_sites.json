@@ -202,22 +202,6 @@
       }
     },
     {
-      "name": "DailyRemote",
-      "url": "https://dailyremote.com/",
-      "search_terms": [
-        "QA",
-        "SDET",
-        "Quality Assurance"
-      ],
-      "locations": [
-        "Remote"
-      ],
-      "filters": {
-        "salary": "140k+",
-        "experience": "10+ years"
-      }
-    },
-    {
       "name": "JobLeads",
       "url": "https://www.jobleads.com/home",
       "search_terms": [

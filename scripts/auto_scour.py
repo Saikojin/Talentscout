@@ -18,6 +18,7 @@ except ImportError:
 CONFIG_FILE = "site_selectors.json" #"site_configs.json"
 SITES_FILE = "job_search_sites.json"
 SKILLSET_FILE = "base_skillset.json"
+BLACKLIST_FILE = "blacklist.json"
 
 def load_json(filepath):
     if os.path.exists(filepath):
@@ -54,6 +55,15 @@ async def scrape_company(page, company):
     # Process up to 30 like job boards
     for idx, card in enumerate(cards[:30]):
         try:
+            # Check for old dates in card text early to skip unnecessary processing
+            card_text = await card.text_content()
+            if card_text:
+                clower = card_text.lower()
+                old_phrases = ["30+ days", "30 days", "month ago", "months ago", "60 days", "90 days"]
+                if any(p in clower for p in old_phrases):
+                    print(f"  [-] Skipping old job (found date text in card)")
+                    continue
+
             title_el = card.locator(company.get("title_selector")).first
             title = await title_el.text_content() if await title_el.count() else "Unknown Title"
             
@@ -123,6 +133,14 @@ async def scrape_site(page, site_name, site_info, config, search_term, location)
     # Only process up to 30 to save time during testing
     for idx, card in enumerate(cards[:30]):
         try:
+            # Check for old dates in card text early to skip unnecessary processing
+            card_text = await card.text_content()
+            if card_text:
+                clower = card_text.lower()
+                old_phrases = ["30+ days", "30 days", "month ago", "months ago", "60 days", "90 days"]
+                if any(p in clower for p in old_phrases):
+                    continue
+
             # Extract basic info
             title_el = card.locator(config.get("title_selector")).first
             company_el = card.locator(config.get("company_selector")).first
@@ -189,6 +207,9 @@ async def fetch_job_description(context, job_url):
 async def main():
     search_configs = get_all_search_configs()
     companies = get_all_companies()
+    blacklist = load_json(BLACKLIST_FILE)
+    if not isinstance(blacklist, list):
+        blacklist = []
     
     if not search_configs and not companies:
         print("[!] No search configurations or companies found in the database. Please add some first.")
@@ -207,39 +228,52 @@ async def main():
         all_results = []
         
         # 1. Scrape Job Board Search Configs
+        processed_urls = set()
         for config in search_configs:
             site_name = config["site_name"]
             
+            # Check blacklist
+            is_blacklisted = False
+            for blocked in blacklist:
+                if blocked.lower() in site_name.lower() or (config.get("url") and blocked.lower() in config.get("url").lower()):
+                    is_blacklisted = True
+                    break
+            
+            if is_blacklisted:
+                print(f"[*] Skipping blacklisted site: {site_name}")
+                continue
+
             search_terms = config.get("search_terms") or ["Senior QA Engineer"]
-            search_term = search_terms[0]
-            
             locations = config.get("locations") or ["Seattle"]
-            location = locations[0]
             
-            jobs = await scrape_site(page, site_name, config, config, search_term, location)
-            
-            new_jobs = []
-            for job in jobs:
-                job["site"] = site_name
-                if not job["url"]:
-                    continue
+            for search_term in search_terms:
+                for location in locations:
+                    jobs = await scrape_site(page, site_name, config, config, search_term, location)
                     
-                if is_duplicate(job["url"]):
-                    print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
-                    continue
-                    
-                jd_text = await fetch_job_description(context, job["url"])
-                filter_results = filter_job(jd_text, SKILLSET_FILE)
-                job["filter_results"] = filter_results
-                
-                score = 75 # arbitrary default score
-                missing_skills = filter_results.get("missing_skills", [])[:3]
-                matched_skills = filter_results.get("matched_skills", [])[:5] 
-                
-                add_job(job["title"], job["company"], job["url"], site_name, score, missing_skills, matched_skills)
-                new_jobs.append(job)
-                    
-            all_results.extend(new_jobs)
+                    new_jobs = []
+                    for job in jobs:
+                        job["site"] = site_name
+                        if not job["url"] or job["url"] in processed_urls:
+                            continue
+                            
+                        processed_urls.add(job["url"])
+                        
+                        if is_duplicate(job["url"], job["title"], job["company"]):
+                            print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
+                            continue
+                            
+                        jd_text = await fetch_job_description(context, job["url"])
+                        filter_results = filter_job(jd_text, SKILLSET_FILE)
+                        job["filter_results"] = filter_results
+                        
+                        score = filter_results.get("score", 75)
+                        missing_skills = filter_results.get("missing_skills", [])[:3]
+                        matched_skills = filter_results.get("matched_skills", [])[:5] 
+                        
+                        add_job(job["title"], job["company"], job["url"], site_name, score, missing_skills, matched_skills)
+                        new_jobs.append(job)
+                            
+                    all_results.extend(new_jobs)
             
         # 2. Scrape Direct Company Sites
         for company in companies:
@@ -249,10 +283,12 @@ async def main():
             new_jobs = []
             for job in jobs:
                 job["site"] = site_name
-                if not job["url"]:
+                if not job["url"] or job["url"] in processed_urls:
                     continue
                     
-                if is_duplicate(job["url"]):
+                processed_urls.add(job["url"])
+                
+                if is_duplicate(job["url"], job["title"], job["company"]):
                     print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
                     continue
                     
@@ -260,7 +296,7 @@ async def main():
                 filter_results = filter_job(jd_text, SKILLSET_FILE)
                 job["filter_results"] = filter_results
                 
-                score = 75
+                score = filter_results.get("score", 75)
                 missing_skills = filter_results.get("missing_skills", [])[:3]
                 matched_skills = filter_results.get("matched_skills", [])[:5] 
                 
@@ -290,7 +326,7 @@ async def main():
                 reason = "/".join(fr.get("disqualified_by", ["Unknown"]))
                 md_updates_failed.append(f"- {job['title']} ({job['company']}) - **{reason}**")
             else:
-                score = 75 # arbitrary default score for new pulls
+                score = fr.get("score", 75)
                 title = job['title']
                 company = job['company']
                 url = job['url']

@@ -91,18 +91,25 @@ def init_db():
         finally:
             conn.close()
 
-def is_duplicate(url):
-    """Check if the given URL already exists in the database and its status is not 'new'."""
+def is_duplicate(url, title=None, company=None):
+    """Check if the given URL already exists in the database or if title/company combo exists, and its status is not 'new'."""
     conn = create_connection()
     if conn is not None:
         try:
             cursor = conn.cursor()
+            # First check by URL
             cursor.execute("SELECT status FROM jobs WHERE url = ?", (url,))
             row = cursor.fetchone()
             if row is not None:
-                # If existing job is not 'new', we treat it as a duplicate and skip it.
-                # If it IS 'new', we want to process it again in the results.
                 return row[0].lower() != 'new'
+            
+            # If URL not found, check by title and company if provided
+            if title and company:
+                cursor.execute("SELECT status FROM jobs WHERE title = ? AND company = ?", (title, company))
+                row = cursor.fetchone()
+                if row is not None:
+                    return row[0].lower() != 'new'
+                    
             return False
         except sqlite3.Error as e:
             print(f"Error checking duplicate: {e}")
