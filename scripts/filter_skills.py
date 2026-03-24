@@ -23,7 +23,8 @@ def filter_job(job_description, base_skillset_path):
         "is_disqualified": False,
         "disqualified_by": [],
         "missing_skills": [],
-        "matched_skills": []
+        "matched_skills": [],
+        "score": 0
     }
     
     # Check for disqualified skills
@@ -50,6 +51,58 @@ def filter_job(job_description, base_skillset_path):
     
     # Deduplicate and sort
     findings["missing_skills"] = sorted(list(set(findings["missing_skills"])))
+    
+    # Calculate score based on matched core skills
+    if core_skills:
+        findings["score"] = int((len(findings["matched_skills"]) / len(core_skills)) * 100)
+    else:
+        findings["score"] = 75
+        
+    # -- Location Filtering Heuristics --
+    jd_lower = job_description.lower()
+    
+    wa_locations = ["redmond", "kirkland", "bellevue", "seattle", "washington", " wa ", ", wa", "wa."]
+    mentions_wa = any(loc in jd_lower for loc in wa_locations)
+    
+    # 0. Score is 0 (No Matching Skills)
+    if findings["score"] == 0:
+        findings["is_disqualified"] = True
+        findings["disqualified_by"].append("No matching core skills")
+        
+    # 1. On-site in distant location
+    if "hybrid" not in jd_lower and "remote" not in jd_lower and not mentions_wa:
+        findings["is_disqualified"] = True
+        findings["disqualified_by"].append("Not remote and not in WA")
+        
+    # 2. Hybrid in distant location
+    if "hybrid" in jd_lower and not mentions_wa:
+        findings["is_disqualified"] = True
+        findings["disqualified_by"].append("Hybrid in distant location")
+        
+    # 3. Remote restricted to distant location
+    if "remote" in jd_lower and not mentions_wa:
+        # It's remote, but doesn't explicitly mention WA.
+        # Check if it's explicitly nationwide or anywhere.
+        is_nationwide = re.search(r'\b(us|usa|united states|national|anywhere|nationwide)\b', jd_lower)
+        
+        # Check for other states
+        other_states = [
+            "alabama", "alaska", "arizona", "arkansas", "california", "colorado", 
+            "connecticut", "delaware", "florida", "georgia", "hawaii", "idaho", 
+            "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana", 
+            "maine", "maryland", "massachusetts", "michigan", "minnesota", 
+            "mississippi", "missouri", "montana", "nebraska", "nevada", 
+            "new hampshire", "new jersey", "new mexico", "new york", 
+            "north carolina", "north dakota", "ohio", "oklahoma", "oregon", 
+            "pennsylvania", "rhode island", "south carolina", "south dakota", 
+            "tennessee", "texas", "utah", "vermont", "virginia", "west virginia", 
+            "wisconsin", "wyoming", "san francisco", "los angeles", "austin", "chicago", "boston"
+        ]
+        
+        found_others = [s for s in other_states if re.search(rf'\b{s}\b', jd_lower)]
+        if found_others and not is_nationwide:
+             findings["is_disqualified"] = True
+             findings["disqualified_by"].append(f"Remote but restricted (mentions: {found_others[0]})")
     
     return findings
 
