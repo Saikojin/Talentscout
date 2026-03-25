@@ -40,8 +40,53 @@ async def scrape_company(page, company):
         print(f"[!] Warning: Navigation to {url} timed out or failed. {e}")
         
     card_sel = company.get("job_card_selector")
-    if not card_sel: return []
     
+    jobs = []
+    
+    if not card_sel:
+        # Smart Callback: No selectors defined in DB. We will heuristically find job links.
+        print(f"[*] No selectors defined for {name}. Using smart fallback to find job links...")
+        
+        # Pull all links from the DOM instantly to avoid timeout issues
+        try:
+            links_data = await page.evaluate('''() => {
+                return Array.from(document.querySelectorAll("a")).map(a => ({
+                    href: a.getAttribute("href") || a.href || "",
+                    text: a.innerText || ""
+                }));
+            }''')
+        except Exception as e:
+            print(f"      [!] Error extracting links: {e}")
+            links_data = []
+            
+        for data in links_data:
+            href = data.get("href", "")
+            text = data.get("text", "")
+            if href and text and text.strip():
+                href_lower = href.lower()
+                # Check for common job URL patterns or exact roles
+                keywords = ["/job", "/career", "/req", "/position", "jobid=", "opening", "opportunity", "role"]
+                if any(k in href_lower for k in keywords):
+                    # Exclude generic nav links
+                    if "search" not in href_lower and "login" not in href_lower and "mailto:" not in href_lower:
+                        full_url = href if href.startswith('http') else urljoin(url, href)
+                        jobs.append({
+                            "title": text.strip(),
+                            "company": name,
+                            "url": full_url
+                        })
+        
+        # Deduplicate discovered jobs
+        unique_jobs = {}
+        for j in jobs:
+            # Prefer shorter URLs (avoids tracking params if they differ)
+            if j["url"] not in unique_jobs:
+                unique_jobs[j["url"]] = j
+        
+        jobs = list(unique_jobs.values())
+        print(f"[*] Smart fallback found {len(jobs)} potential job links.")
+        return jobs[:30]
+        
     try:
         await page.wait_for_selector(card_sel, timeout=10000)
     except Exception:
@@ -51,7 +96,6 @@ async def scrape_company(page, company):
     cards = await page.locator(card_sel).all()
     print(f"[*] Found {len(cards)} job postings for {name}. Analyzing...")
     
-    jobs = []
     # Process up to 30 like job boards
     for idx, card in enumerate(cards[:30]):
         try:
@@ -266,6 +310,10 @@ async def main():
                         filter_results = filter_job(jd_text, SKILLSET_FILE)
                         job["filter_results"] = filter_results
                         
+                        if filter_results.get("is_disqualified"):
+                            print(f"  [-] Job Disqualified: {job['title']} at {job['company']}")
+                            continue
+                            
                         score = filter_results.get("score", 75)
                         missing_skills = filter_results.get("missing_skills", [])[:3]
                         matched_skills = filter_results.get("matched_skills", [])[:5] 
@@ -296,6 +344,10 @@ async def main():
                 filter_results = filter_job(jd_text, SKILLSET_FILE)
                 job["filter_results"] = filter_results
                 
+                if filter_results.get("is_disqualified"):
+                    print(f"  [-] Job Disqualified: {job['title']} at {job['company']}")
+                    continue
+                    
                 score = filter_results.get("score", 75)
                 missing_skills = filter_results.get("missing_skills", [])[:3]
                 matched_skills = filter_results.get("matched_skills", [])[:5] 

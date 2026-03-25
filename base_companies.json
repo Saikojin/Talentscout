@@ -1,0 +1,52 @@
+[
+  {
+    "name": "3M",
+    "location": "Saint Paul, Minnesota",
+    "careers_url": "https://www.3m.com/3M/en_US/careers-us/"
+  },
+  {
+    "name": "A. O. Smith",
+    "location": "Milwaukee, Wisconsin",
+    "careers_url": "https://jobs.aosmith.com/"
+  },
+  {
+    "name": "Abbott Laboratories",
+    "location": "North Chicago, Illinois",
+    "careers_url": "https://www.jobs.abbott/us/en/home"
+  },
+  {
+    "name": "AbbVie",
+    "location": "North Chicago, Illinois",
+    "careers_url": "https://careers.abbvie.com/en/jobs"
+  },
+  {
+    "name": "Accenture",
+    "location": "Dublin, Ireland",
+    "careers_url": "https://www.accenture.com/us-en/careers"
+  },
+  {
+    "name": "BairesDev",
+    "location": "San Francisco, CA",
+    "careers_url": "https://www.bairesdev.com/join-us/"
+  },
+  {
+    "name": "Goji Labs",
+    "location": "Los Angeles, CA",
+    "careers_url": "https://gojilabs.com/careers/"
+  },
+  {
+    "name": "Plego",
+    "location": "Chicago, IL",
+    "careers_url": "https://plego.com/careers/"
+  },
+  {
+    "name": "Sketch Development",
+    "location": "Webster Groves, MO",
+    "careers_url": "https://builtin.com/company/sketch-development-services"
+  },
+  {
+    "name": "Bluelight",
+    "location": "Sacramento, CA",
+    "careers_url": "https://bluelight.co/careers"
+  }
+]
