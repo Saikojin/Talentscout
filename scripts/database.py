@@ -433,3 +433,19 @@ def company_exists_by_domain(domain):
         finally:
             conn.close()
     return False
+
+def reject_jobs_below_score(threshold):
+    """Reject jobs that have a match score <= threshold."""
+    conn = create_connection()
+    updated_count = 0
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE jobs SET status = 'rejected' WHERE status = 'new' AND score <= ?", (threshold,))
+            conn.commit()
+            updated_count = cursor.rowcount
+        except sqlite3.Error as e:
+            print(f"Error rejecting jobs by score: {e}")
+        finally:
+            conn.close()
+    return updated_count

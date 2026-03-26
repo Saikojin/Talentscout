@@ -61,6 +61,14 @@ async def update_status(job_id: int, req: StatusUpdate):
         return {"status": "success", "message": f"Job {job_id} updated to {req.status}"}
     raise HTTPException(status_code=400, detail="Failed to update job status. Invalid status or job ID.")
 
+class ThresholdRequest(BaseModel):
+    threshold: int
+
+@app.post("/api/jobs/reject_by_score")
+async def reject_by_score(req: ThresholdRequest):
+    count = db.reject_jobs_below_score(req.threshold)
+    return {"status": "success", "message": f"Rejected {count} jobs", "count": count}
+
 if __name__ == "__main__":
     import uvicorn
     os.chdir(BASE_DIR)
