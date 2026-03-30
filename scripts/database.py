@@ -8,7 +8,7 @@ def create_connection():
     """Create a database connection to the SQLite database specified by DB_PATH."""
     conn = None
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=10)
         return conn
     except sqlite3.Error as e:
         print(f"Error connecting to database: {e}")
@@ -84,6 +84,9 @@ def init_db():
                     date_added TEXT
                 )
             """)
+            
+            # Enable WAL mode for better concurrency
+            cursor.execute("PRAGMA journal_mode=WAL")
                 
             conn.commit()
         except sqlite3.Error as e:
