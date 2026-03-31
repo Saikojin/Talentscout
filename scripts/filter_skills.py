@@ -1,16 +1,22 @@
+import os
 import json
 import re
-import sys
 
-IGNORE_LIST = {
-    "the", "and", "for", "with", "this", "that", "from", "into", "your", "will",
-    "have", "work", "team", "each", "both", "such", "than", "been", "where",
-    "these", "those", "when", "while", "what", "which", "who", "whom", "whose",
-    "must", "haves", "nices", "offer", "plus", "days", "years", "each", "long",
-    "term", "good", "fast", "some", "past", "help", "role", "grow", "make",
-    "feel", "most", "also", "take", "give", "stay", "back", "next", "over",
-    "full", "time", "high"
-}
+
+def load_ignore_list():
+    # Look for ignore_skills.txt in the project root
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(script_dir)
+    ignore_path = os.path.join(root_dir, "ignore_skills.txt")
+    
+    if os.path.exists(ignore_path):
+        with open(ignore_path, 'r', encoding='utf-8') as f:
+            return {line.strip().lower() for line in f if line.strip()}
+    return set()
+
+IGNORE_LIST = load_ignore_list()
+
+
 
 def filter_job(job_description, base_skillset_path):
     with open(base_skillset_path, 'r') as f:
@@ -40,7 +46,10 @@ def filter_job(job_description, base_skillset_path):
             
     # Look for common technical patterns (uppercase acronyms, CamelCase, tool names)
     # that are NOT in our core_skills or matched_skills.
-    potential_tech_terms = set(re.findall(r'\b[A-Z]{2,}\b|\b[A-Z][a-z]+[A-Z][a-z]+\b|\b[A-Z][a-z]+\d+\b', job_description))
+    # Refined: Only 2-5 chars for acronyms to avoid common long capitalized words, 
+    # or CamelCase, or names with numbers.
+    potential_tech_terms = set(re.findall(r'\b[A-Z]{2,6}\b|\b[A-Z][a-z]+[A-Z][a-z]+\b|\b[A-Z][a-z]+\d+\b', job_description))
+
     
     # Filter out common English words and already matched skills
     for term in potential_tech_terms:

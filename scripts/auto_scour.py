@@ -262,12 +262,38 @@ async def fetch_job_description(context, job_url, semaphore):
         try:
             print(f"  [-] Fetching JD from {job_url}")
             await page.goto(job_url, wait_until="domcontentloaded", timeout=20000)
-            description = await page.evaluate("document.body.innerText")
+            
+            # Refined extraction: 
+            # 1. Hide/Remove elements that are usually UI noise (nav, footer, buttons)
+            # 2. Try to find the primary 'main' or 'article' content first
+            description = await page.evaluate('''() => {
+                const noiseSelectors = [
+                    'nav', 'footer', 'aside', 'header', 'button', 'script', 'style',
+                    '.nav', '.footer', '.header', '.menu', '.sidebar', '.ad',
+                    '[role="banner"]', '[role="navigation"]', '[role="contentinfo"]'
+                ];
+                
+                // Clone body to avoid messing with the actual page if needed, but innerText is fine
+                const body = document.body.cloneNode(true);
+                noiseSelectors.forEach(sel => {
+                    const elements = body.querySelectorAll(sel);
+                    elements.forEach(el => el.remove());
+                });
+                
+                // Try to find the main content if it exists
+                const main = body.querySelector('main') || body.querySelector('article') || body.querySelector('[role="main"]');
+                if (main) {
+                    return main.innerText;
+                }
+                
+                return body.innerText;
+            }''')
         except Exception as e:
             print(f"  [!] Failed to load JD: {e}")
         finally:
             await page.close()
     return description
+
 
 MAX_CONCURRENT_PAGES = 5
 
