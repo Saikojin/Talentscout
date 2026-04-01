@@ -295,7 +295,7 @@ async def fetch_job_description(context, job_url, semaphore):
     return description
 
 
-MAX_CONCURRENT_PAGES = 5
+MAX_CONCURRENT_PAGES = 10
 
 async def discover_jobs_from_config(context, config, semaphore, blacklist):
     site_name = config["site_name"]
@@ -314,13 +314,22 @@ async def discover_jobs_from_config(context, config, semaphore, blacklist):
     search_terms = config.get("search_terms") or ["Senior QA Engineer"]
     locations = config.get("locations") or ["Seattle"]
     
-    all_discovered = []
+    tasks = []
     for search_term in search_terms:
         for location in locations:
-            jobs = await scrape_site(context, site_name, config, config, search_term, location, semaphore)
-            for job in jobs:
+            tasks.append(scrape_site(context, site_name, config, config, search_term, location, semaphore))
+            
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    all_discovered = []
+    for res in results:
+        if isinstance(res, Exception):
+            log(f"  [!] Internal search failed for {site_name}: {res}")
+        else:
+            for job in res:
                 job["site"] = site_name
-            all_discovered.extend(jobs)
+            all_discovered.extend(res)
+            
     return all_discovered
 
 async def discover_jobs_from_company(context, company, semaphore):
@@ -383,30 +392,45 @@ async def main():
         semaphore = asyncio.Semaphore(MAX_CONCURRENT_PAGES)
         processed_urls = set()
         
-        # 1. DISCOVERY PHASE (Parallel)
-        log("\n=== Phase 1: Discovering Jobs ===")
-        discovery_tasks = []
+        # 1. DISCOVERY PHASE (Tiered)
+        log("\n=== Phase 1a: Discovering Jobs (Job Boards) ===")
+        site_tasks = []
         for config in search_configs:
-            # Wrap each site discovery in a timeout (5 mins) to prevent total hang
-            task = asyncio.wait_for(discover_jobs_from_config(context, config, semaphore, blacklist), timeout=300)
-            discovery_tasks.append(task)
-        for company in companies:
-            task = asyncio.wait_for(discover_jobs_from_company(context, company, semaphore), timeout=120)
-            discovery_tasks.append(task)
+            # Increased timeout to 15 mins (900s) for job boards
+            task = asyncio.wait_for(discover_jobs_from_config(context, config, semaphore, blacklist), timeout=900)
+            site_tasks.append(task)
             
-        # Use return_exceptions=True so one failure doesn't kill the whole run
-        discovery_results_raw = await asyncio.gather(*discovery_tasks, return_exceptions=True)
+        site_results_raw = await asyncio.gather(*site_tasks, return_exceptions=True)
         
-        discovery_results = []
-        for i, res in enumerate(discovery_results_raw):
+        all_discovered = []
+        for i, res in enumerate(site_results_raw):
             if isinstance(res, Exception):
-                log(f"[!] Phase 1 Task {i} failed with error: {res}")
+                log(f"[!] Phase 1a Site {i} failed or timed out: {res}")
             else:
-                discovery_results.append(res)
+                all_discovered.extend(res)
         
-        # Flatten results
-        all_discovered = [job for sublist in discovery_results for job in sublist]
-        log(f"\n[*] Discovery complete. Found {len(all_discovered)} potential jobs.")
+        log(f"\n[*] Job Board discovery complete. Found {len(all_discovered)} potential jobs.")
+
+        log("\n=== Phase 1b: Discovering Jobs (Company Careers) ===")
+        company_tasks = []
+        for company in companies:
+            # 2 min timeout for direct career pages
+            task = asyncio.wait_for(discover_jobs_from_company(context, company, semaphore), timeout=120)
+            company_tasks.append(task)
+            
+        company_results_raw = await asyncio.gather(*company_tasks, return_exceptions=True)
+        
+        company_count = 0
+        for i, res in enumerate(company_results_raw):
+            if isinstance(res, Exception):
+                # Don't log every company failure (too noisy), just count them
+                continue
+            else:
+                all_discovered.extend(res)
+                company_count += len(res)
+        
+        log(f"[*] Company discovery complete. Found {company_count} potential jobs.")
+        log(f"\n[*] Total Discovery complete. Found {len(all_discovered)} potential jobs.")
         
         # 2. PROCESSING PHASE (Parallel)
         log("\n=== Phase 2: Fetching Descriptions and Filtering ===")
