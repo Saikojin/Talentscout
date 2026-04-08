@@ -81,7 +81,8 @@ async def scrape_company(context, company, semaphore):
                         jobs.append({
                             "title": text.strip(),
                             "company": name,
-                            "url": full_url
+                            "url": full_url,
+                            "priority": 2  # Fallback priority
                         })
         
         # Deduplicate discovered jobs
@@ -146,7 +147,8 @@ async def scrape_company(context, company, semaphore):
             jobs.append({
                 "title": title.strip(),
                 "company": company_text.strip(),
-                "url": job_href or url
+                "url": job_href or url,
+                "priority": 1  # Standard priority
             })
         except Exception as e:
             continue
@@ -245,7 +247,8 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                 jobs.append({
                     "title": title,
                     "company": company,
-                    "url": job_href or url
+                    "url": job_href or url,
+                    "priority": 1
                 })
             except Exception as e:
                 print(f"[!] Error parsing card {idx}: {e}")
@@ -369,6 +372,19 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
     add_job(job["title"], job["company"], job["url"], job["site"], score, missing_skills, matched_skills)
     return job
 
+async def worker(context, queue, semaphore, processed_urls, results):
+    """A worker task that drains the job queue."""
+    while not queue.empty():
+        job = await queue.get()
+        try:
+            res = await process_discovered_job(context, job, semaphore, processed_urls)
+            if res:
+                results.append(res)
+        except Exception as e:
+            log(f"  [!] Worker error processing {job.get('url')}: {e}")
+        finally:
+            queue.task_done()
+
 async def main():
     search_configs = get_all_search_configs()
     companies = get_all_companies()
@@ -432,18 +448,33 @@ async def main():
         log(f"[*] Company discovery complete. Found {company_count} potential jobs.")
         log(f"\n[*] Total Discovery complete. Found {len(all_discovered)} potential jobs.")
         
-        # 2. PROCESSING PHASE (Parallel)
-        log("\n=== Phase 2: Fetching Descriptions and Filtering ===")
-        processing_tasks = []
-        # Wrap each processing task with a timeout just in case
-        log(f"[*] Processing {len(all_discovered)} jobs...")
-        for i, job in enumerate(all_discovered):
-            if i > 0 and i % 10 == 0:
-                log(f"    - Progress: {i}/{len(all_discovered)} jobs submitted...")
-            processing_tasks.append(process_discovered_job(context, job, semaphore, processed_urls))
+        # 2. PROCESSING PHASE (Prioritized Queue)
+        log("\n=== Phase 2: Fetching Descriptions and Filtering (Prioritized Queue) ===")
+        
+        # Sort jobs by priority (1 is highest)
+        all_discovered.sort(key=lambda x: x.get("priority", 1))
+        
+        job_queue = asyncio.Queue()
+        for job in all_discovered:
+            job_queue.put_nowait(job)
             
-        processed_results = await asyncio.gather(*processing_tasks)
-        all_results = [r for r in processed_results if r is not None]
+        log(f"[*] Processing {len(all_discovered)} jobs with {MAX_CONCURRENT_PAGES} workers...")
+        
+        results = []
+        # We use a set of worker tasks to drain the queue
+        worker_tasks = []
+        for _ in range(MAX_CONCURRENT_PAGES):
+            task = asyncio.create_task(worker(context, job_queue, semaphore, processed_urls, results))
+            worker_tasks.append(task)
+            
+        # Wait for all jobs to be processed
+        await job_queue.join()
+        
+        # Cancel worker tasks
+        for task in worker_tasks:
+            task.cancel()
+            
+        all_results = results
         
         await browser.close()
         
