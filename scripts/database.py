@@ -71,7 +71,7 @@ def init_db():
                 )
             """)
             
-            # Create companies table for direct crawling
+            # Create companies table for direct crawling/ATS harvesting
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS companies (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,9 +81,22 @@ def init_db():
                     title_selector TEXT,
                     company_selector TEXT,
                     job_url_selector TEXT,
-                    date_added TEXT
+                    date_added TEXT,
+                    website TEXT,
+                    ats_type TEXT,
+                    ats_url TEXT,
+                    tech_stack TEXT,
+                    industry_category TEXT,
+                    countries TEXT
                 )
             """)
+            
+            # Migration logic for existing DBs (companies table)
+            cursor.execute("PRAGMA table_info(companies)")
+            comp_columns = [col[1] for col in cursor.fetchall()]
+            for new_col in ['website', 'ats_type', 'ats_url', 'tech_stack', 'industry_category', 'countries']:
+                if new_col not in comp_columns:
+                    cursor.execute(f"ALTER TABLE companies ADD COLUMN {new_col} TEXT")
             
             # Enable WAL mode for better concurrency
             cursor.execute("PRAGMA journal_mode=WAL")
@@ -350,18 +363,23 @@ def get_all_search_configs():
 
 # --- Companies CRUD Methods ---
 
-def add_company(name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector):
+def add_company(name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, website=None, ats_type=None, ats_url=None, tech_stack=None, industry_category=None, countries=None):
     import datetime
+    import json
     conn = create_connection()
     company_id = None
     if conn is not None:
         try:
             cursor = conn.cursor()
             date_added = datetime.datetime.now().isoformat()
+            
+            ts_str = json.dumps(tech_stack) if isinstance(tech_stack, list) else tech_stack
+            cnt_str = json.dumps(countries) if isinstance(countries, list) else countries
+            
             cursor.execute("""
-                INSERT OR IGNORE INTO companies (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, date_added)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, date_added))
+                INSERT OR IGNORE INTO companies (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, date_added, website, ats_type, ats_url, tech_stack, industry_category, countries)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, date_added, website, ats_type, ats_url, ts_str, industry_category, cnt_str))
             conn.commit()
             company_id = cursor.lastrowid
         except sqlite3.Error as e:
@@ -370,17 +388,21 @@ def add_company(name, careers_url, job_card_selector, title_selector, company_se
             conn.close()
     return company_id
 
-def update_company(company_id, name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector):
+def update_company(company_id, name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, website=None, ats_type=None, ats_url=None, tech_stack=None, industry_category=None, countries=None):
+    import json
     conn = create_connection()
     success = False
     if conn is not None:
         try:
             cursor = conn.cursor()
+            ts_str = json.dumps(tech_stack) if isinstance(tech_stack, list) else tech_stack
+            cnt_str = json.dumps(countries) if isinstance(countries, list) else countries
+            
             cursor.execute("""
                 UPDATE companies 
-                SET name=?, careers_url=?, job_card_selector=?, title_selector=?, company_selector=?, job_url_selector=?
+                SET name=?, careers_url=?, job_card_selector=?, title_selector=?, company_selector=?, job_url_selector=?, website=?, ats_type=?, ats_url=?, tech_stack=?, industry_category=?, countries=?
                 WHERE id=?
-            """, (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, company_id))
+            """, (name, careers_url, job_card_selector, title_selector, company_selector, job_url_selector, website, ats_type, ats_url, ts_str, industry_category, cnt_str, company_id))
             conn.commit()
             success = cursor.rowcount > 0
         except sqlite3.Error as e:

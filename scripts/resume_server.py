@@ -91,6 +91,12 @@ class CompanyConfig(BaseModel):
     title_selector: str
     company_selector: str
     job_url_selector: str
+    website: Optional[str] = None
+    ats_type: Optional[str] = None
+    ats_url: Optional[str] = None
+    tech_stack: Optional[List[str]] = None
+    industry_category: Optional[str] = None
+    countries: Optional[List[str]] = None
 
 class SearchConfig(BaseModel):
     site_id: int
@@ -158,13 +164,19 @@ async def api_get_companies():
 
 @app.post("/api/companies")
 async def api_add_company(c: CompanyConfig):
-    cid = add_company(c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector)
+    cid = add_company(
+        c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector,
+        c.website, c.ats_type, c.ats_url, c.tech_stack, c.industry_category, c.countries
+    )
     if cid: return {"status": "success", "id": cid}
     raise HTTPException(status_code=500, detail="Failed to add company")
 
 @app.put("/api/companies/{company_id}")
 async def api_update_company(company_id: int, c: CompanyConfig):
-    success = update_company(company_id, c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector)
+    success = update_company(
+        company_id, c.name, c.careers_url, c.job_card_selector, c.title_selector, c.company_selector, c.job_url_selector,
+        c.website, c.ats_type, c.ats_url, c.tech_stack, c.industry_category, c.countries
+    )
     if success: return {"status": "success"}
     raise HTTPException(status_code=500, detail="Failed to update company")
 

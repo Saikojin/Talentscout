@@ -354,13 +354,64 @@
         <div class="modal-content">
             <h3 class="modal-title" id="companyModalTitle">Add New Company</h3>
             <input type="hidden" id="companyId">
-            <div class="form-group">
-                <label>Company Name</label>
-                <input type="text" id="companyName" placeholder="e.g. Microsoft">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="companyName" placeholder="e.g. Microsoft">
+                </div>
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="text" id="companyWebsite" placeholder="https://www.microsoft.com">
+                </div>
             </div>
             <div class="form-group">
                 <label>Careers URL</label>
                 <input type="text" id="companyCareersUrl" placeholder="https://careers.microsoft.com/">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ATS Type</label>
+                    <select id="companyAtsType">
+                        <option value="">None (Custom Scraper)</option>
+                        <option value="greenhouse">Greenhouse</option>
+                        <option value="lever">Lever</option>
+                        <option value="ashby">Ashby</option>
+                        <option value="workable">Workable</option>
+                        <option value="smartrecruiters">SmartRecruiters</option>
+                        <option value="workday">Workday</option>
+                        <option value="teamtailor">Teamtailor</option>
+                        <option value="recruitee">Recruitee</option>
+                        <option value="bamboohr">BambooHR</option>
+                        <option value="breezy">Breezy</option>
+                        <option value="jobvite">Jobvite</option>
+                        <option value="join">Join</option>
+                        <option value="personio">Personio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ATS URL</label>
+                    <input type="text" id="companyAtsUrl" placeholder="ATS board API URL/slug">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tech Stack (comma separated)</label>
+                <input type="text" id="companyTechStack" placeholder="e.g. unity, c#">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Industry Category</label>
+                    <select id="companyIndustryCategory">
+                        <option value="tech">Tech</option>
+                        <option value="gaming">Gaming</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Countries (comma separated)</label>
+                    <input type="text" id="companyCountries" placeholder="e.g. United States, Canada">
+                </div>
+            </div>
+            <div class="section-header" style="margin-top: 1.5rem; margin-bottom: 0.5rem;">
+                <h4 style="font-size: 1rem; color: var(--text-secondary);">Custom Scraper Selectors (Only if ATS Type is None)</h4>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Job Card Selector</label><input type="text" id="companyCard"></div>
@@ -615,7 +666,13 @@
             document.getElementById('companyModalTitle').innerText = 'Add New Company';
             document.getElementById('companyId').value = '';
             document.getElementById('companyName').value = '';
+            document.getElementById('companyWebsite').value = '';
             document.getElementById('companyCareersUrl').value = '';
+            document.getElementById('companyAtsType').value = '';
+            document.getElementById('companyAtsUrl').value = '';
+            document.getElementById('companyTechStack').value = '';
+            document.getElementById('companyIndustryCategory').value = 'tech';
+            document.getElementById('companyCountries').value = '';
             document.getElementById('companyCard').value = '';
             document.getElementById('companyTitle').value = '';
             document.getElementById('companySelector').value = '';
@@ -627,16 +684,49 @@
             document.getElementById('companyModalTitle').innerText = 'Edit Company';
             document.getElementById('companyId').value = c.id;
             document.getElementById('companyName').value = c.name;
+            document.getElementById('companyWebsite').value = c.website || '';
             document.getElementById('companyCareersUrl').value = c.careers_url;
-            document.getElementById('companyCard').value = c.job_card_selector;
-            document.getElementById('companyTitle').value = c.title_selector;
+            document.getElementById('companyAtsType').value = c.ats_type || '';
+            document.getElementById('companyAtsUrl').value = c.ats_url || '';
+            
+            // Handle parsing arrays back into strings
+            let ts = '';
+            if (c.tech_stack) {
+                try {
+                    const parsed = JSON.parse(c.tech_stack);
+                    ts = Array.isArray(parsed) ? parsed.join(', ') : parsed;
+                } catch(e) { ts = c.tech_stack; }
+            }
+            document.getElementById('companyTechStack').value = ts;
+            
+            document.getElementById('companyIndustryCategory').value = c.industry_category || 'tech';
+            
+            let cnt = '';
+            if (c.countries) {
+                try {
+                    const parsed = JSON.parse(c.countries);
+                    cnt = Array.isArray(parsed) ? parsed.join(', ') : parsed;
+                } catch(e) { cnt = c.countries; }
+            }
+            document.getElementById('companyCountries').value = cnt;
+            
+            document.getElementById('companyCard').value = c.job_card_selector || '';
+            document.getElementById('companyTitle').value = c.title_selector || '';
             document.getElementById('companySelector').value = c.company_selector || '';
-            document.getElementById('companyUrl').value = c.job_url_selector;
+            document.getElementById('companyUrl').value = c.job_url_selector || '';
             openModal('companyModal');
         }
 
         async function saveCompany() {
             const id = document.getElementById('companyId').value;
+            
+            // Format arrays
+            const ts_raw = document.getElementById('companyTechStack').value;
+            const tech_stack = ts_raw ? ts_raw.split(',').map(s => s.trim()).filter(Boolean) : [];
+            
+            const cnt_raw = document.getElementById('companyCountries').value;
+            const countries = cnt_raw ? cnt_raw.split(',').map(s => s.trim()).filter(Boolean) : [];
+            
             const payload = {
                 name: document.getElementById('companyName').value,
                 careers_url: document.getElementById('companyCareersUrl').value,
@@ -644,6 +734,12 @@
                 title_selector: document.getElementById('companyTitle').value,
                 company_selector: document.getElementById('companySelector').value,
                 job_url_selector: document.getElementById('companyUrl').value,
+                website: document.getElementById('companyWebsite').value || null,
+                ats_type: document.getElementById('companyAtsType').value || null,
+                ats_url: document.getElementById('companyAtsUrl').value || null,
+                tech_stack: tech_stack,
+                industry_category: document.getElementById('companyIndustryCategory').value,
+                countries: countries
             };
 
             const method = id ? 'PUT' : 'POST';

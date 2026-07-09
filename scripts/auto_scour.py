@@ -352,11 +352,14 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
         print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
         return None
         
-    try:
-        jd_text = await asyncio.wait_for(fetch_job_description(context, job["url"], semaphore), timeout=45)
-    except asyncio.TimeoutError:
-        print(f"  [!] Timeout fetching JD for {job['url']}")
-        return None
+    # If we already have the description from the ATS API, use it. Otherwise, fetch it.
+    jd_text = job.get("description", "")
+    if not jd_text:
+        try:
+            jd_text = await asyncio.wait_for(fetch_job_description(context, job["url"], semaphore), timeout=45)
+        except asyncio.TimeoutError:
+            print(f"  [!] Timeout fetching JD for {job['url']}")
+            return None
     
     filter_results = filter_job(jd_text, SKILLSET_FILE)
     job["filter_results"] = filter_results
@@ -386,6 +389,9 @@ async def worker(context, queue, semaphore, processed_urls, results):
             queue.task_done()
 
 async def main():
+    import aiohttp
+    from scripts.ats_adapters.index import route_company
+    
     search_configs = get_all_search_configs()
     companies = get_all_companies()
     blacklist = load_json(BLACKLIST_FILE)
@@ -398,6 +404,30 @@ async def main():
         
     # Clean logs before scraping
     clean_logs("logs")
+    
+    all_discovered = []
+    
+    # Phase 0: Fast ATS API Harvesting (No browser)
+    log("\n=== Phase 0: Discovering Jobs via ATS APIs (Fast Mode) ===")
+    ats_companies = [c for c in companies if c.get("ats_type")]
+    if ats_companies:
+        async with aiohttp.ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
+            # Gather jobs across all companies with APIs concurrently
+            ats_tasks = []
+            for company in ats_companies:
+                task = route_company(session, company["name"], company["ats_type"], company["ats_url"])
+                ats_tasks.append(task)
+                
+            ats_results = await asyncio.gather(*ats_tasks, return_exceptions=True)
+            for company, result in zip(ats_companies, ats_results):
+                if isinstance(result, Exception):
+                    log(f"  [!] Failed to scrape ATS for {company['name']}: {result}")
+                else:
+                    for job in result:
+                        job["site"] = company["name"]
+                        job["priority"] = 0 # Highest priority
+                        all_discovered.append(job)
+        log(f"[*] ATS API discovery complete. Found {len([j for j in all_discovered if j.get('priority') == 0])} jobs.")
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -418,7 +448,6 @@ async def main():
             
         site_results_raw = await asyncio.gather(*site_tasks, return_exceptions=True)
         
-        all_discovered = []
         for i, res in enumerate(site_results_raw):
             if isinstance(res, Exception):
                 log(f"[!] Phase 1a Site {i} failed or timed out: {res}")
@@ -430,6 +459,8 @@ async def main():
         log("\n=== Phase 1b: Discovering Jobs (Company Careers) ===")
         company_tasks = []
         for company in companies:
+            if company.get("ats_type"):
+                continue
             # 2 min timeout for direct career pages
             task = asyncio.wait_for(discover_jobs_from_company(context, company, semaphore), timeout=120)
             company_tasks.append(task)
