@@ -1,0 +1,12 @@
+{
+    "companies_v2_path": "data/companies_v2.json",
+    "companies_v2_url": "https://raw.githubusercontent.com/outscal/OpenJobs/main/data/companies_v2.json",
+    "enabled": true,
+    "filters": {
+        "industry_categories": ["gaming", "tech"],
+        "countries": ["United States", "Canada", "Remote"],
+        "require_ats_link": true
+    },
+    "concurrency": 15,
+    "fetch_timeout_ms": 15000
+}
