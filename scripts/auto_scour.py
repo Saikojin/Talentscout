@@ -3,8 +3,9 @@ import datetime
 import json
 import os
 import re
+import socket
 import sys
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from playwright.async_api import async_playwright
 
 # Append current dir to sys.path to import local modules
@@ -32,20 +33,80 @@ def load_json(filepath):
 def log(message):
     print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] {message}")
 
+def is_domain_reachable(url: str) -> bool:
+    """Quick synchronous DNS check before spinning up a Playwright page."""
+    try:
+        hostname = urlparse(url).netloc
+        socket.getaddrinfo(hostname, 443, proto=socket.IPPROTO_TCP)
+        return True
+    except socket.gaierror:
+        return False
+
+# Errors that indicate a permanently broken domain — auto-blacklist these.
+FATAL_NAV_ERRORS = (
+    "ERR_CERT_COMMON_NAME_INVALID",
+    "ERR_CERT_DATE_INVALID",
+    "ERR_CERT_AUTHORITY_INVALID",
+    "ERR_SSL_VERSION_OR_CIPHER_MISMATCH",
+    "ERR_HTTP2_PROTOCOL_ERROR",
+    "ERR_SSL_PROTOCOL_ERROR",
+)
+
+# SPA hosts that require networkidle instead of domcontentloaded
+SPA_HOSTS = ("notion.site", "notion.so")
+
+def _wait_strategy(url: str) -> str:
+    """Return the appropriate Playwright wait_until strategy for a given URL."""
+    return "networkidle" if any(h in url for h in SPA_HOSTS) else "domcontentloaded"
+
+def _get_timeout(url: str) -> int:
+    """Longer timeout for SPA hosts that load slowly."""
+    return 45000 if any(h in url for h in SPA_HOSTS) else 30000
+
+def auto_blacklist(url: str, error_str: str) -> None:
+    """Append the hostname to blacklist.json when a fatal TLS/protocol error occurs."""
+    if not any(code in error_str for code in FATAL_NAV_ERRORS):
+        return
+    hostname = urlparse(url).netloc
+    try:
+        with open(BLACKLIST_FILE, "r", encoding="utf-8") as f:
+            bl = json.load(f)
+        if not isinstance(bl, list):
+            bl = []
+        if hostname not in bl:
+            bl.append(hostname)
+            with open(BLACKLIST_FILE, "w", encoding="utf-8") as f:
+                json.dump(bl, f, indent=4)
+            print(f"[!] Auto-blacklisted {hostname} (fatal TLS/protocol error).")
+    except Exception as ex:
+        print(f"[!] Could not update blacklist: {ex}")
+
 async def scrape_company(context, company, semaphore):
     name = company["name"]
     url = company["careers_url"]
+
+    # T5: Skip unresolvable domains before spinning up a browser page
+    if not is_domain_reachable(url):
+        print(f"[!] DNS lookup failed for {name} ({url}). Skipping.")
+        return []
     
     async with semaphore:
         page = await context.new_page()
         print(f"\n[*] Scraping Company: {name}...")
-        
         print(f"[*] Navigating to {url}")
-    try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-        await asyncio.sleep(2)
-    except Exception as e:
-        print(f"[!] Warning: Navigation to {url} timed out or failed. {e}")
+        # T1: page.goto() is inside the semaphore so it is rate-limited properly
+        # Use networkidle for SPA hosts (e.g. Notion), domcontentloaded elsewhere
+        wait_strat = _wait_strategy(url)
+        nav_timeout = _get_timeout(url)
+        try:
+            await page.goto(url, wait_until=wait_strat, timeout=nav_timeout)
+            await asyncio.sleep(2)
+        except Exception as e:
+            error_str = str(e)
+            print(f"[!] Warning: Navigation to {url} timed out or failed. {error_str}")
+            auto_blacklist(url, error_str)
+            await page.close()
+            return []
         
     card_sel = company.get("job_card_selector")
     
@@ -56,15 +117,22 @@ async def scrape_company(context, company, semaphore):
         print(f"[*] No selectors defined for {name}. Using smart fallback to find job links...")
         
         # Pull all links from the DOM instantly to avoid timeout issues
+        # T4: Guard against context destruction from SPA redirects
         try:
-            links_data = await page.evaluate('''() => {
-                return Array.from(document.querySelectorAll("a")).map(a => ({
-                    href: a.getAttribute("href") || a.href || "",
-                    text: a.innerText || ""
-                }));
-            }''')
+            current_url = page.url
+            expected_host = urlparse(url).netloc
+            if not current_url or expected_host not in current_url:
+                print(f"      [!] Page redirected away from {url} (now at {current_url}), skipping link extraction.")
+                links_data = []
+            else:
+                links_data = await page.evaluate('''() => {
+                    return Array.from(document.querySelectorAll("a")).map(a => ({
+                        href: a.getAttribute("href") || a.href || "",
+                        text: a.innerText || ""
+                    }));
+                }''')
         except Exception as e:
-            print(f"      [!] Error extracting links: {e}")
+            print(f"      [!] Error extracting links (context may have been destroyed): {e}")
             links_data = []
             
         for data in links_data:
@@ -101,6 +169,8 @@ async def scrape_company(context, company, semaphore):
         await page.wait_for_selector(card_sel, timeout=10000)
     except Exception:
         log(f"[!] Could not find any job cards ('{card_sel}') on this page.")
+        # T2: Close the page to avoid leaking a browser tab
+        await page.close()
         return []
 
     cards = await page.locator(card_sel).all()
@@ -170,12 +240,19 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
         url = url.replace("{location}", location.replace(" ", "%20"))
 
         print(f"[*] Navigating to {url}")
+        wait_strat = _wait_strategy(url)
+        nav_timeout = _get_timeout(url)
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            await page.goto(url, wait_until=wait_strat, timeout=nav_timeout)
             # Some sites need a bit more time for AJAX cards
             await asyncio.sleep(2)
         except Exception as e:
-            print(f"[!] Warning: Navigation to {url} timed out or failed. {e}")
+            error_str = str(e)
+            print(f"[!] Warning: Navigation to {url} timed out or failed. {error_str}")
+            auto_blacklist(url, error_str)
+            # T3: Early exit so we don't evaluate a dead/error page
+            await page.close()
+            return []
             
         # Wait for job cards to load
         card_sel = config.get("job_card_selector")
@@ -183,6 +260,8 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
             await page.wait_for_selector(card_sel, timeout=10000)
         except Exception:
             print(f"[!] Could not find any job cards ('{card_sel}') on this page.")
+            # T3: Close the leaked page on selector failure
+            await page.close()
             return []
 
         cards = await page.locator(card_sel).all()
