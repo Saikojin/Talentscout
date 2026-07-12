@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>TalentScout — Portfolio</title>
+  <meta name="description" content="Portfolio and interactive resume powered by TalentScout resume-as-code engine." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="TalentScout — Portfolio" />
+  <meta property="og:description" content="Interactive resume with real-time Focus Selector and AI agent integration via MCP." />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TalentScout — Portfolio" />
+  <meta name="twitter:description" content="Interactive resume with real-time Focus Selector and MCP integration." />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Preconnect for Google Fonts (loaded in CSS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Favicon (inline SVG emoji) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>" />
+</head>
+<body>
+
+  <!-- Skip link for accessibility -->
+  <a href="#main-content" class="visually-hidden" style="
+    position: absolute;
+    left: -9999px;
+    z-index: 9999;
+    padding: 8px 16px;
+    background: var(--color-accent, #58a6ff);
+    color: #0d1117;
+    font-weight: 600;
+    border-radius: 4px;
+    text-decoration: none;
+  ">Skip to main content</a>
+
+  <!-- App root — all content rendered by app.js -->
+  <div id="app"></div>
+
+  <!-- Resume app script -->
+  <script src="app.js" defer></script>
+
+</body>
+</html>
