@@ -1,0 +1,582 @@
+{
+  "legalName": {
+    "firstName": "Thomas",
+    "lastName": "S. Snyder",
+    "formattedName": "Thomas S. Snyder"
+  },
+  "contactInformation": {
+    "primaryEmail": "Mr.Thomas.Snyder@gmail.com",
+    "primaryPhone": "please email",
+    "primaryUrl": "https://www.linkedin.com/in/mr-thomas-snyder/",
+    "city": "Redmond",
+    "state": "Washington",
+    "country": "US",
+    "socialProfiles": [
+      {
+        "type": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mr-thomas-snyder/",
+        "username": "mr-thomas-snyder"
+      },
+      {
+        "type": "GitHub",
+        "url": "https://github.com/Mr-Thomas-Snyder?tab=repositories",
+        "username": "Mr-Thomas-Snyder"
+      },
+      {
+        "type": "GitHub",
+        "url": "https://github.com/Saikojin/seikoclaw-harness",
+        "username": "Saikojin"
+      }
+    ]
+  },
+  "workExperience": [
+    {
+      "employer": "Smartsheet",
+      "jobTitle": "Senior QA Engineer",
+      "startDate": "2021-11-01",
+      "endDate": "2025-12-01",
+      "isCurrent": false,
+      "description": "Software Test Engineer focused on manual and automated testing of a Drupal-based website and multiple custom applications. Built Karate-based automation suite from nothing; championed automation expansion to free up engineering capacity for exploratory testing.",
+      "achievements": [
+        "Built new automation suites covering 85% of all manual testing with 1,500 tests — from zero automation baseline",
+        "Maintained and expanded automation reporting for stakeholders",
+        "Used Browserstack for cross-browser and mobile testing",
+        "Managed test execution, triage, bug management, and resolution",
+        "Tracked lifecycle timelines and produced test status reports"
+      ],
+      "tags": [
+        "automation",
+        "karate",
+        "drupal",
+        "web",
+        "qa"
+      ]
+    },
+    {
+      "employer": "OpenMarket",
+      "jobTitle": "Senior QA Engineer",
+      "startDate": "2019-01-01",
+      "endDate": "2021-06-01",
+      "isCurrent": false,
+      "description": "Software Test Engineer testing web services and APIs managing SMS, MMS, and RCS traffic. Maintained legacy Fitness automation, coded new tests in Karate, and transitioned to cloud technology team testing AWS-refactored services. Principal advocate for company-wide QA standardization.",
+      "achievements": [
+        "Built documentation stores for test tools and methods, standardizing QA practices across the organization",
+        "Configured hardware and software environments for manual and automated test execution",
+        "Automated tests in both Fit and Karate frameworks",
+        "Tracked lifecycle timelines and produced test status reports"
+      ],
+      "tags": [
+        "automation",
+        "api",
+        "karate",
+        "aws",
+        "sms",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Apptio",
+      "jobTitle": "Senior QA Engineer",
+      "startDate": "2018-04-01",
+      "endDate": "2018-12-01",
+      "isCurrent": false,
+      "description": "Software Test Engineer focused on manual testing of an IT financial management web application. Principal tester for Fortune 500 client upgrade validations — stood up instances, ran automation, administered test users.",
+      "achievements": [
+        "Set up and deployed client environment instances for upgrade testing",
+        "Built product knowledge base and upcoming feature documentation",
+        "Pushed management to broaden automation capabilities",
+        "Standardized documentation and experience sharing across disciplines"
+      ],
+      "tags": [
+        "manual-testing",
+        "enterprise",
+        "web",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Placed Inc.",
+      "jobTitle": "Software Test Engineer",
+      "startDate": "2015-11-01",
+      "endDate": "2018-01-01",
+      "isCurrent": false,
+      "description": "Key engineer in building the Quality Assurance department. Established baseline processes and documentation for new hires. Ran daily, weekly, and monthly test cycles for aggressive web releases and quarterly mobile releases.",
+      "achievements": [
+        "Built QA department baseline processes and new-hire documentation",
+        "Drove cross-team knowledge sharing through presentations and documentation",
+        "Lead meetings and product development discussions to uphold quality standards",
+        "Ran daily, weekly, monthly test cycles for web and quarterly cycles for mobile"
+      ],
+      "tags": [
+        "mobile",
+        "web",
+        "manual-testing",
+        "qa",
+        "process"
+      ]
+    },
+    {
+      "employer": "Array Health",
+      "jobTitle": "Software Test Engineer",
+      "startDate": "2014-11-01",
+      "endDate": "2015-10-01",
+      "isCurrent": false,
+      "description": "Key engineer in developing the QA department for a healthcare web application. Established processes, created ramp-up documents for new hires, and promoted cross-team knowledge sharing.",
+      "achievements": [
+        "Developed QA baseline processes and new-hire ramp-up documentation",
+        "Led meetings and product development discussions to enforce quality standards",
+        "Standardized documentation and experience sharing across disciplines"
+      ],
+      "tags": [
+        "web",
+        "healthcare",
+        "manual-testing",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Microsoft",
+      "jobTitle": "Software Test Engineer 3 — Device & App Compatibility (Windows OS)",
+      "startDate": "2011-07-01",
+      "endDate": "2014-09-01",
+      "isCurrent": false,
+      "description": "Subject matter expert in device and application compatibility for Windows OS. Performed weekly manual and automated build tests, developed new tests and tools as new hardware platforms were absorbed, and documented and trained testers to handle increased workloads.",
+      "achievements": [
+        "Created modular testing methodology enabling rapid ramp-up of new testers across 15+ feature areas",
+        "Standardized testing processes across feature teams using shared documentation",
+        "Developed tools to automate new feature area testing as hardware platforms were added",
+        "Trained new and existing testers on tools, hardware, and processes"
+      ],
+      "tags": [
+        "windows",
+        "compatibility",
+        "automation",
+        "microsoft",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Microsoft",
+      "jobTitle": "Software Test Engineer 3 — Mobile Applications",
+      "startDate": "2010-11-01",
+      "endDate": "2011-04-01",
+      "isCurrent": false,
+      "description": "Principal Test Engineer for mobile applications on multiple handset devices. Drove creation of test plans and cases; developed scenario-based tests for offshore team handoff after project completion.",
+      "achievements": [
+        "Created the group's first scenario-based tests — enabling untrained testers to deliver professional results",
+        "Provided UI and feature feedback resulting in product stability and multi-region language improvements",
+        "Documented software defects across multiple bug tracking systems",
+        "Developed transition documentation for offshore team handoff"
+      ],
+      "tags": [
+        "mobile",
+        "microsoft",
+        "scenario-testing",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Hewlett-Packard",
+      "jobTitle": "Software & Hardware QA Engineer",
+      "startDate": "2009-01-01",
+      "endDate": "2010-09-01",
+      "isCurrent": false,
+      "description": "QA engineer responsible for triage training and group reorganization. Collaborated with internal and external teams to reorganize support labs, utilized in-house tools to automate manual processes, and built machine imaging infrastructure.",
+      "achievements": [
+        "Reorganized consumer and enterprise support labs to improve workflow efficiency",
+        "Built machine imaging infrastructure reducing machine recovery time",
+        "Investigated external and internal hardware bugs and configured reproduction scenarios",
+        "Researched and implemented process improvements for the department"
+      ],
+      "tags": [
+        "hardware",
+        "triage",
+        "infrastructure",
+        "hp",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Medio Systems",
+      "jobTitle": "Software Test Engineer 3",
+      "startDate": "2008-08-01",
+      "endDate": "2008-11-01",
+      "isCurrent": false,
+      "description": "QA engineer testing ad delivery and data collection from phones. Performed plan-based and ad-hoc testing on local and remote devices to ensure delivery of ad, media, and subscription content, and validated data ingestion for analytics.",
+      "achievements": [
+        "Created scenario-based tests enabling untrained testers to deliver actionable results",
+        "Validated key data ingestion paths for analytics",
+        "Collaborated with SDET team to develop API testing tools",
+        "Supported late-night deployments to live wireless devices"
+      ],
+      "tags": [
+        "mobile",
+        "api",
+        "ad-tech",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Microsoft",
+      "jobTitle": "Software Test Engineer 3 — Mobile Lync (Nokia)",
+      "startDate": "2007-11-01",
+      "endDate": "2008-06-01",
+      "isCurrent": false,
+      "description": "Principal Test Engineer for the Mobile Lync application on Nokia handsets under Microsoft-Nokia partnership. Drove test plan creation and developed scenario-based tests for offshore team handoff.",
+      "achievements": [
+        "Created the first scenario-based tests for the Nokia partnership enabling offshore team transfer",
+        "Managed remote offshore team progress and reporting",
+        "Provided UI and feature feedback improving stability and multi-language support",
+        "Documented defects across multiple bug tracking systems"
+      ],
+      "tags": [
+        "mobile",
+        "lync",
+        "microsoft",
+        "nokia",
+        "qa"
+      ]
+    },
+    {
+      "employer": "AT&T Wireless",
+      "jobTitle": "Software Test Engineer",
+      "startDate": "2007-08-01",
+      "endDate": "2007-11-01",
+      "isCurrent": false,
+      "description": "Test Engineer for location-based ad delivery framework validation. Used Linux terminals for database monitoring, SOAP-based API calls, remote device farms, and device monitoring hardware.",
+      "achievements": [
+        "Validated location-based ad delivery via Linux CLI, SOAP APIs, and remote device farms",
+        "Managed multi-account, multi-tiered security services for partner account management"
+      ],
+      "tags": [
+        "mobile",
+        "api",
+        "linux",
+        "ad-tech",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Microsoft",
+      "jobTitle": "Software Test Engineer 2 — Windows Media Center (eHome)",
+      "startDate": "2006-08-01",
+      "endDate": "2007-08-01",
+      "isCurrent": false,
+      "description": "Test Engineer for Windows Media Center set-top boxes. Performed ad-hoc, plan-based, and automation validations for multiple set-top box devices to validate integration changes.",
+      "achievements": [
+        "Configured a wide range of hardware products interfacing with the software under test",
+        "Researched new features during product lifecycle to produce targeted new tests",
+        "Managed test execution and bug tracking for set-top box integrations"
+      ],
+      "tags": [
+        "windows",
+        "media-center",
+        "hardware",
+        "microsoft",
+        "qa"
+      ]
+    },
+    {
+      "employer": "NVIDIA",
+      "jobTitle": "Principal Test Engineer — Mobile Devices",
+      "startDate": "2006-02-01",
+      "endDate": "2006-08-01",
+      "isCurrent": false,
+      "description": "Ad-hoc and manual testing of existing and unreleased hardware for driver releases. Ran automation test suites and tiered manual tests using experimental hardware and tools.",
+      "achievements": [
+        "Tested unreleased hardware for driver releases using ad-hoc and structured manual methods",
+        "Executed automation suites alongside tiered manual test passes"
+      ],
+      "tags": [
+        "hardware",
+        "drivers",
+        "mobile",
+        "nvidia",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Microsoft",
+      "jobTitle": "Software Test Engineer — Microsoft Game Studios",
+      "startDate": "2005-08-01",
+      "endDate": "2006-02-01",
+      "isCurrent": false,
+      "description": "Plan and ad-hoc based testing across a lab of varying machine configurations for a wide range of games.",
+      "achievements": [
+        "Created scenario-based tests enabling untrained testers to deliver consistent results",
+        "Developed scripts to quickly configure systems after OS installation",
+        "Monitored device trends and made purchase recommendations",
+        "Documented defects and processes to aid tester transitions across tools"
+      ],
+      "tags": [
+        "games",
+        "windows",
+        "scripting",
+        "microsoft",
+        "qa"
+      ]
+    },
+    {
+      "employer": "Monolith Productions",
+      "jobTitle": "Bug Association Rep / Game Master",
+      "startDate": "2005-02-01",
+      "endDate": "2005-07-01",
+      "isCurrent": false,
+      "description": "Customer advocate delivering reproducible user issues to the QA team. Triaged incoming support tickets, reproduced issues, and delivered bug reports to dev and QA. Trained Game Master team on tools.",
+      "achievements": [
+        "Created prioritization process for incoming tickets — significantly speeding up triage and creating room for more weekly patch items",
+        "Trained GMs on tools, product quirks, and player abuse patterns",
+        "Implemented agile ticket processing to eliminate stale open tickets"
+      ],
+      "tags": [
+        "triage",
+        "bug-tracking",
+        "games",
+        "qa"
+      ]
+    },
+    {
+      "employer": "VMC Consulting",
+      "jobTitle": "Software Test Engineer — Xbox",
+      "startDate": "2001-08-01",
+      "endDate": "2005-01-01",
+      "isCurrent": false,
+      "description": "End-to-end manual testing on Xbox console. Helped build, execute, and improve the test process for black-box testing. Became one of the first end-to-end 'rabbits' (dedicated completion testers) and later joined the TCR (Technical Certification Requirements) team in A/V.",
+      "achievements": [
+        "Created the 'rabbit' role — dedicated tester ensuring pipeline games can be completed end-to-end",
+        "Introduced rotating shifts enabling smaller delivery windows for test passes",
+        "Process improvements led to the TCR team handling 8–16 products/games per day vs. the previous 2–4",
+        "Maintained labs, improved infrastructure, and trained new hires on testing and bug reporting"
+      ],
+      "tags": [
+        "xbox",
+        "console",
+        "certification",
+        "qa",
+        "games"
+      ]
+    },
+    {
+      "employer": "Keane Inc.",
+      "jobTitle": "Technical Support Representative",
+      "startDate": "2000-08-01",
+      "endDate": "2001-06-01",
+      "isCurrent": false,
+      "description": "Handled inbound tier-1 support calls for various Windows PC products.",
+      "achievements": [
+        "Consistently top performer taking 16 calls per day against an 8-call service level agreement",
+        "Created boilerplate scripts standardizing the support process for new hires",
+        "Handled tier-2 and tier-3 escalations to reduce higher-tier tech workload"
+      ],
+      "tags": [
+        "support",
+        "windows",
+        "customer-service"
+      ]
+    },
+    {
+      "employer": "Nintendo of America",
+      "jobTitle": "Quality Assurance Engineer",
+      "startDate": "1999-08-01",
+      "endDate": "2000-03-01",
+      "isCurrent": false,
+      "description": "Ad-hoc and plan-based manual testing on a wide range of Nintendo games for N64 and Gameboy consoles.",
+      "achievements": [
+        "Implemented knowledge sharing practices enabling testers with little training to deliver professional results",
+        "Documented platform quirks enabling testers to find more hard-locks and soft-locks",
+        "Provided UI and feature feedback improving product stability and multi-language support"
+      ],
+      "tags": [
+        "games",
+        "console",
+        "qa",
+        "nintendo"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "Self-Directed / Continuous Learning",
+      "degree": "Professional Development",
+      "fieldOfStudy": "Software Quality Engineering, Test Automation & AI-Assisted Development",
+      "startDate": "1999-01-01",
+      "endDate": "",
+      "gpa": null,
+      "courses": [
+        "Karate DSL — BDD API and UI test automation framework",
+        "Playwright — browser automation and end-to-end testing",
+        "AI-assisted development with Antigravity, ChatGPT, Copilot, and custom MCP agents",
+        "AWS cloud services and Kubernetes orchestration",
+        "WinDbg and symbol-connected stack trace analysis"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "skillCategory": "Test Automation",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "Karate",
+        "Playwright",
+        "Fit",
+        "JavaScript",
+        "IntelliJ",
+        "Vitest"
+      ],
+      "tags": [
+        "automation",
+        "qa"
+      ]
+    },
+    {
+      "skillCategory": "Manual & Exploratory Testing",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "Regression Testing",
+        "Negative Testing",
+        "UI Testing",
+        "Compatibility Testing",
+        "Ad-hoc Testing",
+        "Scenario-Based Testing",
+        "Browserstack"
+      ],
+      "tags": [
+        "qa",
+        "manual-testing"
+      ]
+    },
+    {
+      "skillCategory": "API & Data Testing",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "REST APIs",
+        "SOAP",
+        "Postman",
+        "Data Interface Testing",
+        "Migration Testing",
+        "SQL string testing"
+      ],
+      "tags": [
+        "api",
+        "qa"
+      ]
+    },
+    {
+      "skillCategory": "Performance & Load Testing",
+      "proficiencyLevel": "Advanced",
+      "skillKeywords": [
+        "Performance Testing",
+        "Load Testing",
+        "Stress Testing"
+      ],
+      "tags": [
+        "qa",
+        "performance"
+      ]
+    },
+    {
+      "skillCategory": "AI-Assisted Development & Testing",
+      "proficiencyLevel": "Advanced",
+      "skillKeywords": [
+        "Antigravity (AGY)",
+        "ChatGPT",
+        "GitHub Copilot",
+        "MCP agents",
+        "AI-based test generation",
+        "AI-based coding"
+      ],
+      "tags": [
+        "ai",
+        "automation",
+        "qa"
+      ]
+    },
+    {
+      "skillCategory": "Test Planning & Process",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "Test Plans",
+        "Test Cases",
+        "Test Strategies",
+        "Coverage Analysis",
+        "Defect & Bug Tracking",
+        "Lifecycle Reporting",
+        "Documentation"
+      ],
+      "tags": [
+        "qa",
+        "process"
+      ]
+    },
+    {
+      "skillCategory": "Debugging & Diagnostics",
+      "proficiencyLevel": "Advanced",
+      "skillKeywords": [
+        "WinDbg",
+        "Stack Trace Analysis",
+        "Symbol-connected builds",
+        "Splunk",
+        "Grafana",
+        "Graphite"
+      ],
+      "tags": [
+        "debugging",
+        "qa"
+      ]
+    },
+    {
+      "skillCategory": "DevOps & Infrastructure",
+      "proficiencyLevel": "Intermediate",
+      "skillKeywords": [
+        "AWS",
+        "Docker",
+        "Kubernetes",
+        "Helm",
+        "Bash",
+        "TeamCity",
+        "Windows Deployment Services",
+        "Tomcat"
+      ],
+      "tags": [
+        "devops",
+        "infrastructure"
+      ]
+    },
+    {
+      "skillCategory": "Platforms & Tools",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "Jira",
+        "Confluence",
+        "Team Foundation Server",
+        "Product Studio",
+        "Clarify",
+        "Right Now",
+        "Visual Studio",
+        "VS Code",
+        "Windows",
+        "Mac",
+        "Linux"
+      ],
+      "tags": [
+        "tools",
+        "qa"
+      ]
+    },
+    {
+      "skillCategory": "Training & Knowledge Management",
+      "proficiencyLevel": "Expert",
+      "skillKeywords": [
+        "New Hire Training",
+        "Process Documentation",
+        "Cross-Discipline Knowledge Sharing",
+        "Functional Requirements"
+      ],
+      "tags": [
+        "leadership",
+        "process"
+      ]
+    }
+  ],
+  "summary": "Senior Software Test Engineer with 25+ years across Microsoft, Smartsheet, OpenMarket, and mobile/console game ecosystems. Builds automation from scratch, elevates QA practices across organizations, and reduces time-to-release through tight feedback loops with stakeholders. Integrates AI tooling — including custom MCP-based agents — into testing and development workflows."
+}
