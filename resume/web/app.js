@@ -13,10 +13,16 @@
 'use strict';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
-const MCP_URL = 'http://localhost:3001/mcp';
 // When loaded from the repo root via index.html, window.__RESUME_CONFIG__ overrides
-// these paths so the correct relative URLs are used. The standalone resume/web/index.html
+// these values so the correct relative URLs are used. The standalone resume/web/index.html
 // does not set this global, so the defaults apply there as-is.
+//
+// mcpUrl: set to null on the public GitHub Pages site to hide the clipboard button
+//         (localhost:3001 is meaningless to external visitors). Set to a real URL only
+//         when the MCP server is publicly reachable behind HTTPS.
+const MCP_URL     = window.__RESUME_CONFIG__?.mcpUrl !== undefined
+                    ? window.__RESUME_CONFIG__.mcpUrl
+                    : 'http://localhost:3001/mcp';
 const RESUME_PATH = window.__RESUME_CONFIG__?.resumePath ?? './data/resume.json';
 const DIST_PATH   = window.__RESUME_CONFIG__?.distPath   ?? '../dist';
 
@@ -174,27 +180,43 @@ function renderActionBar(basics) {
   });
   docxBtn.innerHTML = '📝 Download DOCX';
 
-  // MCP Button
-  const mcpBtn = el('button', {
-    class: 'btn btn-mcp',
-    id: 'btn-mcp',
-    type: 'button',
-    'aria-label': 'Copy MCP server URL to clipboard',
-    title: `Copy MCP URL: ${MCP_URL}`,
-  });
-  mcpBtn.innerHTML = '🔌 Plug into MCP';
-  mcpBtn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(MCP_URL);
-      showToast(`MCP URL copied! ${MCP_URL}`, 'success');
-      mcpBtn.innerHTML = '✅ Copied!';
-      setTimeout(() => { mcpBtn.innerHTML = '🔌 Plug into MCP'; }, 2000);
-    } catch {
-      showToast('Could not copy — MCP URL: ' + MCP_URL, 'warning', 5000);
-    }
-  });
-
-  bar.append(pdfBtn, mdBtn, docxBtn, mcpBtn);
+  // MCP Button — only shown as an active clipboard button when MCP_URL is a live
+  // address (local dev). On the public GitHub Pages site mcpUrl is set to null so
+  // we render a passive informational link to the repo instead.
+  if (MCP_URL) {
+    const mcpBtn = el('button', {
+      class: 'btn btn-mcp',
+      id: 'btn-mcp',
+      type: 'button',
+      'aria-label': 'Copy MCP server URL to clipboard',
+      title: `Copy MCP URL: ${MCP_URL}`,
+    });
+    mcpBtn.innerHTML = '🔌 Plug into MCP';
+    mcpBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(MCP_URL);
+        showToast(`MCP URL copied! ${MCP_URL}`, 'success');
+        mcpBtn.innerHTML = '✅ Copied!';
+        setTimeout(() => { mcpBtn.innerHTML = '🔌 Plug into MCP'; }, 2000);
+      } catch {
+        showToast('Could not copy — MCP URL: ' + MCP_URL, 'warning', 5000);
+      }
+    });
+    bar.append(pdfBtn, mdBtn, docxBtn, mcpBtn);
+  } else {
+    // Public site: show a neutral link to the MCP integration docs on GitHub
+    const mcpLink = el('a', {
+      class: 'btn btn-mcp',
+      id: 'btn-mcp',
+      href: 'https://github.com/Saikojin/Talentscout#readme',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      'aria-label': 'Learn about MCP server integration',
+      title: 'MCP server runs locally — see README for setup',
+    });
+    mcpLink.innerHTML = '🔌 MCP Integration ↗';
+    bar.append(pdfBtn, mdBtn, docxBtn, mcpLink);
+  }
   return bar;
 }
 
@@ -497,7 +519,9 @@ async function boot() {
   // Footer
   const footer = el('footer');
   const footerText = el('p', { class: 'footer-text' });
-  footerText.innerHTML = `Built with <a href="https://github.com/nathanfox/resume-as-code" target="_blank" rel="noopener">resume-as-code</a> · <a href="${MCP_URL}" target="_blank" rel="noopener">MCP Server</a>`;
+  const mcpFooterHref = MCP_URL || 'https://github.com/Saikojin/Talentscout#readme';
+  const mcpFooterLabel = MCP_URL ? 'MCP Server' : 'MCP Integration';
+  footerText.innerHTML = `Built with <a href="https://github.com/nathanfox/resume-as-code" target="_blank" rel="noopener">resume-as-code</a> · <a href="${mcpFooterHref}" target="_blank" rel="noopener">${mcpFooterLabel}</a>`;
   footer.appendChild(footerText);
   app.appendChild(footer);
 

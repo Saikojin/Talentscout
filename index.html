@@ -641,7 +641,10 @@ flowchart TD
      */
     window.__RESUME_CONFIG__ = {
       resumePath: 'resume/data/resume.json',
-      distPath:   'resume/dist'
+      distPath:   'resume/dist',
+      // mcpUrl: null — hides the localhost clipboard button on the public site.
+      // Set to a real https:// URL only if you expose the MCP server publicly.
+      mcpUrl:     null,
     };
 
     // ─── View Switcher ─────────────────────────────────────────────────
