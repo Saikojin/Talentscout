@@ -14,7 +14,11 @@
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 const MCP_URL = 'http://localhost:3001/mcp';
-const RESUME_PATH = './data/resume.json';
+// When loaded from the repo root via index.html, window.__RESUME_CONFIG__ overrides
+// these paths so the correct relative URLs are used. The standalone resume/web/index.html
+// does not set this global, so the defaults apply there as-is.
+const RESUME_PATH = window.__RESUME_CONFIG__?.resumePath ?? './data/resume.json';
+const DIST_PATH   = window.__RESUME_CONFIG__?.distPath   ?? '../dist';
 
 const FOCUS_TAGS = {
   all:        null,   // No filtering
@@ -143,7 +147,7 @@ function renderActionBar(basics) {
   // PDF Download
   const pdfBtn = el('a', {
     class: 'btn btn-primary',
-    href: '../dist/resume.pdf',
+    href: `${DIST_PATH}/resume.pdf`,
     download: `${basics.name?.replace(/\s+/g, '_')}_Resume.pdf`,
     id: 'btn-download-pdf',
     'aria-label': 'Download resume as PDF',
@@ -153,7 +157,7 @@ function renderActionBar(basics) {
   // Markdown Download
   const mdBtn = el('a', {
     class: 'btn btn-secondary',
-    href: '../dist/resume.md',
+    href: `${DIST_PATH}/resume.md`,
     download: `${basics.name?.replace(/\s+/g, '_')}_Resume.md`,
     id: 'btn-download-md',
     'aria-label': 'Download resume as Markdown',
@@ -163,7 +167,7 @@ function renderActionBar(basics) {
   // DOCX Download
   const docxBtn = el('a', {
     class: 'btn btn-secondary',
-    href: '../dist/resume.docx',
+    href: `${DIST_PATH}/resume.docx`,
     download: `${basics.name?.replace(/\s+/g, '_')}_Resume.docx`,
     id: 'btn-download-docx',
     'aria-label': 'Download resume as Word Document',

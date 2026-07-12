@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>TalentScout — Thomas S. Snyder · Portfolio</title>
+  <meta name="description" content="Portfolio and living resume of Thomas S. Snyder, powered by TalentScout — an automated job scout and resume-as-code engine." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://Saikojin.github.io/Talentscout/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="TalentScout — Thomas S. Snyder" />
+  <meta property="og:description" content="Interactive living resume and automated job scout engine. Powered by Python, Node.js, and MCP." />
+  <meta property="og:url" content="https://Saikojin.github.io/Talentscout/" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TalentScout — Thomas S. Snyder" />
+  <meta name="twitter:description" content="Interactive living resume and automated job scout engine." />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Resume styles (shared) -->
+  <link rel="stylesheet" href="resume/web/style.css" />
+
+  <!-- Google Fonts preconnect (picked up by style.css) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>" />
+
+  <style>
+    /* ─── Site Navigation Bar ──────────────────────────────────────────── */
+    #site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(13, 17, 23, 0.93);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(48, 54, 61, 0.85);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #e6edf3;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-brand-accent { color: #58a6ff; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      border-radius: 9px;
+      padding: 3px;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      cursor: pointer;
+      padding: 0.35rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      transition: color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+      font-family: inherit;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+
+    .nav-tab:hover {
+      color: #e6edf3;
+      background: rgba(48, 54, 61, 0.5);
+    }
+
+    .nav-tab.active {
+      background: #21262d;
+      color: #58a6ff;
+      box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.25), inset 0 1px 0 rgba(88, 166, 255, 0.08);
+    }
+
+    /* ─── View System ───────────────────────────────────────────────── */
+    .site-view { min-height: calc(100vh - 52px); }
+
+    .site-view[hidden] { display: none !important; }
+
+    @keyframes viewFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    .site-view:not([hidden]) { animation: viewFadeIn 0.22s ease; }
+
+    /* ─── Project Hero ──────────────────────────────────────────────── */
+    .project-hero {
+      background: linear-gradient(150deg, #111827 0%, #0d1117 55%);
+      border-bottom: 1px solid rgba(48, 54, 61, 0.85);
+      padding: 4.5rem 1.5rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-hero::before,
+    .project-hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .project-hero::before {
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(88, 166, 255, 0.09) 0%, transparent 65%);
+      top: -180px; left: -160px;
+    }
+
+    .project-hero::after {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(188, 140, 255, 0.07) 0%, transparent 65%);
+      bottom: -110px; right: -60px;
+    }
+
+    .project-hero-inner { position: relative; z-index: 1; }
+
+    .project-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(88, 166, 255, 0.1);
+      border: 1px solid rgba(88, 166, 255, 0.25);
+      color: #58a6ff;
+      padding: 0.28rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-title {
+      font-size: clamp(2.25rem, 5.5vw, 3.5rem);
+      font-weight: 800;
+      color: #e6edf3;
+      margin: 0 0 0.8rem;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+    }
+
+    .project-title-accent { color: #58a6ff; }
+
+    .project-subtitle {
+      font-size: 1.05rem;
+      color: #8b949e;
+      margin: 0 auto 2.75rem;
+      max-width: 580px;
+      line-height: 1.65;
+    }
+
+    .project-stats {
+      display: flex;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: rgba(22, 27, 34, 0.85);
+      border: 1px solid rgba(48, 54, 61, 0.9);
+      border-radius: 10px;
+      padding: 0.875rem 1.35rem;
+      min-width: 100px;
+      text-align: center;
+      transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(88, 166, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #58a6ff;
+      display: block;
+      letter-spacing: -0.025em;
+    }
+
+    .stat-label {
+      font-size: 0.6875rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 3px;
+    }
+
+    .tech-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      justify-content: center;
+      margin-bottom: 2.25rem;
+    }
+
+    .tech-badge {
+      background: rgba(22, 27, 34, 0.8);
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      color: #8b949e;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .project-hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.35rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+    }
+
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #1f6feb, #388bfd);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(31, 111, 235, 0.28);
+    }
+
+    .btn-hero-primary:hover {
+      box-shadow: 0 4px 22px rgba(88, 166, 255, 0.42);
+      transform: translateY(-1px);
+    }
+
+    .btn-hero-secondary {
+      background: rgba(22, 27, 34, 0.9);
+      color: #e6edf3;
+      border-color: rgba(48, 54, 61, 0.85);
+    }
+
+    .btn-hero-secondary:hover {
+      background: #30363d;
+      border-color: #8b949e;
+    }
+
+    /* ─── Project Content Area ──────────────────────────────────────── */
+    .project-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .project-section { margin-bottom: 4rem; }
+
+    .project-section-title {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: #e6edf3;
+      margin: 0 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.85);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ─── Mermaid Diagram ───────────────────────────────────────────── */
+    .mermaid-wrap {
+      background: rgba(13, 17, 23, 0.75);
+      border: 1px solid rgba(48, 54, 61, 0.9);
+      border-radius: 12px;
+      padding: 2.5rem 1.5rem;
+      overflow-x: auto;
+    }
+
+    .mermaid-wrap .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* ─── README Content ────────────────────────────────────────────── */
+    .readme-wrap {
+      background: rgba(22, 27, 34, 0.45);
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      color: #e6edf3;
+      line-height: 1.75;
+    }
+
+    .readme-wrap h1, .readme-wrap h2, .readme-wrap h3 {
+      color: #e6edf3;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .readme-wrap h1 { font-size: 1.75rem; }
+
+    .readme-wrap h2 {
+      font-size: 1.25rem;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.8);
+      padding-bottom: 0.4rem;
+    }
+
+    .readme-wrap h3 { font-size: 1.05rem; }
+
+    .readme-wrap p { margin: 0.75rem 0; }
+
+    .readme-wrap a { color: #58a6ff; text-decoration: none; }
+    .readme-wrap a:hover { text-decoration: underline; }
+
+    .readme-wrap code {
+      background: rgba(110, 118, 129, 0.18);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
+      font-size: 0.875em;
+    }
+
+    .readme-wrap pre {
+      background: #161b22;
+      border: 1px solid rgba(48, 54, 61, 0.9);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .readme-wrap pre code { background: none; padding: 0; font-size: 0.8125rem; }
+
+    .readme-wrap table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .readme-wrap th, .readme-wrap td {
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      padding: 0.5rem 0.9rem;
+      text-align: left;
+    }
+
+    .readme-wrap th {
+      background: rgba(22, 27, 34, 0.9);
+      font-weight: 600;
+    }
+
+    .readme-wrap ul, .readme-wrap ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+    .readme-wrap li { margin: 0.25rem 0; }
+
+    .readme-wrap blockquote {
+      border-left: 3px solid #58a6ff;
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      color: #8b949e;
+      background: rgba(88, 166, 255, 0.05);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .readme-loading {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #8b949e;
+      padding: 0.5rem;
+      font-style: italic;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-brand { display: none; }
+      .project-content { padding: 2rem 1rem 4rem; }
+      .readme-wrap { padding: 1.25rem; }
+      .mermaid-wrap { padding: 1.25rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip navigation -->
+  <a href="#main-content"
+     style="position:absolute;left:-9999px;z-index:9999;padding:8px 16px;background:#58a6ff;color:#0d1117;font-weight:600;border-radius:4px;text-decoration:none;top:1rem"
+     onfocus="this.style.left='1rem'"
+     onblur="this.style.left='-9999px'">Skip to main content</a>
+
+  <!-- ── Site Navigation Bar ───────────────────────────────────────── -->
+  <nav id="site-nav" role="navigation" aria-label="Site navigation">
+    <div class="nav-inner">
+      <span class="nav-brand">
+        🔍 <span class="nav-brand-accent">Talent</span>Scout
+      </span>
+      <div class="nav-tabs" role="tablist" aria-label="Page selector">
+        <button
+          id="tab-resume"
+          class="nav-tab active"
+          role="tab"
+          aria-selected="true"
+          aria-controls="view-resume"
+          onclick="switchView('resume')"
+        >📄 Resume</button>
+        <button
+          id="tab-project"
+          class="nav-tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="view-project"
+          onclick="switchView('project')"
+        >🔭 Project</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Resume View ────────────────────────────────────────────────── -->
+  <div id="view-resume" class="site-view" role="tabpanel" aria-labelledby="tab-resume">
+    <!-- app.js renders hero, action bar, focus selector, and all sections into #app -->
+    <div id="app"></div>
+  </div>
+
+  <!-- ── Project View ───────────────────────────────────────────────── -->
+  <div id="view-project" class="site-view" role="tabpanel" aria-labelledby="tab-project" hidden>
+
+    <!-- Hero -->
+    <header class="project-hero" role="banner">
+      <div class="project-hero-inner">
+
+        <div class="project-eyebrow">⚡ Open Source Tool</div>
+
+        <h1 class="project-title">
+          <span class="project-title-accent">Talent</span>Scout
+        </h1>
+
+        <p class="project-subtitle">
+          An automated job scout and living resume engine.<br>
+          Multi-site scraping · Skill filtering · Resume-as-code · MCP AI integration.
+        </p>
+
+        <div class="project-stats">
+          <div class="stat-card">
+            <span class="stat-value">19</span>
+            <div class="stat-label">Features</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">29/29</span>
+            <div class="stat-label">Tests Passing</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">7</span>
+            <div class="stat-label">MCP Tools</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">2</span>
+            <div class="stat-label">ATS Adapters</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">8</span>
+            <div class="stat-label">Subsystems</div>
+          </div>
+        </div>
+
+        <div class="tech-badges" aria-label="Technology stack">
+          <span class="tech-badge">🐍 Python 3.8+</span>
+          <span class="tech-badge">🟩 Node.js ESM</span>
+          <span class="tech-badge">📦 TypeScript</span>
+          <span class="tech-badge">🗃️ SQLite</span>
+          <span class="tech-badge">🎭 Playwright</span>
+          <span class="tech-badge">⚡ FastAPI</span>
+          <span class="tech-badge">🔌 MCP Protocol</span>
+          <span class="tech-badge">🚀 GitHub Pages</span>
+          <span class="tech-badge">🛸 SpacetimeDB</span>
+        </div>
+
+        <div class="project-hero-actions">
+          <button class="btn-hero btn-hero-primary" onclick="switchView('resume')" id="hero-btn-resume">
+            📄 View Live Resume
+          </button>
+          <a class="btn-hero btn-hero-secondary"
+             href="https://github.com/Saikojin/Talentscout"
+             target="_blank"
+             rel="noopener noreferrer"
+             id="hero-btn-github">
+            🐙 GitHub Repository
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="project-content" id="main-content" aria-label="Project details">
+
+      <!-- Feature Architecture -->
+      <section class="project-section" aria-labelledby="section-features">
+        <h2 class="project-section-title" id="section-features">⚡ Feature Architecture</h2>
+        <div class="mermaid-wrap">
+          <pre class="mermaid">
+flowchart TD
+    subgraph IDENTITY["Identity Layer — Single Source of Truth"]
+        RS["📄 Resume Ingest\nresume/data/resume.json\nJSON Resume standard"]
+        RP["🔍 Resume Parser UI\nscripts/resume_parser.py\nlocalhost:8000"]
+        RS --> RP
+    end
+    subgraph SKILLS["Skill Management"]
+        SK["✅ Skill List\nbase_skillset.json\nsearchable skills"]
+        BL["🚫 Skill Blacklist\nignore_skills.txt\nnoise / irrelevant skills"]
+        FS["⚙️ Skill Filter\nscripts/filter_skills.py"]
+        RP --> SK
+        SK --> FS
+        BL --> FS
+    end
+    subgraph SEARCH["Job Search Engine"]
+        SC["🕷️ Auto Scour\nscripts/auto_scour.py\nPlaywright multi-site scraper"]
+        SJ["🌐 Job Search Sites\njob_search_sites.json\nsite_selectors.json"]
+        SB["⛔ Site Blacklist\nblacklist.json\nbroken / incompatible sites"]
+        FS --> SC
+        SJ --> SC
+        SB --> SC
+    end
+    subgraph DB["Job Database"]
+        JT["💾 SQLite Job Tracker\njob_tracker.db\ndeduplication / applied / rejected"]
+        JR["📋 Jobs to Review\njobs_to_review.md"]
+        DH["📊 Dashboard\ndashboard.html / dashboard_server.py"]
+        SC --> JT
+        JT --> JR
+        JT --> DH
+    end
+    subgraph RESUME["Resume-as-Code Engine"]
+        VAL["✅ Schema Validator\nresume/compiler/validate.js\nAJV + strict JSON Schema"]
+        BUILD["🔨 Compiler\nresume/compiler/build.js\nJSON to MD + HTML + PDF + DOCX"]
+        ATS["🏢 ATS Adapters\nresume/compiler/adapters\nGreenhouse and Workday"]
+        WATCH["👁️ Watch Mode\nresume/scripts/watch.js\nlive rebuild on save"]
+        RS --> VAL
+        VAL --> BUILD
+        BUILD --> ATS
+        RS --> WATCH
+        WATCH --> BUILD
+    end
+    subgraph HOSTING["Resume Hosting"]
+        WEB["🌐 Portfolio Landing Page\nresume/web/index.html\nFocus Selector + DOCX download"]
+        GHPAGES["🚀 GitHub Pages Deploy\nSaikojin.github.io/Talentscout"]
+        BUILD --> WEB
+        WEB --> GHPAGES
+    end
+    subgraph MCP["AI Agent Layer"]
+        MCPS["🔌 MCP Server\nresume/mcp-server/src/index.ts\n7 agent tools / stdio + HTTP 3001"]
+        BUILD --> MCPS
+    end
+    subgraph AUDIT["Audit and Run Memory"]
+        STDB["🛸 SpacetimeDB\nresume/spacetime\nbuild runs / test results / schema errors"]
+        BUILD --> STDB
+        VAL --> STDB
+    end
+    FS -.->|"skills inform job query"| SC
+    classDef identity  fill:#4f46e5,color:#fff,stroke:#3730a3
+    classDef skill     fill:#0891b2,color:#fff,stroke:#0e7490
+    classDef search    fill:#7c3aed,color:#fff,stroke:#6d28d9
+    classDef db        fill:#059669,color:#fff,stroke:#047857
+    classDef resume    fill:#d97706,color:#fff,stroke:#b45309
+    classDef hosting   fill:#dc2626,color:#fff,stroke:#b91c1c
+    classDef mcp       fill:#9333ea,color:#fff,stroke:#7e22ce
+    classDef audit     fill:#475569,color:#fff,stroke:#334155
+    class RS,RP identity
+    class SK,BL,FS skill
+    class SC,SJ,SB search
+    class JT,JR,DH db
+    class VAL,BUILD,ATS,WATCH resume
+    class WEB,GHPAGES hosting
+    class MCPS mcp
+    class STDB audit
+          </pre>
+        </div>
+      </section>
+
+      <!-- README -->
+      <section class="project-section" aria-labelledby="section-readme">
+        <h2 class="project-section-title" id="section-readme">📖 README</h2>
+        <div class="readme-wrap">
+          <div id="readme-content">
+            <div class="readme-loading">⏳ Loading README…</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── Config injected before app.js runs ─────────────────────────── -->
+  <script>
+    /**
+     * Path overrides for resume/web/app.js when loaded from the repo root.
+     * app.js reads window.__RESUME_CONFIG__ to resolve correct relative paths.
+     */
+    window.__RESUME_CONFIG__ = {
+      resumePath: 'resume/data/resume.json',
+      distPath:   'resume/dist'
+    };
+
+    // ─── View Switcher ─────────────────────────────────────────────────
+    let projectReady = false;
+
+    function switchView(view) {
+      const resumeView  = document.getElementById('view-resume');
+      const projectView = document.getElementById('view-project');
+      const tabResume   = document.getElementById('tab-resume');
+      const tabProject  = document.getElementById('tab-project');
+
+      if (view === 'resume') {
+        resumeView.hidden  = false;
+        projectView.hidden = true;
+        tabResume.classList.add('active');
+        tabResume.setAttribute('aria-selected', 'true');
+        tabProject.classList.remove('active');
+        tabProject.setAttribute('aria-selected', 'false');
+        history.replaceState(null, '', location.pathname);
+        resumeView.scrollIntoView({ behavior: 'instant' });
+      } else {
+        resumeView.hidden  = true;
+        projectView.hidden = false;
+        tabResume.classList.remove('active');
+        tabResume.setAttribute('aria-selected', 'false');
+        tabProject.classList.add('active');
+        tabProject.setAttribute('aria-selected', 'true');
+        history.replaceState(null, '', location.pathname + '#project');
+        initProjectView();
+      }
+    }
+
+    // ─── Lazy Project View Initializer ─────────────────────────────────
+    async function initProjectView() {
+      if (projectReady) return;
+      projectReady = true;
+
+      // Fetch and render README.md
+      try {
+        const res = await fetch('./README.md');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const md = await res.text();
+        const readmeEl = document.getElementById('readme-content');
+        if (window.marked) {
+          readmeEl.innerHTML = window.marked.parse(md);
+        } else {
+          // Fallback: pre-formatted text with basic escaping
+          readmeEl.innerHTML = '<pre style="white-space:pre-wrap;font-family:inherit">'
+            + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            + '</pre>';
+        }
+      } catch (_) {
+        document.getElementById('readme-content').innerHTML =
+          '<p style="color:#8b949e">README could not be loaded. '
+          + '<a href="https://github.com/Saikojin/Talentscout#readme" target="_blank" rel="noopener">View on GitHub →</a></p>';
+      }
+
+      // Initialize and run Mermaid diagram
+      if (window.mermaid) {
+        mermaid.initialize({
+          startOnLoad:   false,
+          theme:         'dark',
+          securityLevel: 'loose',
+          fontFamily:    'Inter, ui-sans-serif, system-ui, sans-serif',
+          themeVariables: {
+            darkMode:           true,
+            background:         '#0d1117',
+            primaryColor:       '#1f6feb',
+            primaryTextColor:   '#e6edf3',
+            lineColor:          '#58a6ff',
+            edgeLabelBackground:'#161b22',
+          },
+        });
+        await mermaid.run({ querySelector: '.mermaid' });
+      }
+    }
+
+    // ─── Hash routing on initial load ──────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      if (location.hash === '#project') {
+        switchView('project');
+      }
+    });
+  </script>
+
+  <!-- Resume app — deferred so config script above runs first -->
+  <script src="resume/web/app.js" defer></script>
+
+  <!-- Project view dependencies: Mermaid and Marked (non-deferred so they're available synchronously on tab click) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+
+</body>
+</html>
