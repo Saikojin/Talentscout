@@ -52,9 +52,14 @@ function text(str) { return document.createTextNode(str || ''); }
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Present';
+  // Match YYYY-MM or YYYY-MM-DD; pass through anything already human-readable.
+  const match = dateStr.match(/^(\d{4})-(\d{2})/);
+  if (!match) return dateStr;
   try {
-    const d = new Date(dateStr + '-01');
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    // Use local Date constructor (not ISO string) to avoid UTC midnight
+    // rolling back a day in negative-offset timezones.
+    return new Date(Number(match[1]), Number(match[2]) - 1, 1)
+      .toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
   } catch { return dateStr; }
 }
 
