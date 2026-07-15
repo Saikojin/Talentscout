@@ -63,6 +63,31 @@
           "tags": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "location": { "type": "string" },
+          "keyResponsibilities": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "skillsUsed": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "toolsUsed": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "challenges": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "wins": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "lessonsLearned": {
+            "type": "array",
+            "items": { "type": "string" }
           }
         }
       }

@@ -457,6 +457,34 @@ body {
   border: 1px solid rgba(88,166,255,0.2);
 }
 
+/* Detailed Work History Sections */
+.work-sub-section {
+  margin-top: 16px;
+}
+.work-sub-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+.tag-skill {
+  background: rgba(56, 139, 253, 0.1);
+  border-color: rgba(56, 139, 253, 0.3);
+  color: #58a6ff;
+}
+.tag-tool {
+  background: rgba(188, 140, 255, 0.15);
+  border-color: rgba(188, 140, 255, 0.35);
+  color: #bc8cff;
+}
+.card-location {
+  color: var(--color-text-muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
 /* ── Skills Grid ─────────────────────────────────────────────── */
 .skills-grid {
   display: grid;
