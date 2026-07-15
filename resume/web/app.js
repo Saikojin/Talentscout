@@ -26,6 +26,18 @@ const MCP_URL     = window.__RESUME_CONFIG__?.mcpUrl !== undefined
 const RESUME_PATH = window.__RESUME_CONFIG__?.resumePath ?? './data/resume.json';
 const DIST_PATH   = window.__RESUME_CONFIG__?.distPath   ?? '../dist';
 
+const urlParams = new URLSearchParams(window.location.search);
+const includeParam = urlParams.get('include');
+const excludeParam = urlParams.get('exclude');
+const includeFields = includeParam ? includeParam.split(',') : null;
+const excludeFields = excludeParam ? excludeParam.split(',') : null;
+
+function isFieldVisible(fieldName) {
+  if (includeFields && !includeFields.includes(fieldName)) return false;
+  if (excludeFields && excludeFields.includes(fieldName)) return false;
+  return true;
+}
+
 const FOCUS_TAGS = {
   all:        null,   // No filtering
   frontend:   ['frontend'],
@@ -280,8 +292,14 @@ function renderWorkCard(job, delay) {
   const titleGroup = el('div');
   const title = el('h3', { class: 'card-title' });
   title.textContent = job.name;
+  
   const subtitle = el('div', { class: 'card-subtitle' });
   subtitle.textContent = job.position;
+  if (job.location && isFieldVisible('location')) {
+    const locSpan = el('span', { class: 'card-location' });
+    locSpan.textContent = ` 📍 ${job.location}`;
+    subtitle.appendChild(locSpan);
+  }
   titleGroup.append(title, subtitle);
 
   const date = el('span', { class: 'card-date' });
@@ -296,7 +314,7 @@ function renderWorkCard(job, delay) {
     card.appendChild(summary);
   }
 
-  if (job.highlights?.length) {
+  if (job.highlights?.length && isFieldVisible('highlights')) {
     const ul = el('ul', { class: 'card-highlights' });
     for (const h of job.highlights) {
       const li = el('li');
@@ -304,6 +322,84 @@ function renderWorkCard(job, delay) {
       ul.appendChild(li);
     }
     card.appendChild(ul);
+  }
+
+  if (job.keyResponsibilities?.length && isFieldVisible('keyResponsibilities')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Key Responsibilities'));
+    const ul = el('ul', { class: 'card-highlights' });
+    for (const r of job.keyResponsibilities) {
+      const li = el('li');
+      li.textContent = r;
+      ul.appendChild(li);
+    }
+    div.appendChild(ul);
+    card.appendChild(div);
+  }
+
+  if (job.skillsUsed?.length && isFieldVisible('skillsUsed')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Skills Used'));
+    const tags = el('div', { class: 'card-tags' });
+    for (const s of job.skillsUsed) {
+      const tag = el('span', { class: 'tag tag-skill' });
+      tag.textContent = s;
+      tags.appendChild(tag);
+    }
+    div.appendChild(tags);
+    card.appendChild(div);
+  }
+
+  if (job.toolsUsed?.length && isFieldVisible('toolsUsed')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Tools Used'));
+    const tags = el('div', { class: 'card-tags' });
+    for (const t of job.toolsUsed) {
+      const tag = el('span', { class: 'tag tag-tool' });
+      tag.textContent = t;
+      tags.appendChild(tag);
+    }
+    div.appendChild(tags);
+    card.appendChild(div);
+  }
+
+  if (job.challenges?.length && isFieldVisible('challenges')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Challenges'));
+    const ul = el('ul', { class: 'card-highlights' });
+    for (const c of job.challenges) {
+      const li = el('li');
+      li.textContent = c;
+      ul.appendChild(li);
+    }
+    div.appendChild(ul);
+    card.appendChild(div);
+  }
+
+  if (job.wins?.length && isFieldVisible('wins')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Wins'));
+    const ul = el('ul', { class: 'card-highlights' });
+    for (const w of job.wins) {
+      const li = el('li');
+      li.textContent = w;
+      ul.appendChild(li);
+    }
+    div.appendChild(ul);
+    card.appendChild(div);
+  }
+
+  if (job.lessonsLearned?.length && isFieldVisible('lessonsLearned')) {
+    const div = el('div', { class: 'work-sub-section' });
+    div.appendChild(el('h4', { class: 'work-sub-title' }, 'Lessons Learned'));
+    const ul = el('ul', { class: 'card-highlights' });
+    for (const l of job.lessonsLearned) {
+      const li = el('li');
+      li.textContent = l;
+      ul.appendChild(li);
+    }
+    div.appendChild(ul);
+    card.appendChild(div);
   }
 
   if (job.tags?.length) {

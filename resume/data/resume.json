@@ -47,7 +47,30 @@
         "Managed test execution, triage, bug management, and resolution",
         "Tracked lifecycle timelines and produced test status reports"
       ],
-      "tags": ["automation", "karate", "drupal", "web", "qa"]
+      "tags": ["automation", "karate", "drupal", "web", "qa"],
+      "location": "Bellevue, WA / Remote",
+      "keyResponsibilities": [
+        "Drive Karate automation framework architecture and test planning",
+        "Perform manual exploratory testing on new features"
+      ],
+      "skillsUsed": [
+        "Test Planning",
+        "Automation Architecture"
+      ],
+      "toolsUsed": [
+        "Karate",
+        "Browserstack",
+        "Drupal"
+      ],
+      "challenges": [
+        "Transitioning legacy manual processes to automated workflows without delaying existing release cycles"
+      ],
+      "wins": [
+        "Achieved 85% test automation coverage within 18 months"
+      ],
+      "lessonsLearned": [
+        "Involving development teams early in the test plan creation yields far cleaner software builds"
+      ]
     },
     {
       "name": "OpenMarket",

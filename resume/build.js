@@ -17,6 +17,17 @@ const ROOT = resolve(__dirname, '..');
 const DIST = resolve(ROOT, 'dist');
 const PDF_MODE = process.argv.includes('--pdf');
 
+const includeArg = process.argv.find(arg => arg.startsWith('--include='));
+const excludeArg = process.argv.find(arg => arg.startsWith('--exclude='));
+const includeFields = includeArg ? includeArg.split('=')[1].split(',') : null;
+const excludeFields = excludeArg ? excludeArg.split('=')[1].split(',') : null;
+
+function isFieldActive(fieldName) {
+  if (includeFields && !includeFields.includes(fieldName)) return false;
+  if (excludeFields && excludeFields.includes(fieldName)) return false;
+  return true;
+}
+
 function ensureDist() {
   if (!existsSync(DIST)) mkdirSync(DIST, { recursive: true });
 }
@@ -65,11 +76,34 @@ function buildMarkdown(r) {
     lines.push('## Experience');
     for (const job of work) {
       const dates = `${formatDate(job.startDate)} – ${formatDate(job.endDate)}`;
-      lines.push(`### ${job.position} · ${job.name}`);
+      const jobLocation = job.location && isFieldActive('location') ? ` (${job.location})` : '';
+      lines.push(`### ${job.position} · ${job.name}${jobLocation}`);
       lines.push(`*${dates}*`);
       if (job.summary) lines.push(job.summary);
-      if (job.highlights?.length) {
+      if (job.highlights?.length && isFieldActive('highlights')) {
         for (const h of job.highlights) lines.push(`- ${h}`);
+      }
+      if (job.keyResponsibilities?.length && isFieldActive('keyResponsibilities')) {
+        lines.push('\n**Key Responsibilities:**');
+        for (const r of job.keyResponsibilities) lines.push(`- ${r}`);
+      }
+      if (job.skillsUsed?.length && isFieldActive('skillsUsed')) {
+        lines.push(`\n**Skills Used:** ${job.skillsUsed.join(', ')}`);
+      }
+      if (job.toolsUsed?.length && isFieldActive('toolsUsed')) {
+        lines.push(`\n**Tools Used:** ${job.toolsUsed.join(', ')}`);
+      }
+      if (job.challenges?.length && isFieldActive('challenges')) {
+        lines.push('\n**Challenges:**');
+        for (const c of job.challenges) lines.push(`- ${c}`);
+      }
+      if (job.wins?.length && isFieldActive('wins')) {
+        lines.push('\n**Wins:**');
+        for (const w of job.wins) lines.push(`- ${w}`);
+      }
+      if (job.lessonsLearned?.length && isFieldActive('lessonsLearned')) {
+        lines.push('\n**Lessons Learned:**');
+        for (const l of job.lessonsLearned) lines.push(`- ${l}`);
       }
       lines.push('');
     }
