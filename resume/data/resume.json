@@ -50,26 +50,37 @@
       "tags": ["automation", "karate", "drupal", "web", "qa"],
       "location": "Bellevue, WA / Remote",
       "keyResponsibilities": [
-        "Drive Karate automation framework architecture and test planning",
-        "Perform manual exploratory testing on new features"
+        "Drive Karate automation framework architecture, planning, and implementation",
+        "Perform manual website and exploratory testing",
+        "Manage test execution, triage, defect cycles, and lifecycle reporting"
       ],
       "skillsUsed": [
-        "Test Planning",
-        "Automation Architecture"
+        "Test Automation",
+        "Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
       ],
       "toolsUsed": [
-        "Karate",
+        "Karate DSL",
+        "Drupal",
         "Browserstack",
-        "Drupal"
+        "Jira",
+        "Confluence",
+        "JavaScript",
+        "IntelliJ"
       ],
       "challenges": [
-        "Transitioning legacy manual processes to automated workflows without delaying existing release cycles"
+        "Navigating entrenched peer QA resistance to adopting automation",
+        "Customizing parallel execution, wait timings, and full-flow API testing in Karate"
       ],
       "wins": [
-        "Achieved 85% test automation coverage within 18 months"
+        "Built Karate test suites from zero baseline to cover 85% of manual testing with 1500+ tests",
+        "Freed up QA bandwidth so developers/PMs entrusted the team with advanced exploratory testing",
+        "Expanded Karate from simple API checks to full visual UI comparison and performance coverages"
       ],
       "lessonsLearned": [
-        "Involving development teams early in the test plan creation yields far cleaner software builds"
+        "Speak up louder when adding automation and introducing process/documentation improvements",
+        "Proactively investigate documentation gaps even when told everything is covered"
       ]
     },
     {
@@ -85,7 +96,44 @@
         "Automated tests in both Fit and Karate frameworks",
         "Tracked lifecycle timelines and produced test status reports"
       ],
-      "tags": ["automation", "api", "karate", "aws", "sms", "qa"]
+      "tags": ["automation", "api", "karate", "aws", "sms", "qa"],
+      "location": "Seattle, WA / Remote",
+      "keyResponsibilities": [
+        "Configure machines and devices for manual and automated tests",
+        "Perform API and data-driven testing on SMS, MMS, and RCS services",
+        "Design and distribute Karate API testing templates to cloud migration teams",
+        "Document systems, test methodologies, and train developers/QA"
+      ],
+      "skillsUsed": [
+        "Test Automation",
+        "API & Data Testing",
+        "DevOps & Infrastructure",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Karate",
+        "Fit / Fitnesse",
+        "AWS",
+        "Docker",
+        "Terraform",
+        "Postman",
+        "GitHub",
+        "Bash",
+        "IntelliJ"
+      ],
+      "challenges": [
+        "Rapidly learning and integrating complex frameworks, containers, and CI/CD controls as a manual-heavy tester",
+        "Ramping up on Fit/Fitnesse with no prior documentation, resolving merge conflicts, and aligning peer QA practices"
+      ],
+      "wins": [
+        "Designed a reusable Karate API test template for cloud migration, accelerating test setup company-wide",
+        "Succeeded as a product SME by rewriting missing product/codebase documentation",
+        "Transitioned into writing long-lived, complex automated suitesDaily drove Git and CI/CD tools"
+      ],
+      "lessonsLearned": [
+        "Onboarding documentation updates are highly effective at exposing product and codebase gaps",
+        "Reusable templates and standardize tools greatly accelerate organizational agility"
+      ]
     },
     {
       "name": "Apptio",
@@ -100,7 +148,39 @@
         "Pushed management to broaden automation capabilities",
         "Standardized documentation and experience sharing across disciplines"
       ],
-      "tags": ["manual-testing", "enterprise", "web", "qa"]
+      "tags": ["manual-testing", "enterprise", "web", "qa"],
+      "location": "Bellevue, WA",
+      "keyResponsibilities": [
+        "Deploy, configure, and validate Fortune 500 upgrade instances",
+        "Verify data migrations and user administration layers",
+        "Troubleshoot bespoke environment setup scripts with Dev and SDETs"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "API & Data Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Zephyr",
+        "Bespoke data migration scripts",
+        "Spreadsheets (shortcut guides, cheat sheets)",
+        "Windows",
+        "Enterprise Web Apps"
+      ],
+      "challenges": [
+        "Managing data migrations across highly custom, client-specific database layers",
+        "Diagnosing undocumented failures in custom migration scripts that varied between clients"
+      ],
+      "wins": [
+        "Cut manual regression testing cycles in half (from full day to half day) by publishing custom cheat sheets and shortcut maps",
+        "Enabled long-duration test runs to finish within a single business day",
+        "Identified and documented logical errors in development's migration scripts"
+      ],
+      "lessonsLearned": [
+        "Internal alignment remains challenging even when building products dedicated to IT spend communication",
+        "Rapid ramp-up and self-directed organization are critical in high-pace contract roles"
+      ]
     },
     {
       "name": "Placed Inc.",
@@ -115,7 +195,42 @@
         "Lead meetings and product development discussions to uphold quality standards",
         "Ran daily, weekly, monthly test cycles for web and quarterly cycles for mobile"
       ],
-      "tags": ["mobile", "web", "manual-testing", "qa", "process"]
+      "tags": ["mobile", "web", "manual-testing", "qa", "process"],
+      "location": "Seattle, WA",
+      "keyResponsibilities": [
+        "Design QA baseline guidelines and onboarding handbooks",
+        "Perform manual, regression, compatibility, and security tests on Web, iOS, and Android",
+        "Test backend data ingestion pipelines producing commercial reports",
+        "Set up Jenkins triggers to signal manual test runs"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Debugging & Diagnostics",
+        "DevOps & Infrastructure",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Man-in-the-Middle (MitM) proxies",
+        "Jenkins CI/CD",
+        "Browserstack",
+        "Optimizely",
+        "Android SDK",
+        "iOS SDK"
+      ],
+      "challenges": [
+        "Synchronizing release streams of daily web updates, quarterly app store releases, and continuous data pipeline runs",
+        "Upskilling in proxy manipulations (MitM) for negative and security testing"
+      ],
+      "wins": [
+        "Scaled QA department from one overworked tester to a structured team including a lead, an SDET, and manual testers",
+        "Aligned mobile app build flows in Jenkins alongside web and data deployments for true CI/CD",
+        "Delivered repeatable, robust test coverage for core data pipelines and analytics web reporting"
+      ],
+      "lessonsLearned": [
+        "Building a QA department requires a deep technical understanding of the product stack before laying down processes",
+        "Proxy manipulation and A/B testing tools are essential to keep up with multi-platform releases"
+      ]
     },
     {
       "name": "Array Health",
@@ -129,7 +244,36 @@
         "Led meetings and product development discussions to enforce quality standards",
         "Standardized documentation and experience sharing across disciplines"
       ],
-      "tags": ["web", "healthcare", "manual-testing", "qa"]
+      "tags": ["web", "healthcare", "manual-testing", "qa"],
+      "location": "Seattle, WA",
+      "keyResponsibilities": [
+        "Draft baseline product guides and detailed test plans",
+        "Execute manual regression passes across multiple desktop browsers",
+        "Collaborate with SDET to build Gherkin automation frameworks",
+        "Bridge communication between QA and customer support teams"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Gherkin / Cucumber",
+        "Browserstack",
+        "Jira",
+        "Confluence",
+        "Windows & macOS"
+      ],
+      "challenges": [
+        "Integrating complex state and federal healthcare regulatory requirements into test metrics and checklists"
+      ],
+      "wins": [
+        "Mapped the entire healthcare portal product stack, easing manual testing passes and paving the path for automation",
+        "Introduced QA to customer support planning, ensuring production issues directly informed QA test coverage"
+      ],
+      "lessonsLearned": [
+        "Involving QA early in product planning and support loops dramatically reduces defect escape rates"
+      ]
     },
     {
       "name": "Microsoft",
@@ -144,11 +288,47 @@
         "Developed tools to automate new feature area testing as hardware platforms were added",
         "Trained new and existing testers on tools, hardware, and processes"
       ],
-      "tags": ["windows", "compatibility", "automation", "microsoft", "qa"]
+      "tags": ["windows", "compatibility", "automation", "microsoft", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Configure, deploy, and maintain device compatibility test beds",
+        "Perform manual and WTT-automated compatibility test passes",
+        "Write Batch and PowerShell scripts to scan system specs and flash OS builds",
+        "Run white-box debugging on OS core crashes and memory dumps"
+      ],
+      "skillsUsed": [
+        "Test Automation",
+        "Manual & Exploratory Testing",
+        "Debugging & Diagnostics",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Windows Test Technologies (WTT)",
+        "Windows Hardware Lab Kit (HLK)",
+        "WinDbg (symbol-connected builds)",
+        "Product Studio",
+        "PowerShell & Batch scripting",
+        "Motherboards, ARM boards, IoT, Peripherals"
+      ],
+      "challenges": [
+        "Provisioning and testing unstable, pre-release ARM/mobile hardware (exposing open circuits, bare boards, and raw displays)",
+        "Designing test flows that scaled across thousands of diverse consumer and enterprise devices"
+      ],
+      "wins": [
+        "Designed a hardware coverage matrix that allowed simultaneous testing, bypassing device queue bottlenecks",
+        "Automated firmware checks and OS flashing, saving days of prep time by executing cycles overnight",
+        "Successfully scaled automated deployment systems to provision a new compatibility lab housing hundreds of devices",
+        "Identified kernel-level failures using WinDbg stack tracing"
+      ],
+      "lessonsLearned": [
+        "Managing physical testing scale demands robust automation and scheduling systems (WTT)",
+        "White-box debugging tools (WinDbg, symbol maps) are essential for boundary integration issues"
+      ]
     },
     {
       "name": "Microsoft",
-      "position": "Software Test Engineer 3 — Mobile Applications",
+      "position": "Software Test Engineer 3 — Mobile Applications (Office Mobile)",
       "url": "https://www.microsoft.com",
       "startDate": "2010-11-01",
       "endDate": "2011-04-01",
@@ -159,7 +339,38 @@
         "Documented software defects across multiple bug tracking systems",
         "Developed transition documentation for offshore team handoff"
       ],
-      "tags": ["mobile", "microsoft", "scenario-testing", "qa"]
+      "tags": ["mobile", "microsoft", "scenario-testing", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Build test plans and write user experience scenario flows",
+        "Validate device compatibility and connection states for Office Mobile",
+        "Manage secure check-in/checkout device tracking systems for developers",
+        "Train offshore contract hires and document handset transition guidelines"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Nokia and BlackBerry handsets",
+        "Network simulators & cell signal rigs",
+        "Lumen dimming meters",
+        "Product Studio",
+        "Windows OS"
+      ],
+      "challenges": [
+        "Designing a secure device inventory tracker to support dev dogfooding and prevent loss",
+        "Formatting testing passes so offshore teams without formal handset training could deliver consistent results"
+      ],
+      "wins": [
+        "Completed transition and handoff to offshore team so cleanly that management was unaware of the cutover",
+        "Simplified test case design, allowing immediate execution by rotating contract hires"
+      ],
+      "lessonsLearned": [
+        "Visual scenario flows and user experience maps allow remote/offshore teams to execute tests with minimal oversight",
+        "Physical inventory control is vital when managing pre-release mobile devices"
+      ]
     },
     {
       "name": "Hewlett-Packard",
@@ -174,7 +385,39 @@
         "Investigated external and internal hardware bugs and configured reproduction scenarios",
         "Researched and implemented process improvements for the department"
       ],
-      "tags": ["hardware", "triage", "infrastructure", "hp", "qa"]
+      "tags": ["hardware", "triage", "infrastructure", "hp", "qa"],
+      "location": "Bellevue, WA",
+      "keyResponsibilities": [
+        "Reorganize support labs for workstations and server systems",
+        "Configure automated network imaging infrastructure via PXE boot",
+        "Troubleshoot hardware bugs and swap system components",
+        "Maintain Product Studio bug templates and intake triage guides"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Debugging & Diagnostics",
+        "DevOps & Infrastructure",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Pre-boot Execution Environment (PXE)",
+        "Windows Test Technologies (WTT)",
+        "Product Studio",
+        "Workstations, rack-mounted servers, component flashing tools"
+      ],
+      "challenges": [
+        "Absorbing the server lab workload single-handedly after team consolidation",
+        "Modernizing legacy setups where prior engineers ran all OS installs manually"
+      ],
+      "wins": [
+        "Managed both workstation and server lab workloads independently, matching team-level velocity",
+        "Configured PXE boot network setups and remote reservation systems, cutting physical lab footprints",
+        "Implemented standardized triage gates and bug forms in Product Studio to improve bug logging"
+      ],
+      "lessonsLearned": [
+        "Automating lab setups (PXE/WTT) is essential to scale single-engineer capacity",
+        "Understand the constraints and rules of hardware vendor-partner agreements to improve support loops"
+      ]
     },
     {
       "name": "Medio Systems",
@@ -189,7 +432,38 @@
         "Collaborated with SDET team to develop API testing tools",
         "Supported late-night deployments to live wireless devices"
       ],
-      "tags": ["mobile", "api", "ad-tech", "qa"]
+      "tags": ["mobile", "api", "ad-tech", "qa"],
+      "location": "Seattle, WA",
+      "keyResponsibilities": [
+        "Perform mobile testing using emulators and debug tools",
+        "Modify device boot flags to force staging server connections",
+        "Audit data payloads and ad-delivery packets",
+        "Validate production updates during weekly maintenance windows"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "API & Data Testing",
+        "Debugging & Diagnostics"
+      ],
+      "toolsUsed": [
+        "Carrier-specific debuggers",
+        "Device emulators",
+        "Packet capture tools",
+        "Physical mobile handsets",
+        "SQL"
+      ],
+      "challenges": [
+        "Working across highly fragmented, custom debug tools for separate carriers (Verizon vs T-Mobile)",
+        "Isolating ad-delivery bugs that occurred exclusively over wireless carriers but not wired debugging cables",
+        "Executing live updates and rollbacks between 12 AM and 3 AM PST"
+      ],
+      "wins": [
+        "Isolated critical transmission flaws on active wireless signals that bypass emulator checks",
+        "Shipped the core ad-delivery and collection services on schedule"
+      ],
+      "lessonsLearned": [
+        "Formulate precise diagnostic questions to get development support on complex device setups"
+      ]
     },
     {
       "name": "Microsoft",
@@ -204,7 +478,37 @@
         "Provided UI and feature feedback improving stability and multi-language support",
         "Documented defects across multiple bug tracking systems"
       ],
-      "tags": ["mobile", "lync", "microsoft", "nokia", "qa"]
+      "tags": ["mobile", "lync", "microsoft", "nokia", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Flash Nokia devices using CEPC and deploy builds via serial connections",
+        "Author manual test plans and UI scenario checklists",
+        "Monitor remote offshore testing progress and compile status reports"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "CEPC (Mobile Device Emulator)",
+        "Nokia handset hardware",
+        "Serial-to-USB cables",
+        "Product Studio",
+        "OneNote",
+        "Batch scripting"
+      ],
+      "challenges": [
+        "Validating partner handset integrations under strict organizational silos with no direct developer access",
+        "Keeping offshore team members aligned and unblocked across time zones"
+      ],
+      "wins": [
+        "Delivered a seamless handover of Lync scenarios to the offshore team, keeping reporting quality high",
+        "Automated handset flashing and app deployments using custom serial batch scripts"
+      ],
+      "lessonsLearned": [
+        "Visual flowcharts and screenshots resolve international team alignment issues faster than text-heavy guides"
+      ]
     },
     {
       "name": "AT&T Wireless",
@@ -217,7 +521,37 @@
         "Validated location-based ad delivery via Linux CLI, SOAP APIs, and remote device farms",
         "Managed multi-account, multi-tiered security services for partner account management"
       ],
-      "tags": ["mobile", "api", "linux", "ad-tech", "qa"]
+      "tags": ["mobile", "api", "linux", "ad-tech", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Simulate GPS coordinates on rack-mounted mobile device trays",
+        "Audit SOAP APIs and device logs for ad storage behaviors",
+        "Log activities in the RightNow tracking database",
+        "Manage multi-account security credentials"
+      ],
+      "skillsUsed": [
+        "API & Data Testing",
+        "Manual & Exploratory Testing",
+        "Debugging & Diagnostics"
+      ],
+      "toolsUsed": [
+        "Linux CLI",
+        "SOAP API protocols",
+        "Faraday cages (RF isolation)",
+        "RightNow tracking",
+        "Rack-mounted device trays"
+      ],
+      "challenges": [
+        "Verifying experimental ad-serving features amidst frequently shifting project requirements",
+        "Coping with sudden laboratory closures due to an electrical fire in the UPS backup systems"
+      ],
+      "wins": [
+        "Acquired specialized expertise in RF isolation testing using Faraday cages and shielding chambers",
+        "Maintained a flawless audit trail of test runs and coordinate validations in RightNow prior to project shutdown"
+      ],
+      "lessonsLearned": [
+        "Even major telecom entities will drop experimental systems if lab hardware is knocked out by a power failure"
+      ]
     },
     {
       "name": "Microsoft",
@@ -231,7 +565,37 @@
         "Researched new features during product lifecycle to produce targeted new tests",
         "Managed test execution and bug tracking for set-top box integrations"
       ],
-      "tags": ["windows", "media-center", "hardware", "microsoft", "qa"]
+      "tags": ["windows", "media-center", "hardware", "microsoft", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Configure AV capture cards, TV tuners, remotes, and set-top box topologies",
+        "Execute manual and automated test passes using WTT",
+        "Analyze DRM signal security and media stream decodes",
+        "Research incoming features to structure fresh test plans"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Debugging & Diagnostics"
+      ],
+      "toolsUsed": [
+        "Windows Test Technologies (WTT)",
+        "TV Tuners & Capture cards",
+        "Xbox 360 Extenders",
+        "Product Studio",
+        "Signal analyzers (DRM)"
+      ],
+      "challenges": [
+        "Coordinating testing across isolated, hardware-siloed engineering teams",
+        "Resolving composite connection, driver, and signal issues on third-party electronics"
+      ],
+      "wins": [
+        "Consolidated overlapping tests into a centralized rotating matrix, cutting test runtimes and cross-training peers",
+        "Standardized DRM validation templates, preventing signal decryption bugs in production builds"
+      ],
+      "lessonsLearned": [
+        "Breaking down team silos through rotation matrices builds cross-skilled, faster-moving QA wings"
+      ]
     },
     {
       "name": "NVIDIA",
@@ -244,7 +608,37 @@
         "Tested unreleased hardware for driver releases using ad-hoc and structured manual methods",
         "Executed automation suites alongside tiered manual test passes"
       ],
-      "tags": ["hardware", "drivers", "mobile", "nvidia", "qa"]
+      "tags": ["hardware", "drivers", "mobile", "nvidia", "qa"],
+      "location": "Bellevue, WA",
+      "keyResponsibilities": [
+        "Assemble motherboard setups on open-air acrylic test benches",
+        "Rotate pre-production GPUs across benches to keep automation runs active",
+        "Run Tiers 0-2 smoke checks and Tier 3+ compatibility tests",
+        "Check signal security details inside monitor overscan spaces"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Debugging & Diagnostics"
+      ],
+      "toolsUsed": [
+        "Open-air motherboards",
+        "Pre-production GPUs",
+        "Overscan-adjustable monitors",
+        "NVIDIA driver tools",
+        "Windows OS"
+      ],
+      "challenges": [
+        "Swapping delicate pre-production silicon hardware frequently without motherboard pin failures",
+        "Decoding DRM signal handshakes and driver logs embedded inside monitor overscan coordinate data"
+      ],
+      "wins": [
+        "Managed 4 concurrent acrylic benches and 8 graphics cards without throughput bottlenecks",
+        "Successfully verified overscan graphics data to confirm driver DRM compliance"
+      ],
+      "lessonsLearned": [
+        "Splitting verification into tiered blocks (0-2 for core, 3+ for edge cases) optimizes QA cycles"
+      ]
     },
     {
       "name": "Microsoft",
@@ -259,7 +653,37 @@
         "Monitored device trends and made purchase recommendations",
         "Documented defects and processes to aid tester transitions across tools"
       ],
-      "tags": ["games", "windows", "scripting", "microsoft", "qa"]
+      "tags": ["games", "windows", "scripting", "microsoft", "qa"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Validate game performance and hardware compatibility across multiple configurations",
+        "Automate system setups using custom WMI batch scripts",
+        "Upload OS configurations and directX layers to PXE boot files"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Automation",
+        "Debugging & Diagnostics"
+      ],
+      "toolsUsed": [
+        "WMI (Windows Management Instrumentation)",
+        "Batch scripting",
+        "Symantec Ghost & PXE Servers",
+        "DirectX runtimes",
+        "Product Studio",
+        "PC games (Zoo Tycoon, AoE3, Vanguard, Dungeon Siege)"
+      ],
+      "challenges": [
+        "Manually reinstalling and configuring Windows setups for separate game iterations, creating massive waste",
+        "Locating compatibility defects across vast graphics chipsets and motherboard bounds"
+      ],
+      "wins": [
+        "Designed and deployed WMI-driven scripts on PXE, cutting setup times from hours to minutes",
+        "Discovered a major category of power/sleep crashes during laptop lid closures across varying GPU cards"
+      ],
+      "lessonsLearned": [
+        "Providing engineers creative freedom to script automation removes manual bottlenecks and uncovers complex system integration bugs"
+      ]
     },
     {
       "name": "Monolith Productions",
@@ -273,7 +697,36 @@
         "Trained GMs on tools, product quirks, and player abuse patterns",
         "Implemented agile ticket processing to eliminate stale open tickets"
       ],
-      "tags": ["triage", "bug-tracking", "games", "qa"]
+      "tags": ["triage", "bug-tracking", "games", "qa"],
+      "location": "Kirkland, WA",
+      "keyResponsibilities": [
+        "Audit player emails, tickets, and forum posts using RightNow",
+        "Log into games as a GM to troubleshoot active bugs with players",
+        "File structured bug reports in Product Studio and document console commands"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "RightNow",
+        "The Matrix Online game engine",
+        "Product Studio",
+        "Windows OS"
+      ],
+      "challenges": [
+        "Recreating transient, poorly documented MMORPG bugs based on vague player writeups",
+        "Filtering ticket lines to ignore toxic or abusive player requests without slowing down queues"
+      ],
+      "wins": [
+        "Initiated and designed the Bug Association Representative (BAR) role to link customer support with engineering",
+        "Independently processed and triaged over 1,300 tickets a week",
+        "Documented GM debug commands, enabling the support team to clear in-game character blocks immediately"
+      ],
+      "lessonsLearned": [
+        "Drafting clear, transparent updates for mass client mailings prevents community backlashes during beta fixes"
+      ]
     },
     {
       "name": "VMC Consulting",
@@ -288,7 +741,38 @@
         "Process improvements led to the TCR team handling 8–16 products/games per day vs. the previous 2–4",
         "Maintained labs, improved infrastructure, and trained new hires on testing and bug reporting"
       ],
-      "tags": ["xbox", "console", "certification", "qa", "games"]
+      "tags": ["xbox", "console", "certification", "qa", "games"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Execute end-to-end playthroughs using exploits to test completion limits",
+        "Audit games against Xbox Technical Certification Requirements (TCR)",
+        "Monitor SDKs and devkit telemetry during AV state changes",
+        "Author manual guides and train incoming testers"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Original Xbox Developer Kits & debug units",
+        "Xbox SDK monitoring software",
+        "DirectX libraries",
+        "Product Studio",
+        "Windows OS"
+      ],
+      "challenges": [
+        "Transitioning from weekly releases to a fast-moving, multi-shift 24/7 test cadence",
+        "Handling team expansions and shifting management tiers during rapid lab scaling"
+      ],
+      "wins": [
+        "Designed SDK and devkit training programs that tripled lab testing capacity",
+        "Pioneered the 'Rabbit' speedrun-exploit completion methodology in pre-UAT pipelines",
+        "Increased TCR testing volume from 2-4 games daily to 8-16 games daily"
+      ],
+      "lessonsLearned": [
+        "Mastered the foundation of manual test design, console certification parameters, and hardware telemetry"
+      ]
     },
     {
       "name": "Keane Inc.",
@@ -302,7 +786,37 @@
         "Created boilerplate scripts standardizing the support process for new hires",
         "Handled tier-2 and tier-3 escalations to reduce higher-tier tech workload"
       ],
-      "tags": ["support", "windows", "customer-service"]
+      "tags": ["support", "windows", "customer-service"],
+      "location": "Kirkland, WA",
+      "keyResponsibilities": [
+        "Guide callers through dial-up modems and boot failure troubleshooting",
+        "Perform manual registry repairs and boot updates with users",
+        "Author support templates to standardize agent scripts"
+      ],
+      "skillsUsed": [
+        "Debugging & Diagnostics",
+        "Manual & Exploratory Testing",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "Windows 9x OS family",
+        "Fdisk & Format utility commands",
+        "Windows Registry Editors",
+        "Clarify",
+        "Dial-up networking"
+      ],
+      "challenges": [
+        "Resolving deep developer/engineer issues that bypassed normal support lines",
+        "De-escalating hostile clients to perform registry diagnostics"
+      ],
+      "wins": [
+        "Consistently doubled SLA requirements by processing 16 calls daily",
+        "Deflected tier-2/3 ticket loads by correcting manual flags in client registries",
+        "Achieved top monthly clean system recovery (FFR) metrics, resolving corrupted OS sessions"
+      ],
+      "lessonsLearned": [
+        "Built a deep understanding of Windows registries, boot sectors, and OS file setups"
+      ]
     },
     {
       "name": "Nintendo of America",
@@ -316,7 +830,38 @@
         "Documented platform quirks enabling testers to find more hard-locks and soft-locks",
         "Provided UI and feature feedback improving product stability and multi-language support"
       ],
-      "tags": ["games", "console", "qa", "nintendo"]
+      "tags": ["games", "console", "qa", "nintendo"],
+      "location": "Redmond, WA",
+      "keyResponsibilities": [
+        "Test game files on retail consoles loaded with EPROM chips",
+        "Record active gameplay feeds to analog VHS tape capture setups",
+        "Draft physical paper bug sheets and log cartridge crash points",
+        "Check audio and text assets for licensing compliance"
+      ],
+      "skillsUsed": [
+        "Manual & Exploratory Testing",
+        "Test Planning & Process",
+        "Training & Knowledge Management"
+      ],
+      "toolsUsed": [
+        "N64 & Game Boy retail hardware",
+        "EPROM chips and cartridge burners",
+        "VHS tape recorders",
+        "RF-to-Video capture links",
+        "Paper bug forms"
+      ],
+      "challenges": [
+        "Learning professional QA principles, coverage design, and reporting standards",
+        "Recreating transient black-box crash paths without access to terminal logs"
+      ],
+      "wins": [
+        "Discovered music license violations in game soundtracks, preventing invalid releases",
+        "Established standard video-capture workflows to prove complex speedrun exploits to developers"
+      ],
+      "lessonsLearned": [
+        "Deconstruct applications into logical categories to build deep testing structures",
+        "Use video logs as a vital aid in documenting complex reproduction sequences"
+      ]
     }
   ],
   "volunteer": [],
