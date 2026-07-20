@@ -47,7 +47,7 @@
         "Managed test execution, triage, bug management, and resolution",
         "Tracked lifecycle timelines and produced test status reports"
       ],
-      "tags": ["automation", "karate", "drupal", "web", "qa"],
+      "tags": ["automation", "karate", "drupal", "web", "qa", "frontend", "leadership"],
       "location": "Bellevue, WA / Remote",
       "keyResponsibilities": [
         "Drive Karate automation framework architecture, planning, and implementation",
@@ -96,7 +96,7 @@
         "Automated tests in both Fit and Karate frameworks",
         "Tracked lifecycle timelines and produced test status reports"
       ],
-      "tags": ["automation", "api", "karate", "aws", "sms", "qa"],
+      "tags": ["automation", "api", "karate", "aws", "sms", "qa", "backend", "leadership"],
       "location": "Seattle, WA / Remote",
       "keyResponsibilities": [
         "Configure machines and devices for manual and automated tests",
@@ -148,7 +148,7 @@
         "Pushed management to broaden automation capabilities",
         "Standardized documentation and experience sharing across disciplines"
       ],
-      "tags": ["manual-testing", "enterprise", "web", "qa"],
+      "tags": ["manual-testing", "enterprise", "web", "qa", "frontend", "leadership"],
       "location": "Bellevue, WA",
       "keyResponsibilities": [
         "Deploy, configure, and validate Fortune 500 upgrade instances",
@@ -195,7 +195,7 @@
         "Lead meetings and product development discussions to uphold quality standards",
         "Ran daily, weekly, monthly test cycles for web and quarterly cycles for mobile"
       ],
-      "tags": ["mobile", "web", "manual-testing", "qa", "process"],
+      "tags": ["mobile", "web", "manual-testing", "qa", "process", "frontend", "backend", "leadership"],
       "location": "Seattle, WA",
       "keyResponsibilities": [
         "Design QA baseline guidelines and onboarding handbooks",
@@ -244,7 +244,7 @@
         "Led meetings and product development discussions to enforce quality standards",
         "Standardized documentation and experience sharing across disciplines"
       ],
-      "tags": ["web", "healthcare", "manual-testing", "qa"],
+      "tags": ["web", "healthcare", "manual-testing", "qa", "frontend", "leadership"],
       "location": "Seattle, WA",
       "keyResponsibilities": [
         "Draft baseline product guides and detailed test plans",
@@ -288,7 +288,7 @@
         "Developed tools to automate new feature area testing as hardware platforms were added",
         "Trained new and existing testers on tools, hardware, and processes"
       ],
-      "tags": ["windows", "compatibility", "automation", "microsoft", "qa"],
+      "tags": ["windows", "compatibility", "automation", "microsoft", "qa", "backend", "leadership"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Configure, deploy, and maintain device compatibility test beds",
@@ -339,7 +339,7 @@
         "Documented software defects across multiple bug tracking systems",
         "Developed transition documentation for offshore team handoff"
       ],
-      "tags": ["mobile", "microsoft", "scenario-testing", "qa"],
+      "tags": ["mobile", "microsoft", "scenario-testing", "qa", "frontend", "leadership"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Build test plans and write user experience scenario flows",
@@ -385,7 +385,7 @@
         "Investigated external and internal hardware bugs and configured reproduction scenarios",
         "Researched and implemented process improvements for the department"
       ],
-      "tags": ["hardware", "triage", "infrastructure", "hp", "qa"],
+      "tags": ["hardware", "triage", "infrastructure", "hp", "qa", "backend", "leadership"],
       "location": "Bellevue, WA",
       "keyResponsibilities": [
         "Reorganize support labs for workstations and server systems",
@@ -432,7 +432,7 @@
         "Collaborated with SDET team to develop API testing tools",
         "Supported late-night deployments to live wireless devices"
       ],
-      "tags": ["mobile", "api", "ad-tech", "qa"],
+      "tags": ["mobile", "api", "ad-tech", "qa", "backend"],
       "location": "Seattle, WA",
       "keyResponsibilities": [
         "Perform mobile testing using emulators and debug tools",
@@ -478,7 +478,7 @@
         "Provided UI and feature feedback improving stability and multi-language support",
         "Documented defects across multiple bug tracking systems"
       ],
-      "tags": ["mobile", "lync", "microsoft", "nokia", "qa"],
+      "tags": ["mobile", "lync", "microsoft", "nokia", "qa", "frontend", "leadership"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Flash Nokia devices using CEPC and deploy builds via serial connections",
@@ -521,7 +521,7 @@
         "Validated location-based ad delivery via Linux CLI, SOAP APIs, and remote device farms",
         "Managed multi-account, multi-tiered security services for partner account management"
       ],
-      "tags": ["mobile", "api", "linux", "ad-tech", "qa"],
+      "tags": ["mobile", "api", "linux", "ad-tech", "qa", "backend"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Simulate GPS coordinates on rack-mounted mobile device trays",
@@ -697,7 +697,7 @@
         "Trained GMs on tools, product quirks, and player abuse patterns",
         "Implemented agile ticket processing to eliminate stale open tickets"
       ],
-      "tags": ["triage", "bug-tracking", "games", "qa"],
+      "tags": ["triage", "bug-tracking", "games", "qa", "leadership"],
       "location": "Kirkland, WA",
       "keyResponsibilities": [
         "Audit player emails, tickets, and forum posts using RightNow",
@@ -741,7 +741,7 @@
         "Process improvements led to the TCR team handling 8–16 products/games per day vs. the previous 2–4",
         "Maintained labs, improved infrastructure, and trained new hires on testing and bug reporting"
       ],
-      "tags": ["xbox", "console", "certification", "qa", "games"],
+      "tags": ["xbox", "console", "certification", "qa", "games", "leadership"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Execute end-to-end playthroughs using exploits to test completion limits",
@@ -786,7 +786,7 @@
         "Created boilerplate scripts standardizing the support process for new hires",
         "Handled tier-2 and tier-3 escalations to reduce higher-tier tech workload"
       ],
-      "tags": ["support", "windows", "customer-service"],
+      "tags": ["support", "windows", "customer-service", "leadership"],
       "location": "Kirkland, WA",
       "keyResponsibilities": [
         "Guide callers through dial-up modems and boot failure troubleshooting",
@@ -830,7 +830,7 @@
         "Documented platform quirks enabling testers to find more hard-locks and soft-locks",
         "Provided UI and feature feedback improving product stability and multi-language support"
       ],
-      "tags": ["games", "console", "qa", "nintendo"],
+      "tags": ["games", "console", "qa", "nintendo", "leadership"],
       "location": "Redmond, WA",
       "keyResponsibilities": [
         "Test game files on retail consoles loaded with EPROM chips",
