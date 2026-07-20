@@ -297,7 +297,7 @@ function buildFilteredMarkdown(resume) {
 }
 
 // ─── Filtered DOCX Generator (browser-side via docx CDN) ─────────────────────
-const DOCX_CDN = 'https://cdn.jsdelivr.net/npm/docx@9/build/index.js';
+const DOCX_CDN = 'https://esm.sh/docx@9';
 let _docxLib = null;
 
 async function loadDocxLib() {
