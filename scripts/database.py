@@ -45,7 +45,28 @@ def init_db():
                 cursor.execute("ALTER TABLE jobs ADD COLUMN missing_skills TEXT")
             if 'matched_skills' not in columns:
                 cursor.execute("ALTER TABLE jobs ADD COLUMN matched_skills TEXT")
+            if 'score_profile_id' not in columns:
+                cursor.execute("ALTER TABLE jobs ADD COLUMN score_profile_id INTEGER")
                 
+            # Create profiles table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS profiles (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    description TEXT,
+                    config TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+            """)
+
+            # Create app_settings table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS app_settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                )
+            """)
+
             # Create sites table
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS sites (
@@ -134,7 +155,7 @@ def is_duplicate(url, title=None, company=None):
             conn.close()
     return False
 
-def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None):
+def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None):
     """Add a new job to the database if it doesn't exist."""
     conn = create_connection()
     if conn is not None:
@@ -149,9 +170,9 @@ def add_job(title, company, url, site_source, score=None, missing_skills=None, m
                 matched_skills = json.dumps(matched_skills)
                 
             cursor.execute("""
-                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills)
-                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?)
-            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills))
+                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id)
+                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?)
+            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id))
             conn.commit()
         except sqlite3.Error as e:
             print(f"Error adding job: {e}")

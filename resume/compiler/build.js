@@ -29,7 +29,11 @@ function isFieldActive(fieldName) {
   return true;
 }
 
+const atsArg = process.argv.find(arg => arg.startsWith('--ats='));
+const atsStyle = atsArg ? atsArg.split('=')[1].toUpperCase() : null;
+
 import { buildDocx } from './buildDocx.js';
+import { formatWorkEntryAts } from './atsFormatter.js';
 
 function ensureDist() {
   if (!existsSync(DIST)) mkdirSync(DIST, { recursive: true });
@@ -83,30 +87,39 @@ function buildMarkdown(r) {
       lines.push(`### ${job.position} · ${job.name}${jobLocation}`);
       lines.push(`*${dates}*`);
       if (job.summary) lines.push(job.summary);
-      if (job.highlights?.length && isFieldActive('highlights')) {
-        for (const h of job.highlights) lines.push(`- ${h}`);
-      }
-      if (job.keyResponsibilities?.length && isFieldActive('keyResponsibilities')) {
-        lines.push('\n**Key Responsibilities:**');
-        for (const r of job.keyResponsibilities) lines.push(`- ${r}`);
-      }
-      if (job.skillsUsed?.length && isFieldActive('skillsUsed')) {
-        lines.push(`\n**Skills Used:** ${job.skillsUsed.join(', ')}`);
-      }
-      if (job.toolsUsed?.length && isFieldActive('toolsUsed')) {
-        lines.push(`\n**Tools Used:** ${job.toolsUsed.join(', ')}`);
-      }
-      if (job.challenges?.length && isFieldActive('challenges')) {
-        lines.push('\n**Challenges:**');
-        for (const c of job.challenges) lines.push(`- ${c}`);
-      }
-      if (job.wins?.length && isFieldActive('wins')) {
-        lines.push('\n**Wins:**');
-        for (const w of job.wins) lines.push(`- ${w}`);
-      }
-      if (job.lessonsLearned?.length && isFieldActive('lessonsLearned')) {
-        lines.push('\n**Lessons Learned:**');
-        for (const l of job.lessonsLearned) lines.push(`- ${l}`);
+
+      if (atsStyle) {
+        lines.push(`\n**Impact & Achievements (${atsStyle} Framework):**`);
+        const atsBullets = formatWorkEntryAts(job, atsStyle);
+        for (const bullet of atsBullets) {
+          lines.push(`- ${bullet}`);
+        }
+      } else {
+        if (job.highlights?.length && isFieldActive('highlights')) {
+          for (const h of job.highlights) lines.push(`- ${h}`);
+        }
+        if (job.keyResponsibilities?.length && isFieldActive('keyResponsibilities')) {
+          lines.push('\n**Key Responsibilities:**');
+          for (const r of job.keyResponsibilities) lines.push(`- ${r}`);
+        }
+        if (job.skillsUsed?.length && isFieldActive('skillsUsed')) {
+          lines.push(`\n**Skills Used:** ${job.skillsUsed.join(', ')}`);
+        }
+        if (job.toolsUsed?.length && isFieldActive('toolsUsed')) {
+          lines.push(`\n**Tools Used:** ${job.toolsUsed.join(', ')}`);
+        }
+        if (job.challenges?.length && isFieldActive('challenges')) {
+          lines.push('\n**Challenges:**');
+          for (const c of job.challenges) lines.push(`- ${c}`);
+        }
+        if (job.wins?.length && isFieldActive('wins')) {
+          lines.push('\n**Wins:**');
+          for (const w of job.wins) lines.push(`- ${w}`);
+        }
+        if (job.lessonsLearned?.length && isFieldActive('lessonsLearned')) {
+          lines.push('\n**Lessons Learned:**');
+          for (const l of job.lessonsLearned) lines.push(`- ${l}`);
+        }
       }
       lines.push('');
     }
@@ -301,7 +314,7 @@ async function main() {
   if (DOCX_MODE) {
     const docxPath = resolve(DIST, 'resume.docx');
     try {
-      await buildDocx(resume, docxPath);
+      await buildDocx(resume, docxPath, isFieldActive, atsStyle);
       console.log(`✅  dist/resume.docx`);
     } catch (err) {
       console.warn(`⚠️   DOCX generation failed: ${err.message}`);

@@ -5,12 +5,13 @@ echo.
 echo Starting Resume Server (Port 8000)...
 start "TalentScout Resume Server" cmd /c "python scripts\resume_server.py"
 
-echo Starting Dashboard Server (Port 8001)...
+echo Starting Dashboard Server (Port 8088)...
 start "TalentScout Dashboard Server" cmd /c "python scripts\dashboard_server.py"
 
 echo.
 echo TalentScout Services started!
-echo - Dashboard: http://localhost:8001
+echo - Dashboard: http://localhost:8088
+echo - Profiles & Scoring: http://localhost:8088/profiles
 echo - Resume Scanner: http://localhost:8000
 echo - Crawler Management: http://localhost:8000/manage
 echo.

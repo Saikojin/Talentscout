@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentScout | Profile & Scoring Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-blue: #38bdf8;
+            --accent-purple: #818cf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            background-image: radial-gradient(circle at 50% 1%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 99% 99%, rgba(129, 140, 248, 0.1) 0%, transparent 30%);
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        .nav-link:hover { color: var(--accent-blue); }
+        .nav-link.active { color: var(--text-primary); }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            border-radius: 2px;
+        }
+
+        .main-layout {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); }
+
+        .btn-new {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            color: #0f172a;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+        .btn-new:hover { opacity: 0.9; }
+
+        .profile-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .profile-item {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .profile-item:hover { border-color: rgba(56, 189, 248, 0.3); background: rgba(30, 41, 59, 0.8); }
+
+        .profile-item.active {
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .profile-name { font-weight: 600; font-size: 0.95rem; }
+        .active-badge {
+            font-size: 0.7rem;
+            background: var(--accent-blue);
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .editor-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .editor-actions { display: flex; gap: 0.75rem; }
+
+        .btn-action {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .btn-action:hover { border-color: var(--accent-blue); }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            color: #0f172a;
+            border: none;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .sliders-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slider-box {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-blue);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="http://localhost:8088" class="nav-link">Dashboard</a>
+            <a href="http://localhost:8088/profiles" class="nav-link active">Profiles & Scoring</a>
+            <a href="http://localhost:8000" class="nav-link">Resume Scanner</a>
+            <a href="http://localhost:8000/manage" class="nav-link">Manage Crawlers</a>
+        </div>
+    </nav>
+
+    <div class="main-layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Profiles</span>
+                <button class="btn-new" onclick="createNewProfile()">+ New</button>
+            </div>
+            <ul class="profile-list" id="profileList">
+                <li class="profile-item active">Loading...</li>
+            </ul>
+        </div>
+
+        <div class="editor-card">
+            <div class="editor-header">
+                <h2 id="profileTitle">Profile Configuration</h2>
+                <div class="editor-actions">
+                    <button class="btn-action" onclick="activateCurrentProfile()">Activate</button>
+                    <button class="btn-action" onclick="rescoreJobs()">Re-score All</button>
+                    <button class="btn-action btn-primary" onclick="saveCurrentProfile()">Save Profile</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Profile Name</label>
+                <input type="text" id="profName" class="form-input" placeholder="e.g. Senior QA Specialist">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Candidate Name & Target Experience</label>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                    <input type="text" id="candName" class="form-input" placeholder="Candidate Name">
+                    <select id="expTarget" class="form-select">
+                        <option value="senior">Senior (8+ YOE)</option>
+                        <option value="mid">Mid (3-7 YOE)</option>
+                        <option value="junior">Junior (1-3 YOE)</option>
+                        <option value="fresher">Fresher (0-1 YOE)</option>
+                    </select>
+                </div>
+            </div>
+
+            <h3 style="margin: 1.5rem 0 1rem; font-size: 1rem; color: var(--accent-blue);">Scoring Axis Weights (Sums to 100)</h3>
+            <div class="sliders-grid">
+                <div class="slider-box">
+                    <div class="slider-header">
+                        <span>Title Match Weight</span>
+                        <span id="valTitle">30%</span>
+                    </div>
+                    <input type="range" id="wTitle" min="0" max="100" value="30" oninput="updateWeights()">
+                </div>
+                <div class="slider-box">
+                    <div class="slider-header">
+                        <span>Tech Match Weight</span>
+                        <span id="valTech">35%</span>
+                    </div>
+                    <input type="range" id="wTech" min="0" max="100" value="35" oninput="updateWeights()">
+                </div>
+                <div class="slider-box">
+                    <div class="slider-header">
+                        <span>Experience Level Weight</span>
+                        <span id="valExp">20%</span>
+                    </div>
+                    <input type="range" id="wExp" min="0" max="100" value="20" oninput="updateWeights()">
+                </div>
+                <div class="slider-box">
+                    <div class="slider-header">
+                        <span>Location & Signal Weight</span>
+                        <span id="valSig">15%</span>
+                    </div>
+                    <input type="range" id="wSig" min="0" max="100" value="15" oninput="updateWeights()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Core Tech / Skills (Comma-separated)</label>
+                <textarea id="coreTech" class="form-textarea" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Disqualified Skills (Comma-separated)</label>
+                <input type="text" id="disqSkills" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Min Relevance Score Threshold (0-100)</label>
+                <input type="number" id="minScore" class="form-input" min="0" max="100" value="40">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8088/api';
+        let profiles = [];
+        let activeProfileId = null;
+        let currentEditingId = null;
+        let currentConfig = null;
+
+        async function init() {
+            await loadActive();
+            await loadProfiles();
+        }
+
+        async function loadActive() {
+            try {
+                const res = await fetch(`${API_BASE}/profiles/active`);
+                const data = await res.json();
+                activeProfileId = data.id;
+            } catch (e) { console.error('Error fetching active profile:', e); }
+        }
+
+        async function loadProfiles() {
+            try {
+                const res = await fetch(`${API_BASE}/profiles`);
+                profiles = await res.json();
+                renderSidebar();
+                if (profiles.length > 0 && !currentEditingId) {
+                    selectProfile(activeProfileId || profiles[0].id);
+                }
+            } catch (e) { console.error('Error fetching profiles:', e); }
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('profileList');
+            list.innerHTML = profiles.map(p => `
+                <li class="profile-item ${p.id === currentEditingId ? 'active' : ''}" onclick="selectProfile(${p.id})">
+                    <span class="profile-name">${p.name}</span>
+                    ${p.id === activeProfileId ? '<span class="active-badge">ACTIVE</span>' : ''}
+                </li>
+            `).join('');
+        }
+
+        async function selectProfile(id) {
+            currentEditingId = id;
+            renderSidebar();
+            try {
+                const res = await fetch(`${API_BASE}/profiles/${id}`);
+                const data = await res.json();
+                currentConfig = data.config;
+                
+                document.getElementById('profName').value = data.name;
+                document.getElementById('candName').value = currentConfig.meta?.candidate_name || '';
+                document.getElementById('expTarget').value = currentConfig.meta?.experience_target || 'senior';
+                
+                const w = currentConfig.scoring?.weights || { title: 30, tech: 35, experience: 20, signal: 15 };
+                document.getElementById('wTitle').value = w.title;
+                document.getElementById('wTech').value = w.tech;
+                document.getElementById('wExp').value = w.experience;
+                document.getElementById('wSig').value = w.signal;
+                updateWeights();
+
+                document.getElementById('coreTech').value = (currentConfig.scoring?.core_tech || []).join(', ');
+                document.getElementById('disqSkills').value = (currentConfig.scoring?.disqualified_skills || []).join(', ');
+                document.getElementById('minScore').value = currentConfig.scoring?.min_relevance_score || 40;
+            } catch (e) { console.error('Error loading profile detail:', e); }
+        }
+
+        function updateWeights() {
+            document.getElementById('valTitle').innerText = document.getElementById('wTitle').value + '%';
+            document.getElementById('valTech').innerText = document.getElementById('wTech').value + '%';
+            document.getElementById('valExp').innerText = document.getElementById('wExp').value + '%';
+            document.getElementById('valSig').innerText = document.getElementById('wSig').value + '%';
+        }
+
+        async function saveCurrentProfile() {
+            if (!currentEditingId) return;
+            
+            const name = document.getElementById('profName').value;
+            const updatedConfig = { ...currentConfig };
+            
+            updatedConfig.meta = updatedConfig.meta || {};
+            updatedConfig.meta.candidate_name = document.getElementById('candName').value;
+            updatedConfig.meta.experience_target = document.getElementById('expTarget').value;
+            
+            updatedConfig.scoring = updatedConfig.scoring || {};
+            updatedConfig.scoring.weights = {
+                title: parseInt(document.getElementById('wTitle').value),
+                tech: parseInt(document.getElementById('wTech').value),
+                experience: parseInt(document.getElementById('wExp').value),
+                signal: parseInt(document.getElementById('wSig').value)
+            };
+            updatedConfig.scoring.core_tech = document.getElementById('coreTech').value.split(',').map(s => s.trim()).filter(Boolean);
+            updatedConfig.scoring.disqualified_skills = document.getElementById('disqSkills').value.split(',').map(s => s.trim()).filter(Boolean);
+            updatedConfig.scoring.min_relevance_score = parseInt(document.getElementById('minScore').value);
+
+            try {
+                const res = await fetch(`${API_BASE}/profiles/${currentEditingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description: '', config: updatedConfig })
+                });
+                if (res.ok) {
+                    alert('Profile saved!');
+                    await loadProfiles();
+                } else { alert('Error saving profile'); }
+            } catch (e) { console.error(e); }
+        }
+
+        async function activateCurrentProfile() {
+            if (!currentEditingId) return;
+            try {
+                const res = await fetch(`${API_BASE}/profiles/${currentEditingId}/activate`, { method: 'POST' });
+                if (res.ok) {
+                    activeProfileId = currentEditingId;
+                    renderSidebar();
+                    alert('Profile activated!');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function rescoreJobs() {
+            if (!currentEditingId) return;
+            try {
+                const res = await fetch(`${API_BASE}/profiles/${currentEditingId}/rescore`, { method: 'POST' });
+                const data = await res.json();
+                alert(`Re-scoring complete! ${data.rescored_count} jobs re-scored.`);
+            } catch (e) { console.error(e); }
+        }
+
+        async function createNewProfile() {
+            const name = prompt('Enter new profile name:');
+            if (!name) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/profiles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description: 'User created profile', config: {} })
+                });
+                const data = await res.json();
+                if (data.profile_id) {
+                    await loadProfiles();
+                    selectProfile(data.profile_id);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

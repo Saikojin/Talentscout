@@ -85,3 +85,29 @@ describe('Compiler — Output Integrity', () => {
     expect(content).toContain(`<title>${candidateName}`);
   });
 });
+
+describe('Compiler — ATS Framework Formatting', () => {
+  it('builds resume with --ats=CAR flag successfully', () => {
+    execSync('node compiler/build.js --ats=CAR', { cwd: ROOT, stdio: 'pipe' });
+    const md = readFileSync(resolve(ROOT, 'dist', 'resume.md'), 'utf8');
+    expect(md).toContain('CAR Framework');
+    expect(md).toContain('Challenge:');
+    expect(md).toContain('Result:');
+  });
+
+  it('builds resume with --ats=STAR flag successfully', () => {
+    execSync('node compiler/build.js --ats=STAR', { cwd: ROOT, stdio: 'pipe' });
+    const md = readFileSync(resolve(ROOT, 'dist', 'resume.md'), 'utf8');
+    expect(md).toContain('STAR Framework');
+    expect(md).toContain('[Situation]');
+    expect(md).toContain('[Result]');
+  });
+
+  it('builds resume with --ats=WHO flag successfully', () => {
+    execSync('node compiler/build.js --ats=WHO', { cwd: ROOT, stdio: 'pipe' });
+    const md = readFileSync(resolve(ROOT, 'dist', 'resume.md'), 'utf8');
+    expect(md).toContain('WHO Framework');
+    expect(md).toContain('What:');
+    expect(md).toContain('Outcome:');
+  });
+});

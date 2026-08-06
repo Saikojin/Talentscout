@@ -45,9 +45,9 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 ### Python Job Scraper (existing)
 - ✅ Multi-site scraping with Playwright
-- ✅ Skill filtering via `base_skillset.json`
-- ✅ SQLite deduplication
-- ✅ Dashboard and Markdown output
+- ✅ Profile & Scoring Engine (`scripts/profile.py` + `scripts/scorer.py`) with customizable weights
+- ✅ SQLite deduplication and profile persistence
+- ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) and Markdown output
 
 ### Resume-as-Code (new — `resume/`)
 - ✅ `resume/data/resume.json` — placeholder data (Alex Rivera); **replace with your own**

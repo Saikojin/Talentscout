@@ -355,7 +355,42 @@ server.registerTool(
   }
 );
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+// ─── Tool: generate_ats_resume ────────────────────────────────────────────────
+server.registerTool(
+  "generate_ats_resume",
+  {
+    description:
+      "Generates resume work experience entries formatted according to standard ATS frameworks: CAR, STAR, LPS, ELITE, or WHO.",
+    inputSchema: {
+      style: z
+        .enum(["CAR", "STAR", "LPS", "ELITE", "WHO"])
+        .optional()
+        .default("CAR")
+        .describe("Target ATS framework style"),
+    },
+  },
+  async ({ style }) => {
+    const { work } = resume;
+    const { formatWorkEntryAts } = await import("../../compiler/atsFormatter.js");
+
+    const formattedWork = (work ?? []).map((j) => ({
+      company: j.name,
+      position: j.position,
+      dates: `${j.startDate} - ${j.endDate || "Present"}`,
+      atsStyle: style,
+      bullets: formatWorkEntryAts(j as any, style),
+    }));
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ style, work: formattedWork }, null, 2),
+        },
+      ],
+    };
+  }
+);
 const useHttp = process.argv.includes("--http");
 
 if (useHttp) {

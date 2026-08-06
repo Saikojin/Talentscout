@@ -26,6 +26,12 @@ This skill guides the agent in interviewing the user to build a highly detailed,
      - **Challenges Faced** (list)
      - **Wins / Accomplishments** (list)
      - **Lessons Learned** (list)
+     - **ATS Framework Bullets (Optional pre-authoring)**:
+       - **CAR** (Challenge, Action, Result)
+       - **STAR** (Situation, Task, Action, Result)
+       - **LPS** (Leadership, Problem-Solving, Success)
+       - **ELITE** (Elevate, Leverage, Illustrate, Transfer, Execute)
+       - **WHO** (What, How, Outcome)
    - Do not overwhelm the user. Ask about 2-3 fields at a time, providing their current answers (if any) as context.
-   - Once all details are gathered, update `resume/data/resume.json` directly using code replacement tools, ensuring the schema remains valid.
+   - Once all details are gathered, update `resume/data/resume.json` directly (including populating `atsBullets` under the work item if specific ATS formulations were provided), ensuring the schema remains valid.
    - Re-run `npm run build` or `node resume/build.js` to compile the changes.

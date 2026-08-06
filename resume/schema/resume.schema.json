@@ -88,6 +88,17 @@
           "lessonsLearned": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "atsBullets": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "CAR": { "type": "array", "items": { "type": "string" } },
+              "STAR": { "type": "array", "items": { "type": "string" } },
+              "LPS": { "type": "array", "items": { "type": "string" } },
+              "ELITE": { "type": "array", "items": { "type": "string" } },
+              "WHO": { "type": "array", "items": { "type": "string" } }
+            }
           }
         }
       }
