@@ -12,7 +12,9 @@ import { writeFileSync } from 'fs';
  * @param {Function} [isActive]   (fieldName: string) => boolean filter;
  *                                defaults to () => true (include everything)
  */
-export async function buildDocx(resume, outputPath, isActive = () => true) {
+import { formatWorkEntryAts } from './atsFormatter.js';
+
+export async function buildDocx(resume, outputPath, isActive = () => true, atsStyle = null) {
   const { basics, work, education, skills, projects, references } = resume;
 
   const children = [];
@@ -219,16 +221,21 @@ export async function buildDocx(resume, outputPath, isActive = () => true) {
         );
       }
 
-      if (job.highlights && job.highlights.length && isActive('highlights')) {
-        for (const highlight of job.highlights) addBullet(highlight);
-      }
+      if (atsStyle) {
+        const atsBullets = formatWorkEntryAts(job, atsStyle);
+        addSubSection(`Impact & Achievements (${atsStyle} Framework)`, atsBullets);
+      } else {
+        if (job.highlights && job.highlights.length && isActive('highlights')) {
+          for (const highlight of job.highlights) addBullet(highlight);
+        }
 
-      if (isActive('keyResponsibilities')) addSubSection('Key Responsibilities', job.keyResponsibilities);
-      if (isActive('skillsUsed'))          addChipLine('Skills Used', job.skillsUsed);
-      if (isActive('toolsUsed'))           addChipLine('Tools Used', job.toolsUsed);
-      if (isActive('challenges'))          addSubSection('Challenges', job.challenges);
-      if (isActive('wins'))                addSubSection('Wins', job.wins);
-      if (isActive('lessonsLearned'))      addSubSection('Lessons Learned', job.lessonsLearned);
+        if (isActive('keyResponsibilities')) addSubSection('Key Responsibilities', job.keyResponsibilities);
+        if (isActive('skillsUsed'))          addChipLine('Skills Used', job.skillsUsed);
+        if (isActive('toolsUsed'))           addChipLine('Tools Used', job.toolsUsed);
+        if (isActive('challenges'))          addSubSection('Challenges', job.challenges);
+        if (isActive('wins'))                addSubSection('Wins', job.wins);
+        if (isActive('lessonsLearned'))      addSubSection('Lessons Learned', job.lessonsLearned);
+      }
 
       // Spacer between jobs
       children.push(new Paragraph({ spacing: { after: 80 } }));

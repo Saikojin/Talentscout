@@ -12,6 +12,8 @@ from playwright.async_api import async_playwright
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from scripts.filter_skills import filter_job
+    from scripts.scorer import score_job
+    from scripts.profile import get_active_profile, seed_default_profile
     from scripts.database import is_duplicate, add_job, get_all_search_configs, get_all_companies
     from scripts.cleanup import clean_logs
 except ImportError:
@@ -440,7 +442,8 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
             print(f"  [!] Timeout fetching JD for {job['url']}")
             return None
     
-    filter_results = filter_job(jd_text, SKILLSET_FILE)
+    active_profile = get_active_profile()
+    filter_results = score_job(jd_text, title=job.get("title", ""), profile_data=active_profile)
     job["filter_results"] = filter_results
     
     if filter_results.get("is_disqualified"):
@@ -450,8 +453,9 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
     score = filter_results.get("score", 75)
     missing_skills = filter_results.get("missing_skills", [])[:3]
     matched_skills = filter_results.get("matched_skills", [])[:5] 
+    profile_id = filter_results.get("score_profile_id")
     
-    add_job(job["title"], job["company"], job["url"], job["site"], score, missing_skills, matched_skills)
+    add_job(job["title"], job["company"], job["url"], job["site"], score, missing_skills, matched_skills, score_profile_id=profile_id)
     return job
 
 async def worker(context, queue, semaphore, processed_urls, results):
@@ -471,6 +475,7 @@ async def main():
     import aiohttp
     from scripts.ats_adapters.index import route_company
     
+    seed_default_profile()
     search_configs = get_all_search_configs()
     companies = get_all_companies()
     blacklist = load_json(BLACKLIST_FILE)
