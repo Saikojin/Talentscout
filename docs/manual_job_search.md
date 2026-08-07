@@ -29,7 +29,7 @@ Run the automated scrapers to populate the database with new opportunities.
 Evaluate the accumulated jobs using the Dashboard.
 
 1. **Open Dashboard**
-   - Navigate to the **Dashboard** at `http://localhost:8001/`.
+   - Navigate to the **Dashboard** at `http://localhost:8088/` (or **Profiles & Scoring** at `http://localhost:8088/profiles`).
    - Click **Connect to Database**. This will fetch all jobs currently marked as `new`.
 
 2. **Batch Rejection (Optional but Recommended)**
