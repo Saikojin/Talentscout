@@ -88,7 +88,7 @@ def score_job(jd_text: str, title: str = "", profile_data: dict = None) -> dict:
             disqualified_by.append(f"Location Restricted: {loc_neg}")
 
     # Axis 1: Title Score (Weight default 30)
-    title_score = 50 # Baseline neutral
+    title_score = 0 # Baseline 0 if no positive title keywords match
     title_positives = search_cfg.get("title_keywords_positive", [])
     title_matches = [p for p in title_positives if p.lower() in title_lower]
     if title_matches:
