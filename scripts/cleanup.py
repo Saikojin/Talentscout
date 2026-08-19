@@ -1,5 +1,7 @@
 import os
 import glob
+import sys
+import argparse
 
 def clean_logs(logs_dir="logs"):
     """
@@ -46,3 +48,30 @@ def clean_logs(logs_dir="logs"):
         print(f"[*] Cleanup complete. Removed {deleted_count} temporary files.\n")
     else:
         print("[*] Cleanup complete. No temporary files found.\n")
+
+def clean_companies(blacklist_file="blacklist.json"):
+    """Prunes blacklisted companies directly from the database."""
+    # Append root dir to path to import database module
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from scripts.database import clean_blacklisted_companies_from_db
+    
+    print("\n[*] Pruning blacklisted companies from database...")
+    deleted = clean_blacklisted_companies_from_db(blacklist_file)
+    print(f"[*] Removed {deleted} blacklisted companies from database.\n")
+    return deleted
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Cleanup logs and database entries.")
+    parser.add_argument("--logs", action="store_true", help="Clean temporary log files")
+    parser.add_argument("--companies", action="store_true", help="Prune blacklisted companies from DB")
+    parser.add_argument("--all", action="store_true", help="Clean logs and prune blacklisted companies")
+    args = parser.parse_args()
+    
+    if args.all:
+        clean_logs()
+        clean_companies()
+    elif args.companies:
+        clean_companies()
+    else:
+        clean_logs()
+

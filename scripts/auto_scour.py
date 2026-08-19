@@ -35,14 +35,54 @@ def load_json(filepath):
 def log(message):
     print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] {message}")
 
-def is_domain_reachable(url: str) -> bool:
-    """Quick synchronous DNS check before spinning up a Playwright page."""
+_DNS_CACHE = {}
+
+def is_blacklisted(url: str, name: str, blacklist_set: set) -> bool:
+    """Fast check against the blacklist set for domain, hostname, parent domain, or name."""
+    if not blacklist_set:
+        return False
+    if url:
+        hostname = urlparse(url).netloc.lower().strip()
+        if hostname:
+            if hostname in blacklist_set:
+                return True
+            if hostname.startswith("www.") and hostname[4:] in blacklist_set:
+                return True
+            parts = hostname.split(".")
+            for i in range(1, len(parts) - 1):
+                parent = ".".join(parts[i:])
+                if parent in blacklist_set:
+                    return True
+    if name:
+        name_lower = name.lower().strip()
+        if name_lower in blacklist_set:
+            return True
+    return False
+
+def _check_dns_sync(hostname: str) -> bool:
     try:
-        hostname = urlparse(url).netloc
+        socket.setdefaulttimeout(2.0)
         socket.getaddrinfo(hostname, 443, proto=socket.IPPROTO_TCP)
         return True
-    except socket.gaierror:
+    except (socket.gaierror, socket.timeout, Exception):
         return False
+
+async def is_domain_reachable(url: str, blacklist_set: set = None) -> bool:
+    """Non-blocking DNS check with in-memory caching and auto-blacklisting on failure."""
+    hostname = urlparse(url).netloc.lower().strip()
+    if not hostname:
+        return False
+    
+    if hostname in _DNS_CACHE:
+        return _DNS_CACHE[hostname]
+    
+    loop = asyncio.get_running_loop()
+    reachable = await loop.run_in_executor(None, _check_dns_sync, hostname)
+    _DNS_CACHE[hostname] = reachable
+    
+    if not reachable:
+        auto_blacklist(url, "ERR_NAME_NOT_RESOLVED", blacklist_set)
+    return reachable
 
 # Errors that indicate a permanently broken domain — auto-blacklist these.
 FATAL_NAV_ERRORS = (
@@ -65,11 +105,23 @@ def _get_timeout(url: str) -> int:
     """Longer timeout for SPA hosts that load slowly."""
     return 45000 if any(h in url for h in SPA_HOSTS) else 30000
 
-def auto_blacklist(url: str, error_str: str) -> None:
-    """Append the hostname to blacklist.json when a fatal TLS/protocol error occurs."""
-    if not any(code in error_str for code in FATAL_NAV_ERRORS):
+def auto_blacklist(url: str, error_str: str, blacklist_set: set = None) -> None:
+    """Append the hostname to blacklist.json when a fatal TLS/protocol or DNS error occurs."""
+    is_fatal = (
+        any(code in error_str for code in FATAL_NAV_ERRORS) 
+        or "ERR_NAME_NOT_RESOLVED" in error_str 
+        or "DNS" in error_str.upper() 
+        or "GAIERROR" in error_str.upper()
+    )
+    if not is_fatal:
         return
-    hostname = urlparse(url).netloc
+    hostname = urlparse(url).netloc.lower().strip()
+    if not hostname:
+        return
+    if blacklist_set is not None:
+        if hostname in blacklist_set:
+            return
+        blacklist_set.add(hostname)
     try:
         with open(BLACKLIST_FILE, "r", encoding="utf-8") as f:
             bl = json.load(f)
@@ -77,19 +129,23 @@ def auto_blacklist(url: str, error_str: str) -> None:
             bl = []
         if hostname not in bl:
             bl.append(hostname)
+            bl.sort()
             with open(BLACKLIST_FILE, "w", encoding="utf-8") as f:
                 json.dump(bl, f, indent=4)
-            print(f"[!] Auto-blacklisted {hostname} (fatal TLS/protocol error).")
+            print(f"[!] Auto-blacklisted {hostname} ({error_str[:50]}).")
     except Exception as ex:
         print(f"[!] Could not update blacklist: {ex}")
 
-async def scrape_company(context, company, semaphore):
+async def scrape_company(context, company, semaphore, blacklist_set=None):
     name = company["name"]
     url = company["careers_url"]
 
-    # T5: Skip unresolvable domains before spinning up a browser page
-    if not is_domain_reachable(url):
-        print(f"[!] DNS lookup failed for {name} ({url}). Skipping.")
+    # Skip blacklisted companies/domains
+    if blacklist_set and is_blacklisted(url, name, blacklist_set):
+        return []
+
+    # Non-blocking DNS check before spinning up a browser page
+    if not await is_domain_reachable(url, blacklist_set):
         return []
     
     async with semaphore:
@@ -339,7 +395,11 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
         print(f"  [+] Finished: {site_name} ('{search_term}' in '{location}'). Found {len(jobs)} jobs.")
         return jobs
 
-async def fetch_job_description(context, job_url, semaphore):
+async def fetch_job_description(context, job_url, semaphore, blacklist_set=None):
+    if blacklist_set and is_blacklisted(job_url, "", blacklist_set):
+        return ""
+    if not await is_domain_reachable(job_url, blacklist_set):
+        return ""
     async with semaphore:
         page = await context.new_page()
         description = ""
@@ -381,18 +441,11 @@ async def fetch_job_description(context, job_url, semaphore):
 
 MAX_CONCURRENT_PAGES = 10
 
-async def discover_jobs_from_config(context, config, semaphore, blacklist):
+async def discover_jobs_from_config(context, config, semaphore, blacklist_set=None):
     site_name = config["site_name"]
+    url = config.get("url") or config.get("search_url") or ""
     
-    # Check blacklist
-    is_blacklisted = False
-    for blocked in blacklist:
-        if blocked.lower() in site_name.lower() or (config.get("url") and blocked.lower() in config.get("url").lower()):
-            is_blacklisted = True
-            break
-    
-    if is_blacklisted:
-        print(f"[*] Skipping blacklisted site: {site_name}")
+    if blacklist_set and is_blacklisted(url, site_name, blacklist_set):
         return []
 
     search_terms = config.get("search_terms") or ["Senior QA Engineer"]
@@ -416,14 +469,14 @@ async def discover_jobs_from_config(context, config, semaphore, blacklist):
             
     return all_discovered
 
-async def discover_jobs_from_company(context, company, semaphore):
+async def discover_jobs_from_company(context, company, semaphore, blacklist_set=None):
     site_name = company["name"]
-    jobs = await scrape_company(context, company, semaphore)
+    jobs = await scrape_company(context, company, semaphore, blacklist_set=blacklist_set)
     for job in jobs:
         job["site"] = site_name
     return jobs
 
-async def process_discovered_job(context, job, semaphore, processed_urls):
+async def process_discovered_job(context, job, semaphore, processed_urls, blacklist_set=None):
     if not job["url"] or job["url"] in processed_urls:
         return None
         
@@ -437,7 +490,7 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
     jd_text = job.get("description", "")
     if not jd_text:
         try:
-            jd_text = await asyncio.wait_for(fetch_job_description(context, job["url"], semaphore), timeout=45)
+            jd_text = await asyncio.wait_for(fetch_job_description(context, job["url"], semaphore, blacklist_set=blacklist_set), timeout=45)
         except asyncio.TimeoutError:
             print(f"  [!] Timeout fetching JD for {job['url']}")
             return None
@@ -458,12 +511,12 @@ async def process_discovered_job(context, job, semaphore, processed_urls):
     add_job(job["title"], job["company"], job["url"], job["site"], score, missing_skills, matched_skills, score_profile_id=profile_id)
     return job
 
-async def worker(context, queue, semaphore, processed_urls, results):
+async def worker(context, queue, semaphore, processed_urls, results, blacklist_set=None):
     """A worker task that drains the job queue."""
     while not queue.empty():
         job = await queue.get()
         try:
-            res = await process_discovered_job(context, job, semaphore, processed_urls)
+            res = await process_discovered_job(context, job, semaphore, processed_urls, blacklist_set=blacklist_set)
             if res:
                 results.append(res)
         except Exception as e:
@@ -481,6 +534,7 @@ async def main():
     blacklist = load_json(BLACKLIST_FILE)
     if not isinstance(blacklist, list):
         blacklist = []
+    blacklist_set = {b.lower().strip() for b in blacklist if b}
     
     if not search_configs and not companies:
         print("[!] No search configurations or companies found in the database. Please add some first.")
@@ -489,21 +543,51 @@ async def main():
     # Clean logs before scraping
     clean_logs("logs")
     
+    # Pre-filter search_configs upfront
+    active_search_configs = []
+    skipped_configs = 0
+    for cfg in search_configs:
+        cfg_url = cfg.get("url") or cfg.get("search_url") or ""
+        cfg_name = cfg.get("site_name") or ""
+        if is_blacklisted(cfg_url, cfg_name, blacklist_set):
+            skipped_configs += 1
+        else:
+            active_search_configs.append(cfg)
+    if skipped_configs > 0:
+        log(f"[*] Pre-filtered {skipped_configs} blacklisted job boards upfront ({len(active_search_configs)} active).")
+
+    # Pre-filter companies upfront (fast set check, no coroutine overhead or per-row logging)
+    active_ats_companies = []
+    active_direct_companies = []
+    skipped_companies = 0
+    for company in companies:
+        name = company.get("name", "")
+        url = company.get("careers_url", "") or company.get("ats_url", "")
+        if is_blacklisted(url, name, blacklist_set):
+            skipped_companies += 1
+            continue
+        if company.get("ats_type"):
+            active_ats_companies.append(company)
+        else:
+            active_direct_companies.append(company)
+            
+    if skipped_companies > 0:
+        log(f"[*] Pre-filtered {skipped_companies} blacklisted companies upfront ({len(active_ats_companies)} ATS, {len(active_direct_companies)} direct).")
+    
     all_discovered = []
     
     # Phase 0: Fast ATS API Harvesting (No browser)
     log("\n=== Phase 0: Discovering Jobs via ATS APIs (Fast Mode) ===")
-    ats_companies = [c for c in companies if c.get("ats_type")]
-    if ats_companies:
+    if active_ats_companies:
         async with aiohttp.ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
             # Gather jobs across all companies with APIs concurrently
             ats_tasks = []
-            for company in ats_companies:
+            for company in active_ats_companies:
                 task = route_company(session, company["name"], company["ats_type"], company["ats_url"])
                 ats_tasks.append(task)
                 
             ats_results = await asyncio.gather(*ats_tasks, return_exceptions=True)
-            for company, result in zip(ats_companies, ats_results):
+            for company, result in zip(active_ats_companies, ats_results):
                 if isinstance(result, Exception):
                     log(f"  [!] Failed to scrape ATS for {company['name']}: {result}")
                 else:
@@ -525,9 +609,9 @@ async def main():
         # 1. DISCOVERY PHASE (Tiered)
         log("\n=== Phase 1a: Discovering Jobs (Job Boards) ===")
         site_tasks = []
-        for config in search_configs:
+        for config in active_search_configs:
             # Increased timeout to 15 mins (900s) for job boards
-            task = asyncio.wait_for(discover_jobs_from_config(context, config, semaphore, blacklist), timeout=900)
+            task = asyncio.wait_for(discover_jobs_from_config(context, config, semaphore, blacklist_set), timeout=900)
             site_tasks.append(task)
             
         site_results_raw = await asyncio.gather(*site_tasks, return_exceptions=True)
@@ -542,11 +626,9 @@ async def main():
 
         log("\n=== Phase 1b: Discovering Jobs (Company Careers) ===")
         company_tasks = []
-        for company in companies:
-            if company.get("ats_type"):
-                continue
+        for company in active_direct_companies:
             # 2 min timeout for direct career pages
-            task = asyncio.wait_for(discover_jobs_from_company(context, company, semaphore), timeout=120)
+            task = asyncio.wait_for(discover_jobs_from_company(context, company, semaphore, blacklist_set), timeout=120)
             company_tasks.append(task)
             
         company_results_raw = await asyncio.gather(*company_tasks, return_exceptions=True)
@@ -579,7 +661,7 @@ async def main():
         # We use a set of worker tasks to drain the queue
         worker_tasks = []
         for _ in range(MAX_CONCURRENT_PAGES):
-            task = asyncio.create_task(worker(context, job_queue, semaphore, processed_urls, results))
+            task = asyncio.create_task(worker(context, job_queue, semaphore, processed_urls, results, blacklist_set=blacklist_set))
             worker_tasks.append(task)
             
         # Wait for all jobs to be processed
