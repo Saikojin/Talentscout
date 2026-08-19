@@ -495,3 +495,60 @@ def reject_jobs_below_score(threshold):
         finally:
             conn.close()
     return updated_count
+
+def clean_blacklisted_companies_from_db(blacklist_file="blacklist.json"):
+    """Delete companies from the database if their domain or name matches the blacklist."""
+    from urllib.parse import urlparse
+    import json
+    
+    if not os.path.exists(blacklist_file):
+        print(f"[!] Blacklist file not found: {blacklist_file}")
+        return 0
+        
+    with open(blacklist_file, "r", encoding="utf-8") as f:
+        blacklist = json.load(f)
+    if not isinstance(blacklist, list):
+        return 0
+    blacklist_set = {b.lower().strip() for b in blacklist if b}
+
+    conn = create_connection()
+    if conn is None:
+        return 0
+        
+    deleted_count = 0
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, careers_url, ats_url FROM companies")
+        rows = cursor.fetchall()
+        
+        ids_to_delete = []
+        for cid, name, c_url, a_url in rows:
+            url = c_url or a_url or ""
+            is_bl = False
+            if url:
+                host = urlparse(url).netloc.lower().strip()
+                if host and (host in blacklist_set or (host.startswith("www.") and host[4:] in blacklist_set)):
+                    is_bl = True
+                else:
+                    parts = host.split(".")
+                    for i in range(1, len(parts) - 1):
+                        if ".".join(parts[i:]) in blacklist_set:
+                            is_bl = True
+                            break
+            if not is_bl and name and name.lower().strip() in blacklist_set:
+                is_bl = True
+                
+            if is_bl:
+                ids_to_delete.append(cid)
+                
+        if ids_to_delete:
+            cursor.executemany("DELETE FROM companies WHERE id = ?", [(i,) for i in ids_to_delete])
+            conn.commit()
+            deleted_count = len(ids_to_delete)
+    except sqlite3.Error as e:
+        print(f"Error cleaning blacklisted companies from DB: {e}")
+    finally:
+        conn.close()
+        
+    return deleted_count
+

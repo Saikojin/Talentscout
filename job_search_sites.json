@@ -371,6 +371,21 @@
         "Remote"
       ],
       "filters": {}
+    },
+    {
+      "name": "Scion Staffing",
+      "url": "https://scionstaffing.com/search-jobs/",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Quality Assurance",
+        "Testing"
+      ],
+      "locations": [
+        "Remote",
+        "Seattle"
+      ],
+      "filters": {}
     }
   ],
   "global_keywords": [
