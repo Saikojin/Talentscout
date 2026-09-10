@@ -386,9 +386,371 @@
         "Seattle"
       ],
       "filters": {}
+    },
+    {
+      "name": "FlexJobs",
+      "url": "https://www.flexjobs.com/jobs",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation",
+        "QA Lead"
+      ],
+      "locations": [
+        "Remote",
+        "Seattle, WA"
+      ],
+      "filters": {
+        "job_type": "Full-time",
+        "remote": true
+      }
+    },
+    {
+      "name": "WeWorkRemotely",
+      "url": "https://weworkremotely.com/remote-jobs/search",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Test Automation",
+        "Quality Assurance"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "category": "Programming"
+      }
+    },
+    {
+      "name": "Remote.co",
+      "url": "https://remote.co/remote-jobs/",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Test Engineer",
+        "Automation Engineer"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "HubstaffTalent",
+      "url": "https://talent.hubstaff.com/search/jobs",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Software Tester",
+        "Automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Remotive",
+      "url": "https://remotive.com/remote-jobs",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Test Automation",
+        "Quality Assurance"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "category": "Software Dev"
+      }
+    },
+    {
+      "name": "VirtualVocations",
+      "url": "https://www.virtualvocations.com/jobs",
+      "search_terms": [
+        "QA Engineer",
+        "Software Tester",
+        "SDET",
+        "Automation Engineer"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "job_type": "Full-time"
+      }
+    },
+    {
+      "name": "WorkingNomads",
+      "url": "https://www.workingnomads.com/jobs",
+      "search_terms": [
+        "QA",
+        "SDET",
+        "Testing",
+        "Automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Hired",
+      "url": "https://hired.com/jobs",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation",
+        "QA Lead"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Remote"
+      ],
+      "filters": {
+        "job_type": "Full-time",
+        "salary_min": "140000"
+      }
+    },
+    {
+      "name": "Talent.com",
+      "url": "https://www.talent.com/jobs",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation Architect",
+        "QA Manager"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "RemoteOK",
+      "url": "https://remoteok.com",
+      "search_terms": [
+        "qa",
+        "sdet",
+        "testing",
+        "automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Jooble",
+      "url": "https://jooble.org",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Automation"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Jobspresso",
+      "url": "https://jobspresso.co/browsejobs/",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Automation Engineer"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "OnlineJobs.ph",
+      "url": "https://www.onlinejobs.ph/jobseekers/job",
+      "search_terms": [
+        "QA Engineer",
+        "Software Tester",
+        "Automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "TheMuse",
+      "url": "https://www.themuse.com/jobs",
+      "search_terms": [
+        "Senior QA Engineer",
+        "SDET",
+        "Test Engineer"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "SkipTheDrive",
+      "url": "https://www.skipthedrive.com/jobs/",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Software Tester"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "JustRemote",
+      "url": "https://justremote.co/remote-jobs",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Automation Engineer"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "RemoteWorkHub",
+      "url": "https://remoteworkhub.com/remote-jobs/",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Test Automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Upwork",
+      "url": "https://www.upwork.com/search/jobs/",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Test Automation",
+        "Karate Framework",
+        "API Testing"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "contract_type": "hourly"
+      }
+    },
+    {
+      "name": "Freelancer",
+      "url": "https://www.freelancer.com/jobs/",
+      "search_terms": [
+        "QA Testing",
+        "Test Automation",
+        "SDET",
+        "API Testing"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Fiverr",
+      "url": "https://www.fiverr.com/categories/",
+      "search_terms": [
+        "software testing",
+        "QA engineer",
+        "test automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Guru",
+      "url": "https://www.guru.com/d/jobs/",
+      "search_terms": [
+        "QA Engineer",
+        "Software Testing",
+        "Test Automation",
+        "SDET"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Toptal",
+      "url": "https://www.toptal.com/jobs",
+      "search_terms": [
+        "QA Engineer",
+        "SDET",
+        "Test Automation Engineer"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {
+        "experience_level": "Senior"
+      }
+    },
+    {
+      "name": "CloudPeeps",
+      "url": "https://www.cloudpeeps.com/jobs",
+      "search_terms": [
+        "QA",
+        "Software Testing",
+        "Automation"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "TaskRabbit",
+      "url": "https://www.taskrabbit.com/browse",
+      "search_terms": [
+        "software testing",
+        "QA",
+        "technical"
+      ],
+      "locations": [
+        "Seattle, WA",
+        "Remote"
+      ],
+      "filters": {}
+    },
+    {
+      "name": "Zirtual",
+      "url": "https://zirtual.com/jobs",
+      "search_terms": [
+        "QA",
+        "Technical",
+        "Software"
+      ],
+      "locations": [
+        "Remote"
+      ],
+      "filters": {}
     }
   ],
   "global_keywords": [
+
     "Karate Framework",
     "API Testing",
     "Mobile Testing",

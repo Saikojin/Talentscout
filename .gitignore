@@ -14,9 +14,20 @@ job_tracker.db
 
 # Logs and Outputs
 logs/
-tailored_outputs/
+tailored_outputs/*
+!tailored_outputs/.gitkeep
 dashboard.html
 jobs_to_review.md
+
+# Large Language Models (GGUF / Binaries)
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.onnx
+llmworkbench/models/*
+!llmworkbench/models/.gitkeep
+!llmworkbench/models/README.md
 
 # Application Data
 all_collected_jobs.json

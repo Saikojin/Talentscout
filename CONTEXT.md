@@ -12,13 +12,15 @@ TalentScout is a **Python-based automated job scraping and tracking system**. It
 - **Multi-site scraping** via Playwright (headless, JS-rendered)
 - **Skill-based filtering** using `base_skillset.json`
 - **SQLite deduplication** via `job_tracker.db`
-- **Dashboard output** to `dashboard.html` and `jobs_to_review.md`
+- **Dashboard output & scoring** to `dashboard.html` (`http://localhost:8088`) and `jobs_to_review.md`
+- **1-Click Tailored Resume & Cover Letter Generator**: Generates custom Resumes and Cover Letters tailored to specific job cards.
+- **Bundled Local LLM Engine (`llmworkbench/`)**: On-device GGUF inference (port 8000) with UI start/stop controls.
 - **Resume Parser UI** (FastAPI + Uvicorn) at `http://localhost:8000`
 
 ### New: Resume-as-Code Sub-project
 
 A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
-- Single source of truth: `resume/data/resume.json` (JSON Resume standard, extended with `tags`)
+- Single source of truth: `resume/data/resume.json` (JSON Resume standard, extended with `tags` and 26-year career records for Thomas S. Snyder)
 - Compiles to Markdown, HTML, PDF
 - Exposes an **MCP server** (7 AI agent tools) at `http://localhost:3001/mcp`
 - Exports ATS profiles for **Greenhouse** and **Workday**
@@ -32,7 +34,8 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 |---|---|
 | Job scraping | Python 3.8+, Playwright, BeautifulSoup4 |
 | Data storage | SQLite3 (`job_tracker.db`) |
-| Web server | FastAPI + Uvicorn |
+| Web server | FastAPI + Uvicorn (:8088) |
+| Local LLM Backend | FastAPI + Uvicorn + GGUF Engine (:8000) |
 | Resume data | JSON Resume standard (Node.js) |
 | Resume compiler | Node.js ESM scripts + marked + puppeteer |
 | MCP server | TypeScript, `@modelcontextprotocol/sdk` |
@@ -43,16 +46,18 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 ## Project Status
 
-### Python Job Scraper (existing)
+### Python Job Scraper & Tailoring Engine (active)
 - ✅ Multi-site scraping with Playwright
 - ✅ Profile & Scoring Engine (`scripts/profile.py` + `scripts/scorer.py`) with customizable weights
+- ✅ 1-Click Tailored Resume & Cover Letter Generator (`scripts/tailor_engine.py` & `dashboard.html`)
+- ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
 - ✅ SQLite deduplication and profile persistence
 - ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) and Markdown output
 
-### Resume-as-Code (new — `resume/`)
-- ✅ `resume/data/resume.json` — placeholder data (Alex Rivera); **replace with your own**
+### Resume-as-Code (`resume/`)
+- ✅ `resume/data/resume.json` — Comprehensive 26-year career history for Thomas S. Snyder
 - ✅ Schema validation pipeline (AJV, strict JSON Schema)
-- ✅ Compiler: JSON → Markdown + HTML + PDF
+- ✅ Compiler: JSON → Markdown + HTML + PDF + DOCX
 - ✅ 29/29 tests passing (schema matrix + compiler integrity)
 - ✅ MCP server (7 tools, stdio + HTTP transports)
 - ✅ ATS adapters: Greenhouse + Workday
