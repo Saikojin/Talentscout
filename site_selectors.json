@@ -152,5 +152,180 @@
         "title_selector": "a[title='View job details']",
         "company_selector": "a[href*='/job-openings/']",
         "job_url_selector": "a[title='View job details']"
+    },
+    "FlexJobs": {
+        "search_url": "https://www.flexjobs.com/jobs?search={search_term}&location={location}",
+        "job_card_selector": "li.job",
+        "title_selector": "h2.job-title a",
+        "company_selector": "a.job-link-company",
+        "job_url_selector": "h2.job-title a"
+    },
+    "WeWorkRemotely": {
+        "search_url": "https://weworkremotely.com/remote-jobs/search?term={search_term}",
+        "job_card_selector": "ul.jobs li.feature",
+        "title_selector": "span.title",
+        "company_selector": "span.company",
+        "job_url_selector": "a[href*='/remote-jobs/']"
+    },
+    "Remote.co": {
+        "search_url": "https://remote.co/remote-jobs/search/?search_keywords={search_term}",
+        "job_card_selector": ".job_listing",
+        "title_selector": ".job-title",
+        "company_selector": ".company_name",
+        "job_url_selector": "a.job-link"
+    },
+    "HubstaffTalent": {
+        "search_url": "https://talent.hubstaff.com/search/jobs?q={search_term}",
+        "job_card_selector": ".job-item",
+        "title_selector": "h3.job-title a",
+        "company_selector": ".agency-name",
+        "job_url_selector": "h3.job-title a"
+    },
+    "Remotive": {
+        "search_url": "https://remotive.com/remote-jobs?query={search_term}",
+        "job_card_selector": "li.job-item",
+        "title_selector": "h2.position",
+        "company_selector": "span.company",
+        "job_url_selector": "a.position"
+    },
+    "VirtualVocations": {
+        "search_url": "https://www.virtualvocations.com/jobs?q={search_term}",
+        "job_card_selector": ".job-posting",
+        "title_selector": "h2.title a",
+        "company_selector": ".company-name",
+        "job_url_selector": "h2.title a"
+    },
+    "WorkingNomads": {
+        "search_url": "https://www.workingnomads.com/jobs?tag={search_term}",
+        "job_card_selector": ".job-row",
+        "title_selector": "h4 a",
+        "company_selector": "h5 a",
+        "job_url_selector": "h4 a"
+    },
+    "Hired": {
+        "search_url": "https://hired.com/jobs?q={search_term}",
+        "job_card_selector": ".job-list-item",
+        "title_selector": "h3.title a",
+        "company_selector": ".company-name",
+        "job_url_selector": "h3.title a"
+    },
+    "Talent.com": {
+        "search_url": "https://www.talent.com/jobs?k={search_term}&l={location}",
+        "job_card_selector": ".card__job",
+        "title_selector": "h2.card__job-title a",
+        "company_selector": ".card__job-empname-label",
+        "job_url_selector": "h2.card__job-title a"
+    },
+    "RemoteOK": {
+        "search_url": "https://remoteok.com/remote-{search_term}-jobs",
+        "job_card_selector": "tr.job",
+        "title_selector": "h2[itemprop='title']",
+        "company_selector": "h3[itemprop='name']",
+        "job_url_selector": "a.preventLink"
+    },
+    "Jooble": {
+        "search_url": "https://jooble.org/jobs-{search_term}/{location}",
+        "job_card_selector": "article[class*='vacancy']",
+        "title_selector": "h2 a",
+        "company_selector": "p[class*='company']",
+        "job_url_selector": "h2 a"
+    },
+    "Jobspresso": {
+        "search_url": "https://jobspresso.co/browsejobs/?search_keywords={search_term}",
+        "job_card_selector": ".job_listing",
+        "title_selector": "a.job-link",
+        "company_selector": ".company",
+        "job_url_selector": "a.job-link"
+    },
+    "OnlineJobs.ph": {
+        "search_url": "https://www.onlinejobs.ph/jobseekers/job?q={search_term}",
+        "job_card_selector": ".jobpost-list",
+        "title_selector": "h2 a",
+        "company_selector": ".jobpost-company",
+        "job_url_selector": "h2 a"
+    },
+    "TheMuse": {
+        "search_url": "https://www.themuse.com/jobs?keyword={search_term}",
+        "job_card_selector": "[data-testid='job-card']",
+        "title_selector": "h3[data-testid='job-name']",
+        "company_selector": "p[data-testid='company-name']",
+        "job_url_selector": "a[href*='/jobs/']"
+    },
+    "SkipTheDrive": {
+        "search_url": "https://www.skipthedrive.com/jobs/?s={search_term}",
+        "job_card_selector": ".job-listing",
+        "title_selector": "h2 a",
+        "company_selector": ".job-company",
+        "job_url_selector": "h2 a"
+    },
+    "JustRemote": {
+        "search_url": "https://justremote.co/remote-jobs?filter={search_term}",
+        "job_card_selector": ".job",
+        "title_selector": "h2 a",
+        "company_selector": "span.company",
+        "job_url_selector": "h2 a"
+    },
+    "RemoteWorkHub": {
+        "search_url": "https://remoteworkhub.com/remote-jobs/?s={search_term}",
+        "job_card_selector": ".job-list-item",
+        "title_selector": "h2 a",
+        "company_selector": ".company-name",
+        "job_url_selector": "h2 a"
+    },
+    "Upwork": {
+        "search_url": "https://www.upwork.com/search/jobs/?q={search_term}",
+        "job_card_selector": "article.job-tile",
+        "title_selector": "h2.job-tile-title a",
+        "company_selector": "small[data-test='client-country']",
+        "job_url_selector": "h2.job-tile-title a"
+    },
+    "Freelancer": {
+        "search_url": "https://www.freelancer.com/jobs/{search_term}/",
+        "job_card_selector": ".JobSearchCard-item",
+        "title_selector": "a.JobSearchCard-primary-heading",
+        "company_selector": ".JobSearchCard-primary-skills",
+        "job_url_selector": "a.JobSearchCard-primary-heading"
+    },
+    "Fiverr": {
+        "search_url": "https://www.fiverr.com/search/gigs?query={search_term}",
+        "job_card_selector": ".gig-card-layout",
+        "title_selector": "h3.gig-card-layout-title",
+        "company_selector": "span.seller-name",
+        "job_url_selector": "a.gig-wrapper-link"
+    },
+    "Guru": {
+        "search_url": "https://www.guru.com/d/jobs/q/{search_term}/",
+        "job_card_selector": ".serviceItem",
+        "title_selector": "h3.name a",
+        "company_selector": ".postedBy",
+        "job_url_selector": "h3.name a"
+    },
+    "Toptal": {
+        "search_url": "https://www.toptal.com/jobs",
+        "job_card_selector": ".job-listing",
+        "title_selector": "h3.job-title a",
+        "company_selector": ".company-name",
+        "job_url_selector": "h3.job-title a"
+    },
+    "CloudPeeps": {
+        "search_url": "https://www.cloudpeeps.com/jobs?q={search_term}",
+        "job_card_selector": ".job-listing",
+        "title_selector": "h3 a",
+        "company_selector": ".company",
+        "job_url_selector": "h3 a"
+    },
+    "TaskRabbit": {
+        "search_url": "https://www.taskrabbit.com/browse?q={search_term}",
+        "job_card_selector": ".task-group-item",
+        "title_selector": "h3 a",
+        "company_selector": ".tasker-name",
+        "job_url_selector": "h3 a"
+    },
+    "Zirtual": {
+        "search_url": "https://zirtual.com/jobs",
+        "job_card_selector": ".job-listing",
+        "title_selector": "h2 a",
+        "company_selector": "span.company",
+        "job_url_selector": "h2 a"
     }
 }

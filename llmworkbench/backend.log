@@ -1,0 +1,113 @@
+
+--- Starting LLM server with model: gemma-3-1B-it-QAT-Q4_0.gguf at 2026-09-09 21:39:56 ---
+INFO:     Started server process [2304]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57578 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57949 - "GET /v1/models HTTP/1.1" 200 OK
+
+--- Starting LLM server with model: gemma-3-1B-it-QAT-Q4_0.gguf at 2026-09-09 21:40:17 ---
+INFO:     Started server process [37792]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52756 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52753 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49618 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56237 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64458 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51752 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52387 - "GET /v1/models HTTP/1.1" 200 OK
+
+--- Starting LLM server with model: gemma-3-1B-it-QAT-Q4_0.gguf at 2026-09-09 21:42:05 ---
+INFO:     Started server process [58692]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57491 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51484 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57271 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59945 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55765 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64698 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52204 - "GET /api/status HTTP/1.1" 200 OK
+
+--- Starting LLM server with model: gemma-3-1B-it-QAT-Q4_0.gguf at 2026-09-09 21:42:56 ---
+INFO:     Started server process [2440]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57088 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50905 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52478 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60070 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58412 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62385 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49211 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63880 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61969 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53152 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55991 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56154 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64872 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53194 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62766 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51884 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64430 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59012 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56159 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50481 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64427 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54634 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62746 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60035 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61302 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60364 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60752 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51160 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52538 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58020 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62034 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55311 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53057 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63859 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65487 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56019 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60954 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49842 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53819 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54504 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50064 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51687 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51692 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51548 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60733 - "GET /api/status HTTP/1.1" 200 OK
+
+--- Starting LLM server with model: Bonsai-8B.gguf at 2026-09-09 21:47:44 ---
+INFO:     Started server process [50564]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59932 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63978 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56142 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60442 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52556 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53316 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52653 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58845 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62016 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64500 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65120 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64425 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52097 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64147 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50741 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52790 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59224 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64828 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60937 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50765 - "GET /api/status HTTP/1.1" 200 OK
