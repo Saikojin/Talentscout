@@ -341,15 +341,48 @@ async def stop_llm():
     """Stop local LLMWorkbench backend server."""
     return tailor_engine.stop_llm_server()
 
+class LLMTestReq(BaseModel):
+    provider: Optional[str] = None
+    model: Optional[str] = None
+    api_key: Optional[str] = None
+    custom_endpoint: Optional[str] = None
+
+@app.post("/api/profiles/{profile_id}/test_llm")
+async def test_profile_llm(profile_id: int, req: Optional[LLMTestReq] = None):
+    """Test ping connection and API key validity for a given profile provider."""
+    p = profile_mgr.get_profile(profile_id)
+    if not p:
+        raise HTTPException(status_code=404, detail="Profile not found")
+        
+    p_cfg = p.get("config", {})
+    llm_cfg = p_cfg.get("llm", {})
+    
+    provider = (req.provider if (req and req.provider) else llm_cfg.get("provider", "local")).lower()
+    model = req.model if (req and req.model) else llm_cfg.get("model_name")
+    custom_endpoint = req.custom_endpoint if (req and req.custom_endpoint) else llm_cfg.get("custom_endpoint", "")
+    
+    # Resolve API key from request, profile, or environment
+    api_key = req.api_key if (req and req.api_key) else llm_cfg.get("api_keys", {}).get(provider, "")
+    
+    result = tailor_engine.test_provider_connection(
+        provider=provider,
+        model=model,
+        api_key=api_key,
+        custom_endpoint=custom_endpoint
+    )
+    return result
+
 class TailorRequest(BaseModel):
     model: Optional[str] = None
+    provider: Optional[str] = None
 
 @app.post("/api/jobs/{job_id}/tailor")
 async def generate_tailored_resume(job_id: int, req: Optional[TailorRequest] = None):
     """Generate tailored resume and cover letter for a given job."""
     model_name = req.model if req else None
+    provider = req.provider if req else None
     try:
-        result = tailor_engine.tailor_for_job(job_id, model_name=model_name)
+        result = tailor_engine.tailor_for_job(job_id, model_name=model_name, provider=provider)
         return result
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))

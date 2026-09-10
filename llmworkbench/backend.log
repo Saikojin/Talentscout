@@ -111,3 +111,30 @@ INFO:     127.0.0.1:59224 - "GET /api/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:64828 - "GET /api/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:60937 - "GET /api/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:50765 - "GET /api/status HTTP/1.1" 200 OK
+
+--- Starting LLM server with model: Bonsai-8B.gguf at 2026-09-09 22:36:01 ---
+INFO:     Started server process [49968]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59371 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59380 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54547 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58082 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54146 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58951 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58956 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60784 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49257 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59547 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59108 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59113 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50488 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53164 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59942 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49620 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52481 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64682 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58145 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53169 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53247 - "GET /api/status HTTP/1.1" 200 OK

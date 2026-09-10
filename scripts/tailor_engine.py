@@ -239,6 +239,272 @@ def query_local_llm(messages: List[Dict[str, str]], model: Optional[str] = None,
         print(f"query_local_llm call failed: {e}")
     return ""
 
+def query_gemini_llm(messages: List[Dict[str, str]], api_key: str = "", model: str = "gemini-2.0-flash", max_tokens: int = 2500) -> str:
+    """Send chat request to Google Gemini REST API."""
+    if not api_key:
+        api_key = os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "")
+    if not api_key:
+        raise ValueError("Google Gemini API Key is missing. Add it to your Profile or set GEMINI_API_KEY.")
+
+    api_key = api_key.strip()
+    
+    # Sanitize model name: strip whitespace and leading 'models/' prefix
+    model_clean = (model or "").strip()
+    if model_clean.startswith("models/"):
+        model_clean = model_clean[len("models/"):]
+    if not model_clean or model_clean.endswith(".gguf") or any(k in model_clean.lower() for k in ["gemma", "llama", "qwen", "mistral", "gpt-", "claude-"]):
+        model_clean = "gemini-2.0-flash"
+
+    system_text = ""
+    contents = []
+    for m in messages:
+        if m["role"] == "system":
+            system_text += m["content"] + "\n"
+        elif m["role"] in ("user", "assistant"):
+            role_name = "user" if m["role"] == "user" else "model"
+            contents.append({
+                "role": role_name,
+                "parts": [{"text": m["content"]}]
+            })
+
+    payload: Dict[str, Any] = {
+        "contents": contents,
+        "generationConfig": {
+            "temperature": 0.5,
+            "maxOutputTokens": max_tokens
+        }
+    }
+    if system_text.strip():
+        payload["systemInstruction"] = {
+            "parts": [{"text": system_text.strip()}]
+        }
+
+    urls_to_try = [
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model_clean}:generateContent?key={api_key}",
+        f"https://generativelanguage.googleapis.com/v1/models/{model_clean}:generateContent?key={api_key}"
+    ]
+
+    last_err: Optional[Exception] = None
+    for url in urls_to_try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json", "User-Agent": "TalentScout-Engine"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                candidates = res.get("candidates", [])
+                if candidates:
+                    content = candidates[0].get("content", {})
+                    parts = content.get("parts", []) if isinstance(content, dict) else []
+                    texts = [p.get("text", "") for p in parts if isinstance(p, dict) and "text" in p]
+                    full_text = "".join(texts).strip()
+                    if full_text:
+                        return full_text
+                    finish_reason = candidates[0].get("finishReason")
+                    if finish_reason:
+                        return f"OK (finish: {finish_reason})"
+                return "Connection verified (HTTP 200)"
+        except urllib.error.HTTPError as e:
+            err_msg = ""
+            try:
+                raw_body = e.read().decode("utf-8", errors="ignore")
+                err_json = json.loads(raw_body)
+                err_info = err_json.get("error", {})
+                if isinstance(err_info, dict):
+                    err_msg = err_info.get("message", raw_body)
+                elif isinstance(err_info, str):
+                    err_msg = err_info
+            except Exception:
+                pass
+            last_err = RuntimeError(f"Google Gemini Error ({e.code}): {err_msg or e.reason}")
+            # If 404 on v1beta, attempt fallback to v1 endpoint
+            if e.code == 404 and url == urls_to_try[0]:
+                continue
+            raise last_err
+        except Exception as e:
+            last_err = e
+            raise last_err
+
+    if last_err:
+        raise last_err
+    return ""
+
+def query_openai_compatible_llm(messages: List[Dict[str, str]], api_base: str, api_key: str = "", model: str = "gpt-4o-mini", max_tokens: int = 2500) -> str:
+    """Send chat request to OpenAI, Groq, OpenRouter, or custom OpenAI-compatible endpoints."""
+    url = f"{api_base.rstrip('/')}/chat/completions"
+    payload = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.5,
+        "max_tokens": max_tokens
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "TalentScout-Engine"
+    }
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key.strip()}"
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers=headers
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            res = json.loads(resp.read().decode("utf-8"))
+            choices = res.get("choices", [])
+            if choices:
+                return choices[0].get("message", {}).get("content", "").strip()
+    except urllib.error.HTTPError as e:
+        body = ""
+        try:
+            body_raw = e.read().decode("utf-8", errors="ignore")
+            err_json = json.loads(body_raw)
+            err_obj = err_json.get("error", {})
+            if isinstance(err_obj, dict):
+                body = err_obj.get("message", body_raw)
+            elif isinstance(err_obj, str):
+                body = err_obj
+        except Exception:
+            pass
+        raise RuntimeError(f"HTTP {e.code}: {body or e.reason}")
+    return ""
+
+def query_anthropic_llm(messages: List[Dict[str, str]], api_key: str = "", model: str = "claude-3-5-sonnet-20241022", max_tokens: int = 2500) -> str:
+    """Send message request to Anthropic REST API."""
+    if not api_key:
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        raise ValueError("Anthropic API Key is missing. Add it to your Profile or set ANTHROPIC_API_KEY.")
+
+    api_key = api_key.strip()
+    model_clean = (model or "").strip()
+    if not model_clean or model_clean.endswith(".gguf") or "gemma" in model_clean:
+        model_clean = "claude-3-5-sonnet-20241022"
+    url = "https://api.anthropic.com/v1/messages"
+
+    system_text = ""
+    user_msgs = []
+    for m in messages:
+        if m["role"] == "system":
+            system_text += m["content"] + "\n"
+        elif m["role"] in ("user", "assistant"):
+            user_msgs.append({"role": m["role"], "content": m["content"]})
+
+    payload: Dict[str, Any] = {
+        "model": model_clean,
+        "max_tokens": max_tokens,
+        "temperature": 0.5,
+        "messages": user_msgs
+    }
+    if system_text.strip():
+        payload["system"] = system_text.strip()
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+            "User-Agent": "TalentScout-Engine"
+        }
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            res = json.loads(resp.read().decode("utf-8"))
+            content = res.get("content", [])
+            if content:
+                return content[0].get("text", "").strip()
+    except urllib.error.HTTPError as e:
+        body = ""
+        try:
+            body_raw = e.read().decode("utf-8", errors="ignore")
+            err_json = json.loads(body_raw)
+            err_obj = err_json.get("error", {})
+            if isinstance(err_obj, dict):
+                body = err_obj.get("message", body_raw)
+            elif isinstance(err_obj, str):
+                body = err_obj
+        except Exception:
+            pass
+        raise RuntimeError(f"HTTP {e.code}: {body or e.reason}")
+    return ""
+
+def query_ai_service(messages: List[Dict[str, str]], provider: str = "local", model: Optional[str] = None, profile_llm_cfg: Optional[Dict[str, Any]] = None, max_tokens: int = 2500) -> str:
+    """Unified dispatcher for Local GGUF, Google Gemini, OpenAI, Anthropic, Groq, OpenRouter, and Custom endpoints."""
+    cfg = profile_llm_cfg or {}
+    api_keys = cfg.get("api_keys", {})
+    provider = (provider or cfg.get("provider", "local")).lower()
+
+    if provider == "gemini":
+        key = api_keys.get("gemini") or os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "")
+        return query_gemini_llm(messages, api_key=key, model=model or cfg.get("model_name") or "gemini-2.0-flash", max_tokens=max_tokens)
+    elif provider == "openai":
+        key = api_keys.get("openai") or os.environ.get("OPENAI_API_KEY", "")
+        return query_openai_compatible_llm(messages, api_base="https://api.openai.com/v1", api_key=key, model=model or cfg.get("model_name") or "gpt-4o-mini", max_tokens=max_tokens)
+    elif provider == "anthropic":
+        key = api_keys.get("anthropic") or os.environ.get("ANTHROPIC_API_KEY", "")
+        return query_anthropic_llm(messages, api_key=key, model=model or cfg.get("model_name") or "claude-3-5-sonnet-20241022", max_tokens=max_tokens)
+    elif provider == "groq":
+        key = api_keys.get("groq") or os.environ.get("GROQ_API_KEY", "")
+        return query_openai_compatible_llm(messages, api_base="https://api.groq.com/openai/v1", api_key=key, model=model or cfg.get("model_name") or "llama-3.3-70b-versatile", max_tokens=max_tokens)
+    elif provider == "openrouter":
+        key = api_keys.get("openrouter") or os.environ.get("OPENROUTER_API_KEY", "")
+        return query_openai_compatible_llm(messages, api_base="https://openrouter.ai/api/v1", api_key=key, model=model or cfg.get("model_name") or "meta-llama/llama-3.3-70b-instruct", max_tokens=max_tokens)
+    elif provider == "custom":
+        endpoint = cfg.get("custom_endpoint") or os.environ.get("CUSTOM_API_BASE", "http://localhost:8000/v1")
+        key = api_keys.get("custom") or os.environ.get("CUSTOM_API_KEY", "")
+        return query_openai_compatible_llm(messages, api_base=endpoint, api_key=key, model=model or cfg.get("model_name") or "default", max_tokens=max_tokens)
+    else:
+        # Default to local LLMWorkbench
+        return query_local_llm(messages, model=model or cfg.get("model_name"), max_tokens=max_tokens)
+
+def test_provider_connection(provider: str, model: Optional[str] = None, api_key: str = "", custom_endpoint: str = "") -> Dict[str, Any]:
+    """Test ping a specific provider with given credentials."""
+    start_time = time.time()
+    test_messages = [
+        {"role": "user", "content": "Ping test: confirm connection with a brief response."}
+    ]
+    try:
+        p = provider.lower().strip()
+        api_key = (api_key or "").strip()
+        if p == "gemini":
+            resp = query_gemini_llm(test_messages, api_key=api_key, model=model or "gemini-2.0-flash", max_tokens=100)
+        elif p == "openai":
+            resp = query_openai_compatible_llm(test_messages, api_base="https://api.openai.com/v1", api_key=api_key, model=model or "gpt-4o-mini", max_tokens=100)
+        elif p == "anthropic":
+            resp = query_anthropic_llm(test_messages, api_key=api_key, model=model or "claude-3-5-sonnet-20241022", max_tokens=100)
+        elif p == "groq":
+            resp = query_openai_compatible_llm(test_messages, api_base="https://api.groq.com/openai/v1", api_key=api_key, model=model or "llama-3.3-70b-versatile", max_tokens=100)
+        elif p == "openrouter":
+            resp = query_openai_compatible_llm(test_messages, api_base="https://openrouter.ai/api/v1", api_key=api_key, model=model or "meta-llama/llama-3.3-70b-instruct", max_tokens=100)
+        elif p == "custom":
+            resp = query_openai_compatible_llm(test_messages, api_base=custom_endpoint or "http://localhost:8000/v1", api_key=api_key, model=model or "default", max_tokens=100)
+        else: # local
+            resp = query_local_llm(test_messages, model=model, max_tokens=100)
+            
+        elapsed = round((time.time() - start_time) * 1000, 1)
+        # If no HTTPError exception occurred, the connection succeeded
+        return {
+            "success": True,
+            "provider": provider,
+            "model": model,
+            "response": resp or "Connection verified (HTTP 200)",
+            "latency_ms": elapsed
+        }
+    except Exception as e:
+        elapsed = round((time.time() - start_time) * 1000, 1)
+        return {
+            "success": False,
+            "provider": provider,
+            "error": str(e),
+            "latency_ms": elapsed
+        }
+
 def build_fallback_tailored_package(candidate: Dict[str, Any], job: Dict[str, Any]) -> Dict[str, str]:
     """Deterministic fallback tailoring if LLM is offline or model generation fails."""
     company = job.get("company", "the company")
@@ -300,11 +566,19 @@ Senior QA Engineer
 """
     return {"resume_md": resume_md.strip(), "cover_letter_md": cover_letter_md.strip()}
 
-def tailor_for_job(job_id: int, model_name: Optional[str] = None) -> Dict[str, Any]:
-    """Generate tailored Resume.md and Cover_Letter.md for a given job_id."""
+def tailor_for_job(job_id: int, model_name: Optional[str] = None, provider: Optional[str] = None) -> Dict[str, Any]:
+    """Generate tailored Resume.md and Cover_Letter.md for a given job_id using active profile AI settings."""
     job = get_job_details(job_id)
     if not job:
         raise ValueError(f"Job with ID {job_id} not found.")
+
+    from scripts.profile import get_active_profile
+    active_profile = get_active_profile()
+    p_cfg = active_profile.get("config", {}) if active_profile else {}
+    llm_cfg = p_cfg.get("llm", {})
+
+    target_provider = (provider or llm_cfg.get("provider", "local")).lower()
+    target_model = model_name or llm_cfg.get("model_name")
 
     candidate = get_candidate_data()
     company = job.get("company", "Company")
@@ -313,20 +587,19 @@ def tailor_for_job(job_id: int, model_name: Optional[str] = None) -> Dict[str, A
     out_dir = os.path.join(TAILORED_DIR, folder_name)
     os.makedirs(out_dir, exist_ok=True)
 
-    # Check LLM status; try auto-starting if offline
-    status = check_llm_status()
-    if not status.get("online"):
-        print("LLM is offline. Attempting auto-start...")
-        start_llm_server(model_name)
-        time.sleep(2)
+    # If local provider selected, ensure local server is up
+    if target_provider == "local":
         status = check_llm_status()
+        if not status.get("online"):
+            print("Local LLM is offline. Attempting auto-start...")
+            start_llm_server(target_model)
+            time.sleep(2)
 
     resume_md = ""
     cover_letter_md = ""
+    used_ai = False
 
-    if status.get("online"):
-        # Format concise prompt for the local LLM
-        prompt = f"""You are an expert executive resume writer and career strategist.
+    prompt = f"""You are an expert executive resume writer and career strategist.
 Create a targeted, high-impact Resume and Cover Letter for the candidate applying to this specific role.
 
 ### TARGET JOB:
@@ -363,29 +636,32 @@ Include:
 [COVER LETTER MARKDOWN SECTION]
 Write a polished, 3-4 paragraph tailored Cover Letter to the Hiring Team at {company} explaining why the candidate's specific background (especially Karate automation and hardware/device testing) makes them the ideal candidate for the {title} position.
 """
-        try:
-            raw_response = query_local_llm(
-                messages=[
-                    {"role": "system", "content": "You are a professional technical resume and cover letter tailoring assistant. Output markdown only."},
-                    {"role": "user", "content": prompt}
-                ],
-                model=model_name or status.get("active_model"),
-                max_tokens=2500
-            )
+    try:
+        raw_response = query_ai_service(
+            messages=[
+                {"role": "system", "content": "You are a professional technical resume and cover letter tailoring assistant. Output markdown only."},
+                {"role": "user", "content": prompt}
+            ],
+            provider=target_provider,
+            model=target_model,
+            profile_llm_cfg=llm_cfg,
+            max_tokens=2500
+        )
 
-            if raw_response and not raw_response.startswith("Error:") and len(raw_response) > 200:
-                if "===SPLIT_COVER_LETTER===" in raw_response:
-                    parts = raw_response.split("===SPLIT_COVER_LETTER===")
-                    resume_md = parts[0].strip()
-                    cover_letter_md = parts[1].strip()
-                else:
-                    resume_md = raw_response.strip()
+        if raw_response and not raw_response.startswith("Error:") and len(raw_response) > 200:
+            if "===SPLIT_COVER_LETTER===" in raw_response:
+                parts = raw_response.split("===SPLIT_COVER_LETTER===")
+                resume_md = parts[0].strip()
+                cover_letter_md = parts[1].strip()
             else:
-                print(f"Local LLM returned non-standard output or error: {raw_response[:80]}... Using structured fallback.")
-        except Exception as e:
-            print(f"LLM generation encountered error: {e}. Using structured fallback template.")
+                resume_md = raw_response.strip()
+            used_ai = True
+        else:
+            print(f"AI service returned non-standard output or error: {raw_response[:80]}... Using structured fallback.")
+    except Exception as e:
+        print(f"AI generation encountered error: {e}. Using structured fallback template.")
 
-    # If LLM generation was empty or failed, use fallback
+    # If AI generation was empty or failed, use fallback
     fallback = build_fallback_tailored_package(candidate, job)
     if not resume_md or len(resume_md) < 100:
         resume_md = fallback["resume_md"]
@@ -415,7 +691,9 @@ Write a polished, 3-4 paragraph tailored Cover Letter to the Hiring Team at {com
         "cover_letter_path": cover_letter_path,
         "resume_md": resume_md,
         "cover_letter_md": cover_letter_md,
-        "used_llm": status.get("online", False)
+        "used_llm": used_ai,
+        "provider": target_provider,
+        "model": target_model
     }
 
 def get_existing_tailored_package(job_id: int) -> Optional[Dict[str, Any]]:
