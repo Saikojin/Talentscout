@@ -65,6 +65,19 @@ def default_config() -> dict:
             "location_positive": ["washington", "wa", "remote", "nationwide", "usa", "seattle", "redmond", "bellevue", "kirkland"],
             "location_negative": ["india only", "latam only", "uk only", "europe only"],
             "require_wa_or_remote": True
+        },
+        "llm": {
+            "provider": "local",
+            "model_name": "gemma-3-1B-it-QAT-Q4_0.gguf",
+            "custom_endpoint": "",
+            "api_keys": {
+                "gemini": "",
+                "openai": "",
+                "anthropic": "",
+                "groq": "",
+                "openrouter": "",
+                "custom": ""
+            }
         }
     }
 
@@ -92,6 +105,18 @@ def validate_config(config: dict) -> dict:
         except (TypeError, ValueError):
             w[k] = base["scoring"]["weights"][k]
     merged["scoring"]["weights"] = w
+
+    # Validate LLM block
+    llm_cfg = merged.get("llm", {})
+    valid_providers = ("local", "gemini", "openai", "anthropic", "groq", "openrouter", "custom")
+    if llm_cfg.get("provider") not in valid_providers:
+        llm_cfg["provider"] = "local"
+    if not isinstance(llm_cfg.get("api_keys"), dict):
+        llm_cfg["api_keys"] = {}
+    for key_name in ("gemini", "openai", "anthropic", "groq", "openrouter", "custom"):
+        if key_name not in llm_cfg["api_keys"]:
+            llm_cfg["api_keys"][key_name] = ""
+    merged["llm"] = llm_cfg
     return merged
 
 def invalidate_cache() -> None:

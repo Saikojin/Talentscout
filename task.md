@@ -1,28 +1,23 @@
-# Task Checklist: 1-Click Tailored Resume & Bundled Local LLM Engine
+# Task Checklist: AI Service API Keys in Profiles
 
-- [x] **Task 1: Package Bundled LLM Engine (`llmworkbench/`)**
-  - [x] Bundle lightweight server scripts into `llmworkbench/main.py`.
-  - [x] Create `llmworkbench/models/` directory with `.gitkeep` and `README.md`.
-  - [x] Configure `.gitignore` to strictly exclude all `*.gguf`, `*.bin`, `*.safetensors` files.
+- [x] **Task 1: Extend Profile Config & Schema (`scripts/profile.py`)**
+  - [x] Add `llm` block (`provider`, `model_name`, `custom_endpoint`, `api_keys`) to `default_config()`.
+  - [x] Update `validate_config()` to safely merge and sanitize `api_keys` for Google Gemini, OpenAI, Anthropic, Groq, OpenRouter, and Custom endpoints.
 
-- [x] **Task 2: Build Local LLM Bridge & Tailor Engine (`scripts/tailor_engine.py`)**
-  - [x] Ingest candidate data from `resume/data/resume.json`.
-  - [x] Extract job details and matched/missing skills from SQLite.
-  - [x] Implement local LLM querying via OpenAI-compatible endpoint with automatic fallback.
-  - [x] Write generated `Resume.md` and `Cover_Letter.md` to `tailored_outputs/<Company_Role>/`.
+- [x] **Task 2: Build Multi-Provider Tailoring Engine (`scripts/tailor_engine.py`)**
+  - [x] Add API dispatchers for Google Gemini, OpenAI, Anthropic, Groq, OpenRouter, and Custom endpoints.
+  - [x] Integrate active profile LLM configuration into `tailor_for_job()`.
+  - [x] Support fallback to environment variables when profile keys are not explicitly set.
 
-- [x] **Task 3: Implement Dashboard Server Endpoints (`scripts/dashboard_server.py`)**
-  - [x] `GET /api/llm/status`: Status check and available models list.
-  - [x] `POST /api/llm/start`: Start local model server.
-  - [x] `POST /api/llm/stop`: Stop local model server.
-  - [x] `POST /api/jobs/{job_id}/tailor`: Trigger resume and cover letter generation.
-  - [x] `GET /api/jobs/{job_id}/tailor`: Retrieve existing generated packages.
+- [x] **Task 3: Update Profile Editor UI (`dashboard/profile_editor.html`)**
+  - [x] Add "AI Model & Service API Keys" section to the profile editing view.
+  - [x] Add provider dropdown and model name inputs.
+  - [x] Add masked password inputs with show/hide password toggles for all major AI services.
+  - [x] Connect form fields to save and load profile JSON.
 
-- [x] **Task 4: Implement Dashboard UI Controls & Interactive Modal (`dashboard.html`)**
-  - [x] Add top-navigation Local LLM status pill, model selector, and Start/Stop toggle buttons.
-  - [x] Add `✨ Tailor Resume` button on every job card with loading state animations.
-  - [x] Build dark-glass popup modal with tabs (Resume Preview, Cover Letter Preview, Details) and 1-click clipboard copying.
+- [x] **Task 4: Add Backend Test / Validation Route (`scripts/dashboard_server.py`)**
+  - [x] Add `POST /api/profiles/{id}/test_llm` endpoint to test API key validity on demand.
 
-- [x] **Task 5: Documentation & Integration Testing**
-  - [x] Update `README.md` and `CONTEXT.md` with instructions on local LLM setup.
-  - [x] Write unit & integration test script `scripts/test_tailor.py`.
+- [x] **Task 5: Automated Testing & End-to-End Verification**
+  - [x] Run automated tests for profile creation, key storage, and provider generation.
+  - [x] Verify live in `dashboard/profile_editor.html`.

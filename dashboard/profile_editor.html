@@ -201,10 +201,39 @@
 
         .slider-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; }
 
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent-blue);
+        .input-with-action {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
         }
+
+        .btn-toggle-eye {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .btn-toggle-eye:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+
+        .keys-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .test-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .test-badge.success { background: rgba(16, 185, 129, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+        .test-badge.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
     </style>
 </head>
 
@@ -303,6 +332,95 @@
                 <label class="form-label">Min Relevance Score Threshold (0-100)</label>
                 <input type="number" id="minScore" class="form-input" min="0" max="100" value="40">
             </div>
+
+            <!-- AI Model & Service API Keys Section -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: var(--accent-purple); display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🤖</span> AI Model & Service API Keys
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            Configure preferred AI synthesis models and credentials for tailoring applications.
+                        </p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span id="testResultBadge" style="display: none;" class="test-badge"></span>
+                        <button type="button" class="btn-action" onclick="testActiveKey()" style="background: rgba(129, 140, 248, 0.15); border-color: rgba(129, 140, 248, 0.4); color: var(--accent-purple);">
+                            ⚡ Test Provider
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Preferred AI Provider</label>
+                        <select id="llmProvider" class="form-select" onchange="onProviderChange(true)">
+                            <option value="local">Local GGUF (LLMWorkbench / On-Device)</option>
+                            <option value="gemini">Google Gemini (Gemini 2.0 / 1.5 Flash)</option>
+                            <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+                            <option value="anthropic">Anthropic (Claude 3.5 Sonnet / Haiku)</option>
+                            <option value="groq">Groq (Llama 3.3 / Ultra-Fast Inference)</option>
+                            <option value="openrouter">OpenRouter (Multi-Model Router)</option>
+                            <option value="custom">Custom OpenAI-Compatible API</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Model Identifier</label>
+                        <input type="text" id="llmModel" class="form-input" placeholder="e.g. gemma-3-1B-it-QAT-Q4_0.gguf, gemini-2.0-flash, gpt-4o-mini">
+                    </div>
+                </div>
+
+                <div id="customEndpointGroup" class="form-group" style="display: none;">
+                    <label class="form-label">Custom API Base URL</label>
+                    <input type="text" id="llmCustomEndpoint" class="form-input" placeholder="https://api.example.com/v1">
+                </div>
+
+                <div class="keys-grid">
+                    <div class="form-group">
+                        <label class="form-label">Google Gemini API Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyGemini" class="form-input" placeholder="AIzaSy...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyGemini', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">OpenAI API Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyOpenAI" class="form-input" placeholder="sk-proj-...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyOpenAI', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Anthropic API Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyAnthropic" class="form-input" placeholder="sk-ant-...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyAnthropic', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Groq API Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyGroq" class="form-input" placeholder="gsk_...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyGroq', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">OpenRouter API Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyOpenRouter" class="form-input" placeholder="sk-or-v1-...">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyOpenRouter', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Custom Service Key</label>
+                        <div class="input-with-action">
+                            <input type="password" id="keyCustom" class="form-input" placeholder="Bearer token or API key">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('keyCustom', this)">👁️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -347,9 +465,62 @@
             `).join('');
         }
 
+        function onProviderChange(isUserAction = false) {
+            const provider = document.getElementById('llmProvider').value;
+            const customGroup = document.getElementById('customEndpointGroup');
+            const modelInput = document.getElementById('llmModel');
+            
+            if (provider === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+            }
+
+            const defaults = {
+                'local': 'gemma-3-1B-it-QAT-Q4_0.gguf',
+                'gemini': 'gemini-2.0-flash',
+                'openai': 'gpt-4o-mini',
+                'anthropic': 'claude-3-5-sonnet-20241022',
+                'groq': 'llama-3.3-70b-versatile',
+                'openrouter': 'meta-llama/llama-3.3-70b-instruct',
+                'custom': 'default'
+            };
+
+            const placeholders = {
+                'local': 'e.g. gemma-3-1B-it-QAT-Q4_0.gguf',
+                'gemini': 'e.g. gemini-2.0-flash or gemini-1.5-pro',
+                'openai': 'e.g. gpt-4o-mini or gpt-4o',
+                'anthropic': 'e.g. claude-3-5-sonnet-20241022',
+                'groq': 'e.g. llama-3.3-70b-versatile',
+                'openrouter': 'e.g. meta-llama/llama-3.3-70b-instruct',
+                'custom': 'e.g. my-custom-model'
+            };
+            modelInput.placeholder = placeholders[provider] || 'Model identifier';
+
+            const currentVal = modelInput.value.trim();
+            const allDefaults = Object.values(defaults);
+            if (isUserAction || !currentVal || (provider !== 'local' && currentVal.endsWith('.gguf')) || allDefaults.includes(currentVal)) {
+                modelInput.value = defaults[provider] || '';
+            }
+        }
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
         async function selectProfile(id) {
             currentEditingId = id;
             renderSidebar();
+            const badge = document.getElementById('testResultBadge');
+            badge.style.display = 'none';
+
             try {
                 const res = await fetch(`${API_BASE}/profiles/${id}`);
                 const data = await res.json();
@@ -369,6 +540,37 @@
                 document.getElementById('coreTech').value = (currentConfig.scoring?.core_tech || []).join(', ');
                 document.getElementById('disqSkills').value = (currentConfig.scoring?.disqualified_skills || []).join(', ');
                 document.getElementById('minScore').value = currentConfig.scoring?.min_relevance_score || 40;
+
+                // Load LLM configuration & API keys
+                const llmCfg = currentConfig.llm || {};
+                const provider = llmCfg.provider || 'local';
+                document.getElementById('llmProvider').value = provider;
+                
+                let modelName = llmCfg.model_name || '';
+                if (!modelName || (provider !== 'local' && modelName.endsWith('.gguf'))) {
+                    const defaults = {
+                        'local': 'gemma-3-1B-it-QAT-Q4_0.gguf',
+                        'gemini': 'gemini-2.0-flash',
+                        'openai': 'gpt-4o-mini',
+                        'anthropic': 'claude-3-5-sonnet-20241022',
+                        'groq': 'llama-3.3-70b-versatile',
+                        'openrouter': 'meta-llama/llama-3.3-70b-instruct',
+                        'custom': 'default'
+                    };
+                    modelName = defaults[provider] || '';
+                }
+                document.getElementById('llmModel').value = modelName;
+                document.getElementById('llmCustomEndpoint').value = llmCfg.custom_endpoint || '';
+
+                const keys = llmCfg.api_keys || {};
+                document.getElementById('keyGemini').value = keys.gemini || '';
+                document.getElementById('keyOpenAI').value = keys.openai || '';
+                document.getElementById('keyAnthropic').value = keys.anthropic || '';
+                document.getElementById('keyGroq').value = keys.groq || '';
+                document.getElementById('keyOpenRouter').value = keys.openrouter || '';
+                document.getElementById('keyCustom').value = keys.custom || '';
+
+                onProviderChange(false);
             } catch (e) { console.error('Error loading profile detail:', e); }
         }
 
@@ -400,6 +602,22 @@
             updatedConfig.scoring.disqualified_skills = document.getElementById('disqSkills').value.split(',').map(s => s.trim()).filter(Boolean);
             updatedConfig.scoring.min_relevance_score = parseInt(document.getElementById('minScore').value);
 
+            // Save LLM configuration
+            const provider = document.getElementById('llmProvider').value;
+            updatedConfig.llm = {
+                provider: provider,
+                model_name: document.getElementById('llmModel').value.trim(),
+                custom_endpoint: document.getElementById('llmCustomEndpoint').value.trim(),
+                api_keys: {
+                    gemini: document.getElementById('keyGemini').value.trim(),
+                    openai: document.getElementById('keyOpenAI').value.trim(),
+                    anthropic: document.getElementById('keyAnthropic').value.trim(),
+                    groq: document.getElementById('keyGroq').value.trim(),
+                    openrouter: document.getElementById('keyOpenRouter').value.trim(),
+                    custom: document.getElementById('keyCustom').value.trim()
+                }
+            };
+
             try {
                 const res = await fetch(`${API_BASE}/profiles/${currentEditingId}`, {
                     method: 'PUT',
@@ -407,10 +625,73 @@
                     body: JSON.stringify({ name, description: '', config: updatedConfig })
                 });
                 if (res.ok) {
-                    alert('Profile saved!');
+                    alert('Profile and API keys saved successfully!');
                     await loadProfiles();
                 } else { alert('Error saving profile'); }
             } catch (e) { console.error(e); }
+        }
+
+        async function testActiveKey() {
+            if (!currentEditingId) return;
+
+            const badge = document.getElementById('testResultBadge');
+            const provider = document.getElementById('llmProvider').value;
+            let model = document.getElementById('llmModel').value.trim();
+            const customEndpoint = document.getElementById('llmCustomEndpoint').value.trim();
+            
+            // Clean up model name
+            if (provider === 'gemini') {
+                if (model.startsWith('models/')) {
+                    model = model.replace(/^models\//, '');
+                    document.getElementById('llmModel').value = model;
+                } else if (!model || model.endsWith('.gguf')) {
+                    model = 'gemini-2.0-flash';
+                    document.getElementById('llmModel').value = model;
+                }
+            }
+
+            let key = '';
+            if (provider === 'gemini') key = document.getElementById('keyGemini').value.trim();
+            else if (provider === 'openai') key = document.getElementById('keyOpenAI').value.trim();
+            else if (provider === 'anthropic') key = document.getElementById('keyAnthropic').value.trim();
+            else if (provider === 'groq') key = document.getElementById('keyGroq').value.trim();
+            else if (provider === 'openrouter') key = document.getElementById('keyOpenRouter').value.trim();
+            else if (provider === 'custom') key = document.getElementById('keyCustom').value.trim();
+
+            badge.style.display = 'inline-block';
+            badge.className = 'test-badge';
+            badge.textContent = '⏳ Testing connection...';
+            badge.style.background = 'rgba(56, 189, 248, 0.15)';
+            badge.style.color = 'var(--accent-blue)';
+            badge.title = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/profiles/${currentEditingId}/test_llm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: provider,
+                        model: model || null,
+                        api_key: key || null,
+                        custom_endpoint: customEndpoint || null
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    badge.className = 'test-badge success';
+                    badge.textContent = `✓ ${data.provider.toUpperCase()} Online (${data.latency_ms}ms)`;
+                    badge.title = data.response || 'Connection successful';
+                } else {
+                    badge.className = 'test-badge error';
+                    const errStr = data.error || 'Connection failed';
+                    badge.textContent = `✗ Failed: ${errStr.length > 55 ? errStr.substring(0, 52) + '...' : errStr}`;
+                    badge.title = errStr;
+                }
+            } catch (e) {
+                badge.className = 'test-badge error';
+                badge.textContent = `✗ Error: ${e.message}`;
+                badge.title = e.message;
+            }
         }
 
         async function activateCurrentProfile() {
