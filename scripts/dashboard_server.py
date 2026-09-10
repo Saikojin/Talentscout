@@ -399,8 +399,14 @@ async def get_tailored_resume(job_id: int):
 
 if __name__ == "__main__":
     import uvicorn
+    import argparse
+    parser = argparse.ArgumentParser(description="TalentScout Dashboard Server")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("DASHBOARD_PORT", os.environ.get("PORT", 8088))), help="Port to run server on")
+    parser.add_argument("--host", type=str, default="localhost", help="Host to bind to")
+    args = parser.parse_args()
+
     os.chdir(BASE_DIR)
-    port = 8088
-    print(f"Starting Dashboard & Profile Server on http://localhost:{port}")
-    uvicorn.run("scripts.dashboard_server:app", host="localhost", port=port, reload=True)
+    port = args.port
+    print(f"Starting TalentScout Unified Dashboard Server on http://{args.host}:{port}")
+    uvicorn.run("scripts.dashboard_server:app", host=args.host, port=port, reload=True)
 

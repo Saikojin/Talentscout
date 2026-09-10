@@ -61,14 +61,13 @@ def is_blacklisted(url: str, name: str, blacklist_set: set) -> bool:
 
 def _check_dns_sync(hostname: str) -> bool:
     try:
-        socket.setdefaulttimeout(2.0)
-        socket.getaddrinfo(hostname, 443, proto=socket.IPPROTO_TCP)
+        socket.getaddrinfo(hostname, None)
         return True
     except (socket.gaierror, socket.timeout, Exception):
         return False
 
 async def is_domain_reachable(url: str, blacklist_set: set = None) -> bool:
-    """Non-blocking DNS check with in-memory caching and auto-blacklisting on failure."""
+    """Non-blocking DNS check with in-memory caching."""
     hostname = urlparse(url).netloc.lower().strip()
     if not hostname:
         return False
@@ -77,11 +76,11 @@ async def is_domain_reachable(url: str, blacklist_set: set = None) -> bool:
         return _DNS_CACHE[hostname]
     
     loop = asyncio.get_running_loop()
-    reachable = await loop.run_in_executor(None, _check_dns_sync, hostname)
+    try:
+        reachable = await loop.run_in_executor(None, _check_dns_sync, hostname)
+    except Exception:
+        reachable = True
     _DNS_CACHE[hostname] = reachable
-    
-    if not reachable:
-        auto_blacklist(url, "ERR_NAME_NOT_RESOLVED", blacklist_set)
     return reachable
 
 # Errors that indicate a permanently broken domain — auto-blacklist these.
@@ -106,13 +105,8 @@ def _get_timeout(url: str) -> int:
     return 45000 if any(h in url for h in SPA_HOSTS) else 30000
 
 def auto_blacklist(url: str, error_str: str, blacklist_set: set = None) -> None:
-    """Append the hostname to blacklist.json when a fatal TLS/protocol or DNS error occurs."""
-    is_fatal = (
-        any(code in error_str for code in FATAL_NAV_ERRORS) 
-        or "ERR_NAME_NOT_RESOLVED" in error_str 
-        or "DNS" in error_str.upper() 
-        or "GAIERROR" in error_str.upper()
-    )
+    """Append the hostname to blacklist.json when a fatal TLS/protocol error occurs."""
+    is_fatal = any(code in error_str for code in FATAL_NAV_ERRORS)
     if not is_fatal:
         return
     hostname = urlparse(url).netloc.lower().strip()
@@ -162,7 +156,6 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
         except Exception as e:
             error_str = str(e)
             print(f"[!] Warning: Navigation to {url} timed out or failed. {error_str}")
-            auto_blacklist(url, error_str)
             await page.close()
             return []
         
@@ -307,7 +300,6 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
         except Exception as e:
             error_str = str(e)
             print(f"[!] Warning: Navigation to {url} timed out or failed. {error_str}")
-            auto_blacklist(url, error_str)
             # T3: Early exit so we don't evaluate a dead/error page
             await page.close()
             return []

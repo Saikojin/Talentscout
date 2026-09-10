@@ -188,7 +188,14 @@ async def api_delete_company(company_id: int):
 
 if __name__ == "__main__":
     import uvicorn
+    import argparse
+    parser = argparse.ArgumentParser(description="TalentScout Standalone Resume Parser Server")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("RESUME_PORT", os.environ.get("PORT", 8085))), help="Port to run server on")
+    parser.add_argument("--host", type=str, default="localhost", help="Host to bind to")
+    args = parser.parse_args()
+
     # Make sure we're running from the root of the project
     os.chdir(BASE_DIR)
-    print("Starting Resume Parser local server on http://localhost:8000")
-    uvicorn.run("scripts.resume_server:app", host="localhost", port=8000, reload=True)
+    port = args.port
+    print(f"Starting Standalone Resume Parser server on http://{args.host}:{port}")
+    uvicorn.run("scripts.resume_server:app", host=args.host, port=port, reload=True)

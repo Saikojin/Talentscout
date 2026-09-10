@@ -7,12 +7,12 @@ Before starting the search, ensure your profile and target companies are up to d
 
 1. **Update Base Skillset**
    - Start the local servers using `start.bat`.
-   - Open the **Resume Scanner** at `http://localhost:8000/`.
+   - Open the **Resume Scanner** at `http://localhost:8088/scanner` (or standalone on `http://localhost:8085/`).
    - Upload your latest resume to parse the skills.
    - Review the extracted JSON and click "Save Skillset" to update the `base_skillset.json` file. This is crucial for accurate match scoring.
 
 2. **Manage Job Sources & Companies**
-   - Open the **Manage Crawlers** page at `http://localhost:8000/manage` or via the top navigation link.
+   - Open the **Manage Crawlers** page at `http://localhost:8088/manage` or via the top navigation link.
    - **Sites Tab:** Add or update general job board configurations (e.g., search terms, CSS selectors).
    - **Companies Tab:** Add specific company career pages tracking the exact URLs and selectors to ensure we catch exclusive postings.
 
