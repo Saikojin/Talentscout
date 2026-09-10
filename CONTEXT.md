@@ -14,8 +14,8 @@ TalentScout is a **Python-based automated job scraping and tracking system**. It
 - **SQLite deduplication** via `job_tracker.db`
 - **Dashboard output & scoring** to `dashboard.html` (`http://localhost:8088`) and `jobs_to_review.md`
 - **1-Click Tailored Resume & Cover Letter Generator**: Generates custom Resumes and Cover Letters tailored to specific job cards.
-- **Bundled Local LLM Engine (`llmworkbench/`)**: On-device GGUF inference (port 8000) with UI start/stop controls.
-- **Resume Parser UI** (FastAPI + Uvicorn) at `http://localhost:8000`
+- **Bundled Local LLM Engine (`llmworkbench/`)**: On-device GGUF inference (port 8000, worker 8080) with UI start/stop controls.
+- **Resume Parser UI**: Integrated into Unified Dashboard (`http://localhost:8088/scanner`) with standalone fallback on port 8085.
 
 ### New: Resume-as-Code Sub-project
 
@@ -30,17 +30,18 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Job scraping | Python 3.8+, Playwright, BeautifulSoup4 |
-| Data storage | SQLite3 (`job_tracker.db`) |
-| Web server | FastAPI + Uvicorn (:8088) |
-| Local LLM Backend | FastAPI + Uvicorn + GGUF Engine (:8000) |
-| Resume data | JSON Resume standard (Node.js) |
-| Resume compiler | Node.js ESM scripts + marked + puppeteer |
-| MCP server | TypeScript, `@modelcontextprotocol/sdk` |
-| Resume tests | Vitest (29/29 passing) |
-| Landing page | Vanilla HTML/CSS/JS |
+| Layer | Technology | Port |
+|---|---|---|
+| Job scraping | Python 3.8+, Playwright, BeautifulSoup4 | N/A (CLI Engine) |
+| Data storage | SQLite3 (`job_tracker.db`) | N/A (Local File) |
+| Unified Web Server | FastAPI + Uvicorn | `:8088` |
+| Local LLM Backend | FastAPI + Uvicorn + GGUF Engine | `:8000` (Worker `:8080`) |
+| Standalone Parser | FastAPI + Uvicorn | `:8085` |
+| MCP Server | TypeScript, `@modelcontextprotocol/sdk` | `:3001` |
+| Resume data | JSON Resume standard (Node.js) | N/A |
+| Resume compiler | Node.js ESM scripts + marked + puppeteer | N/A |
+| Resume tests | Vitest (29/29 passing) | N/A |
+| Landing page | Vanilla HTML/CSS/JS | N/A |
 
 ---
 
@@ -100,10 +101,10 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 ```powershell
 # From D:\DevWorkspace\TalentScout
 
-# --- Python Job Scraper ---
+# --- Python Job Scraper & Unified Server ---
 python scripts/auto_scour.py        # Run job scraper
-.\start.bat                          # Start resume parser UI (localhost:8000)
-.\stop.bat                           # Stop resume parser UI
+.\start.bat                          # Start Unified Dashboard Server (localhost:8088)
+.\stop.bat                           # Stop TalentScout services (8088, 8085, 8000, 8080, 3001)
 
 # --- Resume Engine (from resume/) ---
 cd resume
