@@ -18,13 +18,18 @@ async def fetch_jobs(session, company_name, ats_url):
             jobs = data.get("offers", [])
             results = []
             for j in jobs:
+                loc_obj = j.get("location", "")
+                loc_str = loc_obj if isinstance(loc_obj, str) else str(loc_obj or "Remote")
+                country = j.get("country")
                 results.append({
                     "title": j.get("title", ""),
                     "company": company_name,
                     "url": j.get("careers_url", ""),
-                    "location": j.get("location", "Remote"),
+                    "location": loc_str,
+                    "country": country.upper() if country else None,
                     "description": j.get("description", "")
                 })
             return results
     except Exception as e:
         return []
+

@@ -39,13 +39,17 @@ async def fetch_jobs(session, company_name, ats_url):
             jobs = data.get("jobPostings", [])
             results = []
             for j in jobs:
+                loc = j.get("locationsText", "Remote")
+                country = j.get("country")
                 results.append({
                     "title": j.get("title", ""),
                     "company": company_name,
                     "url": f"https://{tenant_host}{j.get('externalPath')}",
-                    "location": j.get("locationsText", "Remote"),
+                    "location": loc,
+                    "country": country.upper() if country else None,
                     "description": "" # Description usually fetched separately; fallback handles it
                 })
             return results
     except Exception as e:
         return []
+

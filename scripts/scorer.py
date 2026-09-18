@@ -9,6 +9,7 @@ if BASE_DIR not in sys.path:
 
 from scripts.profile import get_active_profile
 from scripts.filter_skills import filter_job as fallback_filter_skills
+from scripts.location_utils import evaluate_job_location, normalize_country
 
 def estimate_experience_level(text: str) -> str:
     """Guess experience level from job description text."""
@@ -35,11 +36,19 @@ def estimate_experience_level(text: str) -> str:
         return "mid"
     return "mid"
 
-def score_job(jd_text: str, title: str = "", profile_data: dict = None) -> dict:
+def score_job(
+    jd_text: str,
+    title: str = "",
+    location: str = "",
+    country: str = "",
+    company: str = "",
+    url: str = "",
+    profile_data: dict = None
+) -> dict:
     """
     Score a job using multi-axis weighted scoring based on the active profile.
-    Maintains backward compatibility with filter_skills.py output format while
-    retaining the hardcoded WA safety net filter.
+    Enforces country allowances (US-only default), location constraints,
+    empty JD safety net, and skill matching.
     """
     if profile_data is None:
         profile_obj = get_active_profile()
@@ -58,16 +67,27 @@ def score_job(jd_text: str, title: str = "", profile_data: dict = None) -> dict:
     matched_skills = []
     missing_skills = []
 
-    jd_lower = jd_text.lower()
-    title_lower = title.lower()
+    jd_clean = (jd_text or "").strip()
+    jd_lower = jd_clean.lower()
+    title_lower = (title or "").lower()
+    is_empty_jd = len(jd_clean) < 50
 
-    # 0. Check hardcoded WA & location safety net from legacy filter_skills.py
-    legacy_res = fallback_filter_skills(jd_text, "base_skillset.json")
-    if legacy_res.get("is_disqualified"):
-        # Keep safety net disqualifications
-        for reason in legacy_res.get("disqualified_by", []):
-            if "Not remote and not in WA" in reason or "Hybrid in distant location" in reason or "Remote but restricted" in reason:
-                disqualified_by.append(f"SafetyNet: {reason}")
+    # 0. Empty / Invalid Job Description Safety Net Guard
+    if is_empty_jd:
+        disqualified_by.append("SafetyNet: Empty or invalid job description")
+
+    # 0b. Evaluate Location & Country Restrictions (Strict Country & Safety Net)
+    loc_eval = evaluate_job_location(
+        location=location,
+        country=country,
+        title=title,
+        jd_text=jd_text,
+        company=company,
+        url=url,
+        profile_location=loc_cfg
+    )
+    if loc_eval.get("is_disqualified") and loc_eval.get("reason"):
+        disqualified_by.append(loc_eval["reason"])
 
     # 1. Disqualified Skills check
     disqualified_skills = scoring_cfg.get("disqualified_skills", [])
@@ -114,16 +134,27 @@ def score_job(jd_text: str, title: str = "", profile_data: dict = None) -> dict:
         tech_score = min(100, len(matched_skills) * 15)
 
     # Axis 3: Experience Score (Weight default 20)
-    detected_exp = estimate_experience_level(jd_text)
-    target_exp = meta_cfg.get("experience_target", "senior")
-    exp_bonuses = scoring_cfg.get("experience_bonuses", {})
-    exp_bonus_val = exp_bonuses.get(target_exp, {}).get(detected_exp, 5) if isinstance(exp_bonuses.get(target_exp), dict) else exp_bonuses.get(detected_exp, 5)
-    exp_score = min(100, max(0, 70 + exp_bonus_val * 2))
+    if is_empty_jd:
+        detected_exp = "unknown"
+        exp_score = 0
+    else:
+        detected_exp = estimate_experience_level(jd_text)
+        target_exp = meta_cfg.get("experience_target", "senior")
+        exp_bonuses = scoring_cfg.get("experience_bonuses", {})
+        exp_bonus_val = exp_bonuses.get(target_exp, {}).get(detected_exp, 5) if isinstance(exp_bonuses.get(target_exp), dict) else exp_bonuses.get(detected_exp, 5)
+        exp_score = min(100, max(0, 70 + exp_bonus_val * 2))
 
     # Axis 4: Signal / Location Score (Weight default 15)
-    loc_positives = loc_cfg.get("location_positive", ["washington", "wa", "remote", "seattle", "redmond", "bellevue"])
-    loc_matches = [loc for loc in loc_positives if loc.lower() in jd_lower]
-    signal_score = min(100, 50 + (len(loc_matches) * 15))
+    if is_empty_jd:
+        signal_score = 0
+    elif loc_eval.get("is_target") or loc_eval.get("is_wa"):
+        signal_score = 100
+    elif loc_eval.get("is_remote"):
+        signal_score = 85
+    else:
+        loc_positives = loc_cfg.get("location_positive", [])
+        loc_matches = [loc for loc in loc_positives if loc.lower() in jd_lower]
+        signal_score = min(100, 50 + (len(loc_matches) * 15)) if loc_matches else 50
 
     # Calculate Weighted Final Score
     weights = scoring_cfg.get("weights", {"title": 30, "tech": 35, "experience": 20, "signal": 15})
@@ -159,8 +190,10 @@ def score_job(jd_text: str, title: str = "", profile_data: dict = None) -> dict:
             "signal": signal_score
         },
         "experience_level": detected_exp,
+        "detected_country": loc_eval.get("detected_country"),
         "score_profile_id": profile_id
     }
+
 
 if __name__ == "__main__":
     sample_jd = "Looking for a Senior QA Engineer with Karate Framework, API Testing, Docker and AWS experience in Seattle, WA."

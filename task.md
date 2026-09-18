@@ -1,28 +1,27 @@
-# Task Checklist: Service Port Isolation & Scour Rotation Restoration
+# Task Checklist: Location Integrity, Scour Disqualification & Dashboard Cleanliness
 
-- [x] **Task 1: Clean Blacklist & Restore Scour Rotation (`blacklist.json`)**
-  - [x] Purge the 3,273 false-positive auto-blacklisted entries from `blacklist.json`, restoring it to the canonical 15 verified entries.
-  - [x] Verify that all 10,891 companies in `job_tracker.db` and search configs are active in the rotation and no longer skipped upfront.
-  - [x] Verification command: `python -c "import json; bl=json.load(open('blacklist.json')); print('Blacklist size:', len(bl))"`
+- [x] **Task 1: Fix Site Table Schema & Selectors (`scripts/database.py`, `job_tracker.db`, `site_selectors.json`)**
+  - [x] Add `location_selector` column to `sites` table in `scripts/database.py` and run schema migration on `job_tracker.db`.
+  - [x] Populate correct `location_selector` strings for all sites (Dice, Glassdoor, SimplyHired, CareerBuilder, Monster, GameJobs, BuiltIn, LinkedIn, Indeed, etc.) from `site_selectors.json`.
+  - [x] Verification command: `python -c "import sqlite3; conn = sqlite3.connect('job_tracker.db'); cur = conn.cursor(); cur.execute('SELECT name, location_selector FROM sites'); print(cur.fetchall())"`
 
-- [x] **Task 2: Fix Aggressive DNS & Auto-Blacklisting Bug in Crawler (`scripts/auto_scour.py`)**
-  - [x] Remove global `socket.setdefaulttimeout(2.0)` mutation in `_check_dns_sync` that caused spurious DNS failures across coroutines.
-  - [x] Remove destructive `auto_blacklist()` calls on general navigation timeouts, network exceptions, or single DNS check failures in `is_domain_reachable`, `scrape_company`, and `scrape_site`.
-  - [x] Make domain reachability checks resilient with proper logging without permanently blacklisting sites.
-  - [x] Verification command: Run mock scour or test reachability check on sample domains (e.g., `adobe.com`, `ea.com`, `3m.com`).
+- [x] **Task 2: Eliminate Search Query Fallback Location Corruption (`scripts/auto_scour.py`)**
+  - [x] Modify `scrape_site()` so it NEVER populates `job["location"]` with the search query `location` variable when `card_location` is empty. If no card location is found, leave `location=""` or `None`.
+  - [x] Ensure `process_discovered_job()` extracts/reconciles location from the fetched `jd_text` or ATS API payload rather than trusting search query strings.
+  - [x] Verification command: Test running mock `scrape_site` on GameJobs and Dice to confirm `location` is not falsely stamped with "Seattle".
 
-- [x] **Task 3: Service Port Separation & Conflict Resolution (`scripts/dashboard_server.py`, `scripts/resume_server.py`)**
-  - [x] Ensure `scripts/dashboard_server.py` runs on dedicated Port **8088** (supporting `PORT` / `DASHBOARD_PORT` env vars).
-  - [x] Update `scripts/resume_server.py` to run on dedicated Port **8085** (avoiding port 8000 collision with LLM server and port 8088 with Dashboard).
-  - [x] Ensure all frontend client templates (`dashboard.html`, `dashboard/profile_editor.html`, `dashboard/manage_crawlers.html`, `dashboard/resume_scanner.html`) use consistent API routes and distinct ports.
-  - [x] Verification command: Start dashboard server and resume server on their respective ports to verify no port collision.
+- [x] **Task 3: Harden Location & Country Evaluation (`scripts/location_utils.py`, `scripts/scorer.py`)**
+  - [x] Synchronize `COUNTRY_CODES_MAP` and expand `FOREIGN_LOCATIONS_MAP` with complete international countries, territories, and major tech cities (including Pakistan, Qatar, UAE, Saudi Arabia, etc.).
+  - [x] Refactor `is_remote_role()` to eliminate false positives on generic words like isolated `virtual` and `nationwide`, requiring clear remote-work phrases (`remote`, `work from home`, `wfh`, `telecommute`, `virtual role`).
+  - [x] Fix `evaluate_job_location()` so that `is_target_location` only tests the true location header and actual location statements, NOT pre-pending metadata that bypasses JD foreign country / out-of-state checks.
+  - [x] Close the fallthrough loophole in Step 6: When `require_local_or_remote` is `True`, any job that is NOT explicitly confirmed as a target location (WA / Seattle metro) and NOT confirmed US-remote MUST be disqualified.
+  - [x] Ensure `detected_country` only returns `"United States"` when genuinely verified, not as a blanket default fallback for unvetted roles.
+  - [x] Verification command: Run `pytest` or dedicated test script (`scripts/test_location_profiles.py` and `tmp/test_location_hardening.py`) covering Riot Games (Singapore), Dice (Indiana), Veeam (Pakistan/Qatar), Evolution (NJ), and Shield AI (Wichita).
 
-- [x] **Task 4: Update Process Management Scripts (`start.bat`, `stop.bat`)**
-  - [x] Update `start.bat` with clear port overview (Dashboard: 8088, LLM: 8000/8080, Resume: 8085, MCP: 3001).
-  - [x] Update `stop.bat` to kill processes listening on all configured ports (8088, 8085, 8000, 8080, 3001).
-  - [x] Verification command: Dry run / test script syntax and port list.
+- [x] **Task 4: Database Cleanse & Rescoring Utility (`scripts/cleanup_invalid_jobs.py` / `scripts/database.py`)**
+  - [x] Create a migration/rescore script that evaluates all existing "new" and active jobs in `job_tracker.db` against the hardened scoring engine, auto-rejecting or purging false-positive entries.
+  - [x] Verification command: `python scripts/cleanup_invalid_jobs.py --dry-run` followed by live cleanup.
 
-- [x] **Task 5: Update Living Context & Documentation (`CONTEXT.md`, `README.md`, `docs/manual_job_search.md`)**
-  - [x] Document all assigned service ports and separation in `CONTEXT.md` and `README.md`.
-  - [x] Document crawler troubleshooting and blacklist maintenance in `docs/manual_job_search.md`.
-  - [x] Verification: Full review of all markdown docs and link checks.
+- [x] **Task 5: Documentation & Living Context Update (`CONTEXT.md`, `README.md`)**
+  - [x] Update `CONTEXT.md` to document the location resolution architecture, multi-source provenance, and safety nets.
+  - [x] Update test memory and walkthrough documentation.

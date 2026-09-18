@@ -4,35 +4,40 @@
         "job_card_selector": ".base-card",
         "title_selector": ".base-search-card__title",
         "company_selector": ".base-search-card__subtitle",
-        "job_url_selector": ".base-card__full-link"
+        "job_url_selector": ".base-card__full-link",
+        "location_selector": ".job-search-card__location, .base-search-card__metadata span"
     },
     "Indeed": {
         "search_url": "https://www.indeed.com/jobs?q={search_term}&l={location}",
         "job_card_selector": ".job_seen_beacon",
         "title_selector": "h2.jobTitle",
         "company_selector": "[data-testid='company-name']",
-        "job_url_selector": "h2.jobTitle a"
+        "job_url_selector": "h2.jobTitle a",
+        "location_selector": "[data-testid='text-location'], .companyLocation"
     },
     "BuiltIn": {
         "search_url": "https://builtin.com/jobs/seattle?search={search_term}",
         "job_card_selector": ".job-bounded-responsive",
         "title_selector": "a.card-alias-after-overlay",
         "company_selector": "a[href^='/company/'] span",
-        "job_url_selector": "a.card-alias-after-overlay"
+        "job_url_selector": "a.card-alias-after-overlay",
+        "location_selector": ".job-location, .font-barlow"
     },
     "Dice": {
         "search_url": "https://www.dice.com/jobs?q={search_term}&location={location}",
         "job_card_selector": "div.flex.flex-col.gap-6.rounded-lg.border",
         "title_selector": "a[href*='/job-detail/'][class*='font-semibold']",
         "company_selector": "a[href*='/company-profile/'] p",
-        "job_url_selector": "a[href*='/job-detail/'][class*='font-semibold']"
+        "job_url_selector": "a[href*='/job-detail/'][class*='font-semibold']",
+        "location_selector": "[data-cy='search-result-location'], .location"
     },
     "Glassdoor": {
         "search_url": "https://www.glassdoor.com/Job/seattle-wa-us-senior-qa-engineer-jobs-SRCH_IL.0,13_IC1150505_KO14,32.htm",
         "job_card_selector": "li[class*='jobListItem']",
         "title_selector": "a[class*='jobTitle']",
         "company_selector": "div[class*='employerName']",
-        "job_url_selector": "a[class*='jobTitle']"
+        "job_url_selector": "a[class*='jobTitle']",
+        "location_selector": "[data-test='emp-location']"
     },
     "Outscal": {
         "search_url": "https://outscal.com/jobs",
@@ -46,21 +51,24 @@
         "job_card_selector": "article[data-testid='JobCard']",
         "title_selector": "a.title-link",
         "company_selector": "div[class*='Company']",
-        "job_url_selector": "a.title-link"
+        "job_url_selector": "a.title-link",
+        "location_selector": "[data-testid='job-location'], div[class*='Location']"
     },
     "SimplyHired": {
         "search_url": "https://www.simplyhired.com/search?q={search_term}&l={location}",
         "job_card_selector": "div[role='presentation']",
         "title_selector": "h2 a",
         "company_selector": "a[href*='/browse-jobs/companies/']",
-        "job_url_selector": "h2 a"
+        "job_url_selector": "h2 a",
+        "location_selector": "[data-testid='searchSerpJobLocation']"
     },
     "Monster": {
         "search_url": "https://www.monster.com/jobs/search?q={search_term}&where={location}",
         "job_card_selector": "article[data-testid='JobCard']",
         "title_selector": "a.title-link",
         "company_selector": "div[class*='Company']",
-        "job_url_selector": "a.title-link"
+        "job_url_selector": "a.title-link",
+        "location_selector": "[data-testid='job-location'], div[class*='Location']"
     },
     "Hiring Cafe": {
         "search_url": "https://hiring.cafe/?search={search_term}&location={location}",
@@ -95,7 +103,8 @@
         "job_card_selector": ".job",
         "title_selector": "a.title",
         "company_selector": "a.c",
-        "job_url_selector": "a.title"
+        "job_url_selector": "a.title",
+        "location_selector": "a.w, .w"
     },
     "JobLeads": {
         "search_url": "https://www.jobleads.com/jobs?keywords={search_term}",

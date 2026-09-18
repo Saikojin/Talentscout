@@ -22,13 +22,16 @@ async def fetch_jobs(session, company_name, ats_url):
             
             results = []
             for j in jobs:
+                loc_name = j.get("location", {}).get("name", "Remote") if isinstance(j.get("location"), dict) else str(j.get("location") or "Remote")
                 results.append({
                     "title": j.get("title", ""),
                     "company": company_name,
                     "url": j.get("absolute_url", ""),
-                    "location": j.get("location", {}).get("name", "Remote"),
+                    "location": loc_name,
+                    "country": None,
                     "description": j.get("content", "")
                 })
             return results
     except Exception as e:
         return []
+

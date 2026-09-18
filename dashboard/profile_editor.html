@@ -333,7 +333,69 @@
                 <input type="number" id="minScore" class="form-input" min="0" max="100" value="40">
             </div>
 
+            <!-- Location & Geographic Constraints Section -->
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
+                <h3 style="font-size: 1.15rem; color: var(--accent-blue); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📍</span> Candidate Home & Job Search Location
+                </h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                    Configure candidate residence properties and location matching rules for scraping and scoring.
+                </p>
+
+                <!-- Candidate Home Residence -->
+                <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--glass-border); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <h4 style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.75rem;">Candidate Home Residence</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">Country</label>
+                            <input type="text" id="candCountry" class="form-input" placeholder="e.g. US">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">State / Region</label>
+                            <input type="text" id="candState" class="form-input" placeholder="e.g. Washington">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">City</label>
+                            <input type="text" id="candCity" class="form-input" placeholder="e.g. Redmond">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">Postal / ZIP</label>
+                            <input type="text" id="candPostalCode" class="form-input" placeholder="e.g. 98052">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Search Rules & Preferences -->
+                <div class="form-group">
+                    <label class="form-label">Allowed Countries (Comma-separated, roles in other countries auto-disqualified)</label>
+                    <input type="text" id="allowedCountries" class="form-input" placeholder="e.g. US, USA, United States">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Target States / Regions (Comma-separated)</label>
+                        <input type="text" id="targetStates" class="form-input" placeholder="e.g. WA, Washington">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Preferred Cities (Comma-separated)</label>
+                        <input type="text" id="prefCities" class="form-input" placeholder="e.g. Seattle, Redmond, Bellevue, Kirkland">
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <input type="checkbox" id="allowRemote" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-blue);">
+                        <label for="allowRemote" class="form-label" style="margin-bottom: 0; cursor: pointer;">Allow Nationwide / Anywhere Remote Roles</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <input type="checkbox" id="requireLocalOrRemote" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-blue);">
+                        <label for="requireLocalOrRemote" class="form-label" style="margin-bottom: 0; cursor: pointer;">Require Target State or Remote (disqualifies non-remote roles in other states & non-target Redmonds)</label>
+                    </div>
+                </div>
+            </div>
+
             <!-- AI Model & Service API Keys Section -->
+
             <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                     <div>
@@ -541,6 +603,19 @@
                 document.getElementById('disqSkills').value = (currentConfig.scoring?.disqualified_skills || []).join(', ');
                 document.getElementById('minScore').value = currentConfig.scoring?.min_relevance_score || 40;
 
+                // Load Location configuration
+                const locCfg = currentConfig.location || {};
+                document.getElementById('candCountry').value = locCfg.country || 'US';
+                document.getElementById('candState').value = locCfg.state || locCfg.state_code || 'Washington';
+                document.getElementById('candCity').value = locCfg.city || 'Redmond';
+                document.getElementById('candPostalCode').value = locCfg.postal_code || '98052';
+
+                document.getElementById('allowedCountries').value = (locCfg.allowed_countries || ["US", "USA", "United States"]).join(', ');
+                document.getElementById('targetStates').value = (locCfg.target_states || ["WA", "Washington"]).join(', ');
+                document.getElementById('prefCities').value = (locCfg.preferred_cities || ["Seattle", "Redmond", "Bellevue", "Kirkland"]).join(', ');
+                document.getElementById('allowRemote').checked = locCfg.allow_remote !== false;
+                document.getElementById('requireLocalOrRemote').checked = (locCfg.require_local_or_remote !== undefined ? locCfg.require_local_or_remote : (locCfg.require_wa_or_remote !== false));
+
                 // Load LLM configuration & API keys
                 const llmCfg = currentConfig.llm || {};
                 const provider = llmCfg.provider || 'local';
@@ -602,6 +677,22 @@
             updatedConfig.scoring.disqualified_skills = document.getElementById('disqSkills').value.split(',').map(s => s.trim()).filter(Boolean);
             updatedConfig.scoring.min_relevance_score = parseInt(document.getElementById('minScore').value);
 
+            // Save Location configuration
+            updatedConfig.location = updatedConfig.location || {};
+            updatedConfig.location.country = document.getElementById('candCountry').value.trim();
+            updatedConfig.location.country_name = document.getElementById('candCountry').value.trim() === 'US' ? 'United States' : document.getElementById('candCountry').value.trim();
+            updatedConfig.location.state = document.getElementById('candState').value.trim();
+            updatedConfig.location.state_code = document.getElementById('candState').value.trim().length <= 3 ? document.getElementById('candState').value.trim().toUpperCase() : (updatedConfig.location.state_code || 'WA');
+            updatedConfig.location.city = document.getElementById('candCity').value.trim();
+            updatedConfig.location.postal_code = document.getElementById('candPostalCode').value.trim();
+
+            updatedConfig.location.allowed_countries = document.getElementById('allowedCountries').value.split(',').map(s => s.trim()).filter(Boolean);
+            updatedConfig.location.target_states = document.getElementById('targetStates').value.split(',').map(s => s.trim()).filter(Boolean);
+            updatedConfig.location.preferred_cities = document.getElementById('prefCities').value.split(',').map(s => s.trim()).filter(Boolean);
+            updatedConfig.location.allow_remote = document.getElementById('allowRemote').checked;
+            updatedConfig.location.require_local_or_remote = document.getElementById('requireLocalOrRemote').checked;
+            updatedConfig.location.require_wa_or_remote = document.getElementById('requireLocalOrRemote').checked;
+
             // Save LLM configuration
             const provider = document.getElementById('llmProvider').value;
             updatedConfig.llm = {
@@ -617,6 +708,7 @@
                     custom: document.getElementById('keyCustom').value.trim()
                 }
             };
+
 
             try {
                 const res = await fetch(`${API_BASE}/profiles/${currentEditingId}`, {

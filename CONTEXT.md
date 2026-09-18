@@ -49,11 +49,19 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 ### Python Job Scraper & Tailoring Engine (active)
 - ✅ Multi-site scraping with Playwright
-- ✅ Profile & Scoring Engine (`scripts/profile.py` + `scripts/scorer.py`) with customizable weights
+- ✅ Dynamic Profile & Scoring Engine (`scripts/profile.py` + `scripts/scorer.py` + `scripts/location_utils.py`) with customizable weights, dynamic candidate location properties (`country`, `state`, `city`, `postal_code`), configurable search constraints (`allowed_countries`, `target_states`, `preferred_cities`, `allow_remote`, `require_local_or_remote`), 50-state detection, and city/state disambiguation (e.g. `Redmond, OR` vs `Redmond, WA`).
+- ✅ **Location Integrity & Safety Nets**:
+  - **No Search Query Fallback**: `auto_scour.py` never overwrites missing card locations with the search keyword (`Seattle`).
+  - **Site Table Location Selectors**: `sites` table includes `location_selector` column, fully migrated in `job_tracker.db` and configurable via dashboard API.
+  - **Strict Remote Phrase Matching**: Disallows single generic words (`virtual`, `nationwide`) from triggering false-positive US-remote classifications.
+  - **Foreign Country & Out-of-State Safety Nets**: Extensive coverage in `FOREIGN_LOCATIONS_MAP` (Pakistan, Qatar, UAE, India, UK, Singapore, Latin America, etc.) and `US_MAJOR_CITIES` (Puget Sound tech corridor + major US metros).
+  - **True JD Priority**: Pre-pended metadata cannot mask international or non-target physical locations found in the actual job description.
+  - **Live Cleanse Utility**: `scripts/cleanup_invalid_jobs.py` re-evaluates database jobs against candidate profile constraints and purges/rejects disqualified jobs.
 - ✅ 1-Click Tailored Resume & Cover Letter Generator (`scripts/tailor_engine.py` & `dashboard.html`)
 - ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
-- ✅ SQLite deduplication and profile persistence
-- ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) and Markdown output
+- ✅ SQLite deduplication and multi-profile persistence
+- ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) with home residence & job search location controls, and Markdown output
+
 
 ### Resume-as-Code (`resume/`)
 - ✅ `resume/data/resume.json` — Comprehensive 26-year career history for Thomas S. Snyder

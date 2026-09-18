@@ -96,6 +96,32 @@ FATAL_NAV_ERRORS = (
 # SPA hosts that require networkidle instead of domcontentloaded
 SPA_HOSTS = ("notion.site", "notion.so")
 
+NON_JOB_URL_PATTERNS = [
+    r'/c/[^/]+-jobs',
+    r'/categories(?:/|$)',
+    r'/category(?:/|$)',
+    r'/jobcart(?:/|$)',
+    r'/locations(?:/|$)',
+    r'/early-careers(?:/|$)',
+    r'/candidate-resources(?:/|$)',
+    r'/benefits(?:/|$)',
+    r'/life-at-[^/]+',
+    r'/about-us(?:/|$)',
+    r'/our-culture(?:/|$)',
+    r'/saved-jobs(?:/|$)',
+    r'/search-results(?:/|$)',
+]
+
+def is_non_job_url(url: str) -> bool:
+    """Detect category/landing/informational URLs that are not specific job postings."""
+    if not url:
+        return False
+    u_lower = url.lower()
+    for pattern in NON_JOB_URL_PATTERNS:
+        if re.search(pattern, u_lower):
+            return True
+    return False
+
 def _wait_strategy(url: str) -> str:
     """Return the appropriate Playwright wait_until strategy for a given URL."""
     return "networkidle" if any(h in url for h in SPA_HOSTS) else "domcontentloaded"
@@ -163,6 +189,9 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
     
     jobs = []
     
+    comp_countries = company.get("countries")
+    comp_country = comp_countries[0] if isinstance(comp_countries, list) and comp_countries else (comp_countries if isinstance(comp_countries, str) else None)
+    
     if not card_sel:
         # Smart Callback: No selectors defined in DB. We will heuristically find job links.
         print(f"[*] No selectors defined for {name}. Using smart fallback to find job links...")
@@ -194,15 +223,18 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
                 # Check for common job URL patterns or exact roles
                 keywords = ["/job", "/career", "/req", "/position", "jobid=", "opening", "opportunity", "role"]
                 if any(k in href_lower for k in keywords):
-                    # Exclude generic nav links
-                    if "search" not in href_lower and "login" not in href_lower and "mailto:" not in href_lower:
+                    # Exclude generic nav links and non-job landing/category pages
+                    if "search" not in href_lower and "login" not in href_lower and "mailto:" not in href_lower and not is_non_job_url(href):
                         full_url = href if href.startswith('http') else urljoin(url, href)
-                        jobs.append({
-                            "title": text.strip(),
-                            "company": name,
-                            "url": full_url,
-                            "priority": 2  # Fallback priority
-                        })
+                        if not is_non_job_url(full_url):
+                            jobs.append({
+                                "title": text.strip(),
+                                "company": name,
+                                "url": full_url,
+                                "location": "",
+                                "country": comp_country,
+                                "priority": 2  # Fallback priority
+                            })
         
         # Deduplicate discovered jobs
         unique_jobs = {}
@@ -240,6 +272,28 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
                     log(f"  [-] Skipping old job (found date text in card)")
                     continue
 
+            # Extract location from card
+            loc_sel = company.get("location_selector")
+            comp_loc = ""
+            if loc_sel:
+                try:
+                    loc_el = card.locator(loc_sel).first
+                    if await loc_el.count():
+                        comp_loc = (await loc_el.text_content() or "").strip()
+                except Exception:
+                    pass
+            if not comp_loc:
+                for fallback_sel in [".job-search-card__location", ".base-search-card__metadata span", ".companyLocation", "[data-testid='text-location']", ".job-location", ".location"]:
+                    try:
+                        f_el = card.locator(fallback_sel).first
+                        if await f_el.count():
+                            txt = (await f_el.text_content() or "").strip()
+                            if txt and len(txt) > 2 and "ago" not in txt.lower() and "apply" not in txt.lower():
+                                comp_loc = txt
+                                break
+                    except Exception:
+                        pass
+
             title_el = card.locator(company.get("title_selector")).first
             title = await title_el.text_content() if await title_el.count() else "Unknown Title"
             
@@ -265,10 +319,15 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
             if job_href and not job_href.startswith('http'):
                 job_href = urljoin(url, job_href)
                 
+            if job_href and is_non_job_url(job_href):
+                continue
+
             jobs.append({
                 "title": title.strip(),
                 "company": company_text.strip(),
                 "url": job_href or url,
+                "location": comp_loc,
+                "country": comp_country,
                 "priority": 1  # Standard priority
             })
         except Exception as e:
@@ -276,6 +335,7 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
     
     await page.close()
     return jobs
+
 
 async def scrape_site(context, site_name, site_info, config, search_term, location, semaphore):
     async with semaphore:
@@ -341,19 +401,49 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                 title = await title_el.text_content() if await title_el.count() else "Unknown Title"
                 company = await company_el.text_content() if await company_el.count() else "Unknown Company"
                 
+                # Extract location from card
+                loc_sel = config.get("location_selector")
+                card_location = ""
+                if loc_sel:
+                    try:
+                        loc_el = card.locator(loc_sel).first
+                        if await loc_el.count():
+                            card_location = (await loc_el.text_content() or "").strip()
+                    except Exception:
+                        pass
+                if not card_location:
+                    for fallback_sel in [".job-search-card__location", ".base-search-card__metadata span", ".companyLocation", "[data-testid='text-location']", ".job-location", ".location"]:
+                        try:
+                            f_el = card.locator(fallback_sel).first
+                            if await f_el.count():
+                                txt = (await f_el.text_content() or "").strip()
+                                if txt and len(txt) > 2 and "ago" not in txt.lower() and "apply" not in txt.lower():
+                                    card_location = txt
+                                    break
+                        except Exception:
+                            pass
+
                 # Extract all links from the card to find the right one
                 job_href = None
                 links = await card.locator("a").all()
                 for link in links:
                     href = await link.get_attribute("href")
-                    if href and ("/job/" in href or "/post/" in href):
-                        job_href = href
-                        break
+                    if href and ("/job/" in href or "/post/" in href or "/jobs/" in href):
+                        if not is_non_job_url(href):
+                            job_href = href
+                            break
                 
                 if not job_href:
                     url_el = card.locator(config.get("job_url_selector")).first
                     job_href = await url_el.get_attribute("href") if await url_el.count() else None
                 
+                # Resolve relative URLs
+                if job_href and not job_href.startswith('http'):
+                    job_href = urljoin(url, job_href)
+                    
+                if job_href and is_non_job_url(job_href):
+                    continue
+
                 title = title.strip()
                 # Clean up company name if it's missing or has extra whitespace
                 if company and company.strip() and company.strip() != "Unknown Company":
@@ -363,20 +453,19 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                     try:
                         all_text_elements = await card.locator("span").all_text_contents()
                         for t in all_text_elements:
-                            if t and len(t.strip()) > 3 and "Apply" not in t and "ago" not in t:
+                            if t and len(t.strip()) > 3 and "Apply" not in t and "ago" not in t and t.strip() != card_location:
                                 company = t.strip()
                                 break
                     except:
                         pass
                 
-                # Resolve relative URLs
-                if job_href and not job_href.startswith('http'):
-                    job_href = urljoin(url, job_href)
-                    
                 jobs.append({
                     "title": title,
                     "company": company,
                     "url": job_href or url,
+                    "location": card_location,
+                    "country": None,
+                    "searched_location": location,
                     "priority": 1
                 })
             except Exception as e:
@@ -386,6 +475,7 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
         await page.close()
         print(f"  [+] Finished: {site_name} ('{search_term}' in '{location}'). Found {len(jobs)} jobs.")
         return jobs
+
 
 async def fetch_job_description(context, job_url, semaphore, blacklist_set=None):
     if blacklist_set and is_blacklisted(job_url, "", blacklist_set):
@@ -474,6 +564,10 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
         
     processed_urls.add(job["url"])
     
+    if is_non_job_url(job["url"]):
+        print(f"  [-] Skipping non-job landing page URL: {job['url']}")
+        return None
+
     if is_duplicate(job["url"], job["title"], job["company"]):
         print(f"  [-] Skipping existing job: {job['title']} at {job['company']}")
         return None
@@ -488,11 +582,20 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
             return None
     
     active_profile = get_active_profile()
-    filter_results = score_job(jd_text, title=job.get("title", ""), profile_data=active_profile)
+    filter_results = score_job(
+        jd_text,
+        title=job.get("title", ""),
+        location=job.get("location", ""),
+        country=job.get("country", ""),
+        company=job.get("company", ""),
+        url=job.get("url", ""),
+        profile_data=active_profile
+    )
     job["filter_results"] = filter_results
     
     if filter_results.get("is_disqualified"):
-        print(f"  [-] Job Disqualified: {job['title']} at {job['company']}")
+        reasons = ", ".join(filter_results.get("disqualified_by", []))
+        print(f"  [-] Job Disqualified: {job['title']} at {job['company']} (Reasons: {reasons})")
         return job # Return anyway to show in final "failed" list if needed
         
     score = filter_results.get("score", 75)
@@ -500,8 +603,20 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
     matched_skills = filter_results.get("matched_skills", [])[:5] 
     profile_id = filter_results.get("score_profile_id")
     
-    add_job(job["title"], job["company"], job["url"], job["site"], score, missing_skills, matched_skills, score_profile_id=profile_id)
+    add_job(
+        job["title"],
+        job["company"],
+        job["url"],
+        job["site"],
+        score,
+        missing_skills,
+        matched_skills,
+        score_profile_id=profile_id,
+        location=job.get("location"),
+        country=job.get("country") or filter_results.get("detected_country")
+    )
     return job
+
 
 async def worker(context, queue, semaphore, processed_urls, results, blacklist_set=None):
     """A worker task that drains the job queue."""
