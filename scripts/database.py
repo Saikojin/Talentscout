@@ -47,6 +47,10 @@ def init_db():
                 cursor.execute("ALTER TABLE jobs ADD COLUMN matched_skills TEXT")
             if 'score_profile_id' not in columns:
                 cursor.execute("ALTER TABLE jobs ADD COLUMN score_profile_id INTEGER")
+            if 'location' not in columns:
+                cursor.execute("ALTER TABLE jobs ADD COLUMN location TEXT")
+            if 'country' not in columns:
+                cursor.execute("ALTER TABLE jobs ADD COLUMN country TEXT")
                 
             # Create profiles table
             cursor.execute("""
@@ -76,9 +80,15 @@ def init_db():
                     job_card_selector TEXT,
                     title_selector TEXT,
                     company_selector TEXT,
-                    job_url_selector TEXT
+                    job_url_selector TEXT,
+                    location_selector TEXT
                 )
             """)
+
+            cursor.execute("PRAGMA table_info(sites)")
+            site_cols = [col[1] for col in cursor.fetchall()]
+            if 'location_selector' not in site_cols:
+                cursor.execute("ALTER TABLE sites ADD COLUMN location_selector TEXT")
             
             # Create search_configs table
             cursor.execute("""
@@ -155,7 +165,7 @@ def is_duplicate(url, title=None, company=None):
             conn.close()
     return False
 
-def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None):
+def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None, location=None, country=None):
     """Add a new job to the database if it doesn't exist."""
     conn = create_connection()
     if conn is not None:
@@ -170,9 +180,9 @@ def add_job(title, company, url, site_source, score=None, missing_skills=None, m
                 matched_skills = json.dumps(matched_skills)
                 
             cursor.execute("""
-                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id)
-                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?)
-            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id))
+                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id, location, country)
+                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)
+            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id, location, country))
             conn.commit()
         except sqlite3.Error as e:
             print(f"Error adding job: {e}")
@@ -181,6 +191,7 @@ def add_job(title, company, url, site_source, score=None, missing_skills=None, m
 
 # Initialize DB on import
 init_db()
+
 
 def update_job_status(job_id, status):
     """Update a job's status."""
@@ -223,16 +234,16 @@ def get_new_jobs():
 
 # --- Site Configuration CRUD Methods ---
 
-def add_site(name, search_url, job_card_selector, title_selector, company_selector, job_url_selector):
+def add_site(name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, location_selector=None):
     conn = create_connection()
     site_id = None
     if conn is not None:
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO sites (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector))
+                INSERT INTO sites (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, location_selector)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, location_selector))
             conn.commit()
             site_id = cursor.lastrowid
         except sqlite3.Error as e:
@@ -241,7 +252,7 @@ def add_site(name, search_url, job_card_selector, title_selector, company_select
             conn.close()
     return site_id
 
-def update_site(site_id, name, search_url, job_card_selector, title_selector, company_selector, job_url_selector):
+def update_site(site_id, name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, location_selector=None):
     conn = create_connection()
     success = False
     if conn is not None:
@@ -249,9 +260,9 @@ def update_site(site_id, name, search_url, job_card_selector, title_selector, co
             cursor = conn.cursor()
             cursor.execute("""
                 UPDATE sites 
-                SET name=?, search_url=?, job_card_selector=?, title_selector=?, company_selector=?, job_url_selector=?
+                SET name=?, search_url=?, job_card_selector=?, title_selector=?, company_selector=?, job_url_selector=?, location_selector=?
                 WHERE id=?
-            """, (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, site_id))
+            """, (name, search_url, job_card_selector, title_selector, company_selector, job_url_selector, location_selector, site_id))
             conn.commit()
             success = cursor.rowcount > 0
         except sqlite3.Error as e:

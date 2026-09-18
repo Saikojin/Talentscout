@@ -22,14 +22,24 @@ async def fetch_jobs(session, company_name, ats_url):
             
             results = []
             for j in jobs:
-                # Workable returns short description. Full description needs another call or we fall back.
+                loc_obj = j.get("location", {}) or {}
+                city = loc_obj.get("city", "")
+                region = loc_obj.get("region", "")
+                country = loc_obj.get("country", "")
+                loc_parts = [p for p in [city, region, country] if p]
+                loc_str = ", ".join(loc_parts) or "Remote"
+                if j.get("telecommuting"):
+                    loc_str = f"Remote, {loc_str}"
+                
                 results.append({
                     "title": j.get("title", ""),
                     "company": company_name,
                     "url": f"https://apply.workable.com/{slug}/j/{j.get('shortcode')}/",
-                    "location": j.get("location", {}).get("country", "Remote"),
+                    "location": loc_str,
+                    "country": country.upper() if country else None,
                     "description": j.get("description", "")
                 })
             return results
     except Exception as e:
         return []
+

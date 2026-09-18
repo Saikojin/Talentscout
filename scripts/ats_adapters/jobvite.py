@@ -25,13 +25,17 @@ async def fetch_jobs(session, company_name, ats_url):
             data = await resp.json()
             results = []
             for j in data:
+                loc = j.get("location", "Remote")
+                country = j.get("country")
                 results.append({
                     "title": j.get("title", ""),
                     "company": company_name,
                     "url": j.get("detail-url", ""),
-                    "location": j.get("location", "Remote"),
+                    "location": loc,
+                    "country": country.upper() if country else None,
                     "description": j.get("description", "")
                 })
             return results
     except Exception as e:
         return []
+

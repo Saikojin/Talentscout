@@ -37,8 +37,9 @@ async def fetch_jobs(session, company_name, ats_url):
                 results.append({
                     "title": title_text,
                     "company": company_name,
-                    "url": url,
+                    "url": f"https://{slug}.jobs.personio.de/job/{job_id.text}" if job_id is not None else ats_url,
                     "location": loc,
+                    "country": None,
                     "description": desc
                 })
             return results

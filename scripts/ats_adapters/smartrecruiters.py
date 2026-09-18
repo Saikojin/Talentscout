@@ -19,13 +19,28 @@ async def fetch_jobs(session, company_name, ats_url):
             
             results = []
             for j in jobs:
+                loc_obj = j.get("location", {}) or {}
+                city = loc_obj.get("city", "")
+                region = loc_obj.get("region", "")
+                country = loc_obj.get("country", "")
+                is_remote = loc_obj.get("remote", False)
+                
+                loc_parts = [p for p in [city, region, country] if p]
+                loc_str = ", ".join(loc_parts)
+                if is_remote:
+                    loc_str = f"Remote, {loc_str}" if loc_str else "Remote"
+                elif not loc_str:
+                    loc_str = "Remote"
+                    
                 results.append({
                     "title": j.get("name", ""),
                     "company": company_name,
                     "url": f"https://jobs.smartrecruiters.com/{slug}/{j.get('id')}",
-                    "location": j.get("location", {}).get("city", "Remote"),
+                    "location": loc_str,
+                    "country": country.upper() if country else None,
                     "description": "" # Needs secondary fetch or fallback
                 })
             return results
     except Exception as e:
         return []
+

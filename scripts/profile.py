@@ -5,7 +5,7 @@ import os
 import sys
 import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, List, Dict
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
@@ -61,10 +61,20 @@ def default_config() -> dict:
             }
         },
         "location": {
+            "country": "US",
+            "country_name": "United States",
+            "state": "Washington",
+            "state_code": "WA",
+            "city": "Redmond",
+            "postal_code": "98052",
+            "allowed_countries": ["US", "USA", "United States"],
+            "target_states": ["WA", "Washington"],
+            "preferred_cities": ["Seattle", "Redmond", "Bellevue", "Kirkland"],
             "preferred_locations": ["Seattle", "Redmond", "Bellevue", "Remote"],
+            "allow_remote": True,
+            "require_local_or_remote": True,
             "location_positive": ["washington", "wa", "remote", "nationwide", "usa", "seattle", "redmond", "bellevue", "kirkland"],
-            "location_negative": ["india only", "latam only", "uk only", "europe only"],
-            "require_wa_or_remote": True
+            "location_negative": ["india only", "latam only", "uk only", "europe only"]
         },
         "llm": {
             "provider": "local",
@@ -106,6 +116,20 @@ def validate_config(config: dict) -> dict:
             w[k] = base["scoring"]["weights"][k]
     merged["scoring"]["weights"] = w
 
+    # Validate location block
+    loc_cfg = merged.get("location", {})
+    if not isinstance(loc_cfg.get("allowed_countries"), list):
+        loc_cfg["allowed_countries"] = ["US", "USA", "United States"]
+    if not isinstance(loc_cfg.get("target_states"), list):
+        loc_cfg["target_states"] = [loc_cfg.get("state", "Washington"), loc_cfg.get("state_code", "WA")] if loc_cfg.get("state") else ["WA", "Washington"]
+    if not isinstance(loc_cfg.get("preferred_cities"), list):
+        loc_cfg["preferred_cities"] = [loc_cfg.get("city", "Redmond")] if loc_cfg.get("city") else ["Seattle", "Redmond", "Bellevue", "Kirkland"]
+    if "require_local_or_remote" not in loc_cfg:
+        loc_cfg["require_local_or_remote"] = loc_cfg.get("require_wa_or_remote", True)
+    if "allow_remote" not in loc_cfg:
+        loc_cfg["allow_remote"] = True
+    merged["location"] = loc_cfg
+
     # Validate LLM block
     llm_cfg = merged.get("llm", {})
     valid_providers = ("local", "gemini", "openai", "anthropic", "groq", "openrouter", "custom")
@@ -118,6 +142,42 @@ def validate_config(config: dict) -> dict:
             llm_cfg["api_keys"][key_name] = ""
     merged["llm"] = llm_cfg
     return merged
+
+def get_user_location(profile_or_id: Optional[Any] = None) -> dict:
+    """
+    Retrieve candidate location properties and search constraints from a profile.
+    If no profile is provided, uses the active profile.
+    """
+    if profile_or_id is None:
+        p = get_active_profile()
+        cfg = p.get("config", {})
+    elif isinstance(profile_or_id, int):
+        p = get_profile(profile_or_id) or get_active_profile()
+        cfg = p.get("config", {})
+    elif isinstance(profile_or_id, dict):
+        cfg = profile_or_id.get("config", profile_or_id)
+    else:
+        p = get_active_profile()
+        cfg = p.get("config", {})
+        
+    loc = cfg.get("location", {})
+    return {
+        "country": loc.get("country", "US"),
+        "country_name": loc.get("country_name", "United States"),
+        "state": loc.get("state", "Washington"),
+        "state_code": loc.get("state_code", "WA"),
+        "city": loc.get("city", "Redmond"),
+        "postal_code": loc.get("postal_code", "98052"),
+        "allowed_countries": loc.get("allowed_countries", ["US", "USA", "United States"]),
+        "target_states": loc.get("target_states", ["WA", "Washington"]),
+        "preferred_cities": loc.get("preferred_cities", ["Seattle", "Redmond", "Bellevue", "Kirkland"]),
+        "allow_remote": loc.get("allow_remote", True),
+        "require_local_or_remote": loc.get("require_local_or_remote", loc.get("require_wa_or_remote", True)),
+        "location_positive": loc.get("location_positive", ["washington", "wa", "remote", "nationwide", "usa", "seattle", "redmond", "bellevue", "kirkland"]),
+        "location_negative": loc.get("location_negative", [])
+    }
+
+
 
 def invalidate_cache() -> None:
     with _CACHE_LOCK:

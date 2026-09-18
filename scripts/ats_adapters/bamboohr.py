@@ -18,13 +18,22 @@ async def fetch_jobs(session, company_name, ats_url):
             # BambooHR returns a list of jobs
             results = []
             for j in data:
+                loc_obj = j.get("location", {}) or {}
+                city = loc_obj.get("city", "")
+                state = loc_obj.get("state", "")
+                country = loc_obj.get("country", "")
+                loc_parts = [p for p in [city, state, country] if p]
+                loc_str = ", ".join(loc_parts) or "Remote"
+                
                 results.append({
                     "title": j.get("jobHeader", ""),
                     "company": company_name,
                     "url": f"https://{slug}.bamboohr.com/careers/{j.get('id')}",
-                    "location": j.get("location", {}).get("city", "Remote"),
+                    "location": loc_str,
+                    "country": country.upper() if country else None,
                     "description": j.get("description", "")
                 })
             return results
     except Exception as e:
         return []
+

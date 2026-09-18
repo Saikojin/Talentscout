@@ -93,6 +93,7 @@ class SiteConfig(BaseModel):
     title_selector: str
     company_selector: str
     job_url_selector: str
+    location_selector: Optional[str] = None
     
 class CompanyConfig(BaseModel):
     name: str
@@ -121,14 +122,14 @@ async def api_get_sites():
 @app.post("/api/sites")
 async def api_add_site(site: SiteConfig):
     sid = db.add_site(site.name, site.search_url, site.job_card_selector, 
-                      site.title_selector, site.company_selector, site.job_url_selector)
+                      site.title_selector, site.company_selector, site.job_url_selector, site.location_selector)
     if sid: return {"status": "success", "id": sid}
     raise HTTPException(status_code=500, detail="Failed to add site")
 
 @app.put("/api/sites/{site_id}")
 async def api_update_site(site_id: int, site: SiteConfig):
     success = db.update_site(site_id, site.name, site.search_url, site.job_card_selector, 
-                             site.title_selector, site.company_selector, site.job_url_selector)
+                             site.title_selector, site.company_selector, site.job_url_selector, site.location_selector)
     if success: return {"status": "success"}
     raise HTTPException(status_code=500, detail="Failed to update site")
 
@@ -292,7 +293,7 @@ async def rescore_jobs(profile_id: int):
     try:
         conn.row_factory = db.sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT id, title, missing_skills, matched_skills FROM jobs")
+        cursor.execute("SELECT id, title, missing_skills, matched_skills, location, country FROM jobs")
         rows = cursor.fetchall()
         
         for r in rows:
@@ -306,7 +307,13 @@ async def rescore_jobs(profile_id: int):
                 except: pass
             
             fake_jd = f"{r['title']}{skills_text}"
-            res = scorer.score_job(fake_jd, title=r['title'], profile_data=p_data)
+            res = scorer.score_job(
+                fake_jd,
+                title=r['title'],
+                location=r['location'] or "",
+                country=r['country'] or "",
+                profile_data=p_data
+            )
             
             cursor.execute("""
                 UPDATE jobs SET score = ?, score_profile_id = ? WHERE id = ?
@@ -316,6 +323,7 @@ async def rescore_jobs(profile_id: int):
         conn.commit()
     finally:
         conn.close()
+
         
     return {"status": "success", "rescored_count": count}
 
