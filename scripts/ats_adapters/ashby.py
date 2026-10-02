@@ -10,13 +10,19 @@ async def fetch_jobs(session, company_name, ats_url):
     if not slug:
         return []
         
-    api_url = f"https://jobs.ashbyhq.com/api/non-user-facing/posting-board/{slug}"
+    api_url = f"https://api.ashbyhq.com/posting-api/job-board/{slug}"
+    fallback_url = f"https://jobs.ashbyhq.com/api/non-user-facing/posting-board/{slug}"
     
     try:
         async with session.get(api_url, timeout=15) as resp:
-            if resp.status != 200:
-                return []
-            data = await resp.json()
+            if resp.status == 200:
+                data = await resp.json()
+            else:
+                async with session.get(fallback_url, timeout=15) as resp2:
+                    if resp2.status != 200:
+                        return []
+                    data = await resp2.json()
+                    
             jobs = data.get("jobs", [])
             
             results = []
@@ -30,7 +36,7 @@ async def fetch_jobs(session, company_name, ats_url):
                     "url": j.get("jobUrl", ""),
                     "location": loc,
                     "country": country.upper() if country else None,
-                    "description": j.get("descriptionHtml", "")
+                    "description": j.get("descriptionHtml", "") or j.get("descriptionPlain", "")
                 })
             return results
     except Exception as e:

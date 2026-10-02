@@ -294,8 +294,21 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
                     except Exception:
                         pass
 
-            title_el = card.locator(company.get("title_selector")).first
-            title = await title_el.text_content() if await title_el.count() else "Unknown Title"
+            title_sel = company.get("title_selector")
+            title = ""
+            if title_sel:
+                try:
+                    title_el = card.locator(title_sel).first
+                    if await title_el.count():
+                        title = (await title_el.text_content() or "").strip()
+                except Exception:
+                    pass
+            if not title:
+                card_txt = (await card.text_content() or "").strip()
+                if card_txt:
+                    title = card_txt.split("\n")[0].strip()
+            if not title:
+                title = "Unknown Title"
             
             c_sel = company.get("company_selector")
             if c_sel and await card.locator(c_sel).count():
