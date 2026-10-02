@@ -304,9 +304,19 @@ async def scrape_company(context, company, semaphore, blacklist_set=None):
                 company_text = name # fallback to known company name
                 
             job_href = None
-            url_el = card.locator(company.get("job_url_selector") or "a").first
-            if await url_el.count():
-                job_href = await url_el.get_attribute("href")
+            try:
+                card_tag = await card.evaluate("el => el.tagName.toLowerCase()")
+                if card_tag == "a":
+                    c_href = await card.get_attribute("href")
+                    if c_href:
+                        job_href = c_href
+            except Exception:
+                pass
+
+            if not job_href:
+                url_el = card.locator(company.get("job_url_selector") or "a").first
+                if await url_el.count():
+                    job_href = await url_el.get_attribute("href")
             
             if not job_href:
                 links = await card.locator("a").all()
@@ -425,13 +435,23 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
 
                 # Extract all links from the card to find the right one
                 job_href = None
-                links = await card.locator("a").all()
-                for link in links:
-                    href = await link.get_attribute("href")
-                    if href and ("/job/" in href or "/post/" in href or "/jobs/" in href):
-                        if not is_non_job_url(href):
-                            job_href = href
-                            break
+                try:
+                    card_tag = await card.evaluate("el => el.tagName.toLowerCase()")
+                    if card_tag == "a":
+                        c_href = await card.get_attribute("href")
+                        if c_href:
+                            job_href = c_href
+                except Exception:
+                    pass
+
+                if not job_href:
+                    links = await card.locator("a").all()
+                    for link in links:
+                        href = await link.get_attribute("href")
+                        if href and ("/job/" in href or "/post/" in href or "/jobs/" in href):
+                            if not is_non_job_url(href):
+                                job_href = href
+                                break
                 
                 if not job_href:
                     url_el = card.locator(config.get("job_url_selector")).first

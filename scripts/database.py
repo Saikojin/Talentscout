@@ -125,7 +125,7 @@ def init_db():
             # Migration logic for existing DBs (companies table)
             cursor.execute("PRAGMA table_info(companies)")
             comp_columns = [col[1] for col in cursor.fetchall()]
-            for new_col in ['website', 'ats_type', 'ats_url', 'tech_stack', 'industry_category', 'countries']:
+            for new_col in ['website', 'ats_type', 'ats_url', 'tech_stack', 'industry_category', 'countries', 'location_selector']:
                 if new_col not in comp_columns:
                     cursor.execute(f"ALTER TABLE companies ADD COLUMN {new_col} TEXT")
             

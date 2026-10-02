@@ -53,5 +53,167 @@
     "name": "Scion Staffing",
     "location": "Remote / Nationwide",
     "careers_url": "https://scionstaffing.com/search-jobs/"
+  },
+  {
+    "name": "Chainguard",
+    "careers_url": "https://speedrun-talent-network.com/companies/chainguard",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "Tailscale",
+    "careers_url": "https://speedrun-talent-network.com/companies/tailscale",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "1Password",
+    "careers_url": "https://speedrun-talent-network.com/companies/1password",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "Teleport",
+    "careers_url": "https://speedrun-talent-network.com/companies/teleport",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "Onebrief",
+    "careers_url": "https://speedrun-talent-network.com/companies/onebrief",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "Vanta",
+    "careers_url": "https://speedrun-talent-network.com/companies/vanta",
+    "category": "Security",
+    "location": "Remote"
+  },
+  {
+    "name": "Beacon Biosignals",
+    "careers_url": "https://speedrun-talent-network.com/companies/beacon-biosignals",
+    "category": "Healthtech",
+    "location": "Remote"
+  },
+  {
+    "name": "Maven Clinic",
+    "careers_url": "https://speedrun-talent-network.com/companies/maven-clinic",
+    "category": "Healthtech",
+    "location": "Remote"
+  },
+  {
+    "name": "Freenome",
+    "careers_url": "https://speedrun-talent-network.com/companies/freenome",
+    "category": "Healthtech",
+    "location": "Remote"
+  },
+  {
+    "name": "Honor",
+    "careers_url": "https://speedrun-talent-network.com/companies/honor",
+    "category": "Healthtech",
+    "location": "Remote"
+  },
+  {
+    "name": "Viz.ai",
+    "careers_url": "https://speedrun-talent-network.com/companies/viz-ai",
+    "category": "Healthtech",
+    "location": "Remote"
+  },
+  {
+    "name": "Mysten Labs",
+    "careers_url": "https://speedrun-talent-network.com/companies/mysten-labs",
+    "category": "DevTools, Data & AI",
+    "location": "Remote"
+  },
+  {
+    "name": "Jellyfish",
+    "careers_url": "https://speedrun-talent-network.com/companies/jellyfish",
+    "category": "DevTools, Data & AI",
+    "location": "Remote"
+  },
+  {
+    "name": "Cresta",
+    "careers_url": "https://speedrun-talent-network.com/companies/cresta",
+    "category": "DevTools, Data & AI",
+    "location": "Remote"
+  },
+  {
+    "name": "Render",
+    "careers_url": "https://speedrun-talent-network.com/companies/render",
+    "category": "DevTools, Data & AI",
+    "location": "Remote"
+  },
+  {
+    "name": "RunPod",
+    "careers_url": "https://speedrun-talent-network.com/companies/runpod",
+    "category": "DevTools, Data & AI",
+    "location": "Remote"
+  },
+  {
+    "name": "PayNearMe",
+    "careers_url": "https://speedrun-talent-network.com/companies/paynearme",
+    "category": "Fintech & Insurance",
+    "location": "Remote"
+  },
+  {
+    "name": "Affirm",
+    "careers_url": "https://speedrun-talent-network.com/companies/affirm",
+    "category": "Fintech & Insurance",
+    "location": "Remote"
+  },
+  {
+    "name": "Upstart",
+    "careers_url": "https://speedrun-talent-network.com/companies/upstart",
+    "category": "Fintech & Insurance",
+    "location": "Remote"
+  },
+  {
+    "name": "Vesta",
+    "careers_url": "https://speedrun-talent-network.com/companies/vesta",
+    "category": "Fintech & Insurance",
+    "location": "Remote"
+  },
+  {
+    "name": "Lithic",
+    "careers_url": "https://speedrun-talent-network.com/companies/lithic",
+    "category": "Fintech & Insurance",
+    "location": "Remote"
+  },
+  {
+    "name": "Fieldguide",
+    "careers_url": "https://speedrun-talent-network.com/companies/fieldguide",
+    "category": "B2B SaaS",
+    "location": "Remote"
+  },
+  {
+    "name": "FirstWork",
+    "careers_url": "https://speedrun-talent-network.com/companies/firstwork",
+    "category": "B2B SaaS",
+    "location": "Remote"
+  },
+  {
+    "name": "dili",
+    "careers_url": "https://speedrun-talent-network.com/companies/dili",
+    "category": "B2B SaaS",
+    "location": "Remote"
+  },
+  {
+    "name": "ClassDojo",
+    "careers_url": "https://speedrun-talent-network.com/companies/classdojo",
+    "category": "Consumer & Marketplaces",
+    "location": "Remote"
+  },
+  {
+    "name": "Reddit",
+    "careers_url": "https://speedrun-talent-network.com/companies/reddit",
+    "category": "Consumer & Marketplaces",
+    "location": "Remote"
+  },
+  {
+    "name": "Pika",
+    "careers_url": "https://speedrun-talent-network.com/companies/pika",
+    "category": "Consumer & Marketplaces",
+    "location": "Remote"
   }
 ]

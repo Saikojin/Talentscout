@@ -336,5 +336,45 @@
         "title_selector": "h2 a",
         "company_selector": "span.company",
         "job_url_selector": "h2 a"
+    },
+    "SpeedrunTalentNetwork": {
+        "search_url": "https://speedrun-talent-network.com/jobs?remote=1&scope=everywhere&search={search_term}",
+        "job_card_selector": "a.jb-row",
+        "title_selector": ".jb-title",
+        "company_selector": ".jb-meta",
+        "job_url_selector": "a.jb-row",
+        "location_selector": ".jb-meta"
+    },
+    "ArcDev": {
+        "search_url": "https://arc.dev/remote-jobs?query={search_term}",
+        "job_card_selector": ".job-card",
+        "title_selector": ".job-title",
+        "company_selector": ".company-name",
+        "job_url_selector": "a.job-title",
+        "location_selector": ".location-info"
+    },
+    "Wellfound": {
+        "search_url": "https://wellfound.com/jobs?q={search_term}",
+        "job_card_selector": "[data-test='JobListItem']",
+        "title_selector": "a[data-test='JobTitle']",
+        "company_selector": "[data-test='StartupName']",
+        "job_url_selector": "a[data-test='JobTitle']",
+        "location_selector": "[data-test='JobLocation']"
+    },
+    "PowerToFly": {
+        "search_url": "https://powertofly.com/jobs/?keywords={search_term}&location=Remote",
+        "job_card_selector": ".job-card",
+        "title_selector": ".job-title a",
+        "company_selector": ".company-title",
+        "job_url_selector": ".job-title a",
+        "location_selector": ".job-location"
+    },
+    "AuthenticJobs": {
+        "search_url": "https://authenticjobs.com/?search={search_term}",
+        "job_card_selector": "article.job",
+        "title_selector": "h3.title a",
+        "company_selector": "div.company a",
+        "job_url_selector": "h3.title a",
+        "location_selector": "span.location"
     }
 }
