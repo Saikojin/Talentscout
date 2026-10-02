@@ -215,5 +215,273 @@
     "careers_url": "https://speedrun-talent-network.com/companies/pika",
     "category": "Consumer & Marketplaces",
     "location": "Remote"
+  },
+  {
+    "name": "123FormBuilder",
+    "careers_url": "https://apply.workable.com/123formbuilder/",
+    "category": "SaaS & Automation",
+    "location": "Remote / Timisoara, Romania",
+    "ats_type": "workable",
+    "ats_url": "https://apply.workable.com/123formbuilder/"
+  },
+  {
+    "name": "Kit",
+    "careers_url": "https://jobs.ashbyhq.com/kit",
+    "category": "Creator Tools & Email Marketing",
+    "location": "Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/kit"
+  },
+  {
+    "name": "AccuLynx",
+    "careers_url": "https://acculynx.com/careers/",
+    "category": "Vertical SaaS & Construction CRM",
+    "location": "Chicago, IL / Remote",
+    "job_card_selector": "a[href*='recruiting.paylocity.com']",
+    "title_selector": "a",
+    "job_url_selector": "a"
+  },
+  {
+    "name": "Knack",
+    "careers_url": "https://www.knack.com/careers/",
+    "category": "No-Code & Database Apps",
+    "location": "Remote"
+  },
+  {
+    "name": "ActiveCampaign",
+    "careers_url": "https://jobs.lever.co/activecampaign",
+    "category": "Marketing Automation & CRM",
+    "location": "Chicago, IL / Remote",
+    "ats_type": "lever",
+    "ats_url": "https://jobs.lever.co/activecampaign"
+  },
+  {
+    "name": "Landbot",
+    "careers_url": "https://jobs.landbot.io/jobs",
+    "category": "Chatbots & Conversational UI",
+    "location": "Barcelona, Spain / Remote",
+    "job_card_selector": "a[href*='/jobs/']",
+    "title_selector": "span, div",
+    "job_url_selector": "a"
+  },
+  {
+    "name": "Airtable",
+    "careers_url": "https://boards.greenhouse.io/airtable",
+    "category": "Collaboration & Low-Code Databases",
+    "location": "San Francisco, CA / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/airtable"
+  },
+  {
+    "name": "Miro",
+    "careers_url": "https://jobs.ashbyhq.com/miro",
+    "category": "Visual Collaboration & Whiteboarding",
+    "location": "San Francisco, CA / Amsterdam / Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/miro"
+  },
+  {
+    "name": "Apollo",
+    "careers_url": "https://job-boards.greenhouse.io/apolloio",
+    "category": "Sales Intelligence & Engagement",
+    "location": "Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://job-boards.greenhouse.io/apolloio"
+  },
+  {
+    "name": "Nutshell",
+    "careers_url": "https://www.nutshell.com/careers",
+    "category": "CRM & Sales Automation",
+    "location": "Ann Arbor, MI / Remote"
+  },
+  {
+    "name": "BambooHR",
+    "careers_url": "https://www.bamboohr.com/careers/",
+    "category": "HR & People Operations",
+    "location": "Lindon, UT / Remote"
+  },
+  {
+    "name": "One Signal",
+    "careers_url": "https://onesignal.com/careers",
+    "category": "Omnichannel Messaging & Push Notifications",
+    "location": "San Mateo, CA / Remote"
+  },
+  {
+    "name": "Bitly",
+    "careers_url": "https://bitly.com/pages/careers",
+    "category": "Link Management & Analytics",
+    "location": "New York, NY / Remote"
+  },
+  {
+    "name": "Pandadoc",
+    "careers_url": "https://boards.greenhouse.io/pandadoc",
+    "category": "Document Automation & E-Signatures",
+    "location": "San Francisco, CA / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/pandadoc"
+  },
+  {
+    "name": "Brevo",
+    "careers_url": "https://jobs.lever.co/brevo",
+    "category": "CRM & Digital Marketing",
+    "location": "Paris, France / Remote",
+    "ats_type": "lever",
+    "ats_url": "https://jobs.lever.co/brevo"
+  },
+  {
+    "name": "Patreon",
+    "careers_url": "https://jobs.ashbyhq.com/patreon",
+    "category": "Creator Economy & Subscriptions",
+    "location": "San Francisco, CA / New York / Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/patreon"
+  },
+  {
+    "name": "Calendly",
+    "careers_url": "https://boards.greenhouse.io/calendly",
+    "category": "Scheduling & Productivity",
+    "location": "Atlanta, GA / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/calendly"
+  },
+  {
+    "name": "Pipedrive",
+    "careers_url": "https://www.pipedrive.com/en/jobs/open-positions",
+    "category": "Sales CRM & Pipeline Management",
+    "location": "Tallinn, Estonia / New York / Remote"
+  },
+  {
+    "name": "ClickUp",
+    "careers_url": "https://jobs.ashbyhq.com/clickup",
+    "category": "Productivity & Project Management",
+    "location": "San Diego, CA / Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/clickup"
+  },
+  {
+    "name": "Service Titan",
+    "careers_url": "https://servicetitan.wd1.myworkdayjobs.com/ServiceTitan",
+    "category": "Field Service Management SaaS",
+    "location": "Glendale, CA / Remote",
+    "ats_type": "workday",
+    "ats_url": "https://servicetitan.wd1.myworkdayjobs.com/ServiceTitan"
+  },
+  {
+    "name": "Copper CRM",
+    "careers_url": "https://coppercrm.applytojob.com/apply",
+    "category": "Google Workspace CRM",
+    "location": "San Francisco, CA / Remote"
+  },
+  {
+    "name": "Stan",
+    "careers_url": "https://stanforcreators.notion.site/Stan-Job-Board-b8430f3ca1d44c46b8ba74d5434ff022",
+    "category": "Creator Store & Digital Products",
+    "location": "Remote"
+  },
+  {
+    "name": "Discord",
+    "careers_url": "https://boards.greenhouse.io/discord",
+    "category": "Voice, Video & Community Chat",
+    "location": "San Francisco, CA / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/discord"
+  },
+  {
+    "name": "Stripe",
+    "careers_url": "https://boards.greenhouse.io/stripe",
+    "category": "Payments & Financial Infrastructure",
+    "location": "San Francisco, CA / Dublin / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/stripe"
+  },
+  {
+    "name": "Eventbrite",
+    "careers_url": "https://jobs.bendingspoons.com/positions",
+    "category": "Ticketing & Event Management",
+    "location": "Milan, Italy / San Francisco / Remote",
+    "job_card_selector": "a[href*='/positions/']",
+    "title_selector": "div, h3",
+    "job_url_selector": "a[href*='/positions/']"
+  },
+  {
+    "name": "Survey Monkey",
+    "careers_url": "https://jobs.ashbyhq.com/surveymonkey",
+    "category": "Feedback & Survey Software",
+    "location": "San Mateo, CA / Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/surveymonkey"
+  },
+  {
+    "name": "Ghost",
+    "careers_url": "https://careers.ghost.org/",
+    "category": "Open Source Publishing & Newsletters",
+    "location": "Remote"
+  },
+  {
+    "name": "Tawk.to",
+    "careers_url": "https://tawk-to.breezy.hr/",
+    "category": "Live Chat & Customer Communication",
+    "location": "Remote",
+    "ats_type": "breezy",
+    "ats_url": "https://tawk-to.breezy.hr/"
+  },
+  {
+    "name": "Help Scout",
+    "careers_url": "https://jobs.ashbyhq.com/helpscout",
+    "category": "Help Desk & Customer Support",
+    "location": "Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/helpscout"
+  },
+  {
+    "name": "Teachable",
+    "careers_url": "https://boards.greenhouse.io/teachablecareers",
+    "category": "Online Courses & Creator Monetization",
+    "location": "New York, NY / Remote",
+    "ats_type": "greenhouse",
+    "ats_url": "https://boards.greenhouse.io/teachablecareers"
+  },
+  {
+    "name": "Intuit",
+    "careers_url": "https://jobs.intuit.com/search-jobs",
+    "category": "Financial & Tax Software",
+    "location": "Mountain View, CA / Remote",
+    "job_card_selector": "section#search-results-list ul li",
+    "title_selector": "h2",
+    "job_url_selector": "a"
+  },
+  {
+    "name": "Toggl",
+    "careers_url": "https://toggl.com/jobs/",
+    "category": "Time Tracking & Productivity",
+    "location": "Remote"
+  },
+  {
+    "name": "Jobber",
+    "careers_url": "https://jobs.ashbyhq.com/jobber",
+    "category": "Home Service Operations Software",
+    "location": "Edmonton, Canada / Remote",
+    "ats_type": "ashby",
+    "ats_url": "https://jobs.ashbyhq.com/jobber"
+  },
+  {
+    "name": "Trello",
+    "careers_url": "https://www.atlassian.com/company/careers",
+    "category": "Visual Work Management & Collaboration",
+    "location": "Sydney, Australia / San Francisco / Remote"
+  },
+  {
+    "name": "Kajabi",
+    "careers_url": "https://www.kajabi.com/careers",
+    "category": "All-in-One Creator Platform",
+    "location": "Irvine, CA / Remote"
+  },
+  {
+    "name": "Zendesk",
+    "careers_url": "https://zendesk.wd1.myworkdayjobs.com/zendesk",
+    "category": "Customer Service & Engagement Platform",
+    "location": "San Francisco, CA / Remote",
+    "ats_type": "workday",
+    "ats_url": "https://zendesk.wd1.myworkdayjobs.com/zendesk"
   }
 ]
