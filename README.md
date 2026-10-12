@@ -7,6 +7,8 @@ TalentScout is an automated agentic job scraper that utilizes Playwright to find
 
 - **Multi-Site Scraping**: Scour multiple job boards by defining site selectors in a JSON file.
 - **Skill Filtering**: Define your skills and disqualified keywords to automatically reject bad fits before you even see them.
+- **DreamworkHQ Direct Ingestion**: Fast, zero-npm job discovery via DreamworkHQ's public API (`scripts/ingest_dreamwork.py`). Extracts direct employer ATS links (Greenhouse, Lever, Workday, BambooHR, etc.) with pre-parsed tech stacks and full descriptions.
+- **Dynamic Multi-Persona Support**: Automatically adapts to whichever candidate profile is active in SQLite or custom skillset JSON files (`--skillset`). Enables any profession (Engineering, Data Science, QA, Product, DevOps) to search and score jobs against their own criteria.
 - **Local Database Tracking**: Uses a local SQLite database (`job_tracker.db`) to log scraped jobs and prevent re-evaluating the same URL twice.
 - **Dashboard Output & Scoring**: Generates an integrated HTML dashboard (`http://localhost:8088`) and a Markdown list (`jobs_to_review.md`) with multi-axis scoring.
 - **1-Click Tailored Resume & Cover Letter Generator**: Generate targeted resumes and cover letters for specific job postings directly from the dashboard tiles.
@@ -53,13 +55,33 @@ Open your browser to `http://localhost:8088`.
 - In the top navigation, you will see the **Local LLM Widget**.
 - Select a downloaded `.gguf` model from the dropdown and click **▶️ Start LLM**.
 
-### 2. Run the Job Scraper
-To start scoring and filtering jobs:
+### 2. Run the Job Scraper (Playwright & ATS Harvester)
+To start scoring and filtering jobs across configured job boards:
 ```bash
 python scripts/auto_scour.py
 ```
 
-### 3. Generate 1-Click Tailored Resumes & Cover Letters
+### 3. Fast Job Discovery with DreamworkHQ (Zero-NPM Direct API)
+Quickly harvest and score fresh roles directly from DreamworkHQ's public API without launching browser instances or installing npm packages:
+
+```powershell
+# Ingest jobs using active database profile defaults
+python scripts/ingest_dreamwork.py
+
+# Query custom terms or remote positions
+python scripts/ingest_dreamwork.py --terms "Full Stack Developer, Python Engineer" --work-type remote
+
+# Run for a different candidate's skillset file
+python scripts/ingest_dreamwork.py --skillset path/to/candidate_skillset.json
+
+# Preview and score without modifying the database or markdown review list
+python scripts/ingest_dreamwork.py --dry-run --limit 10
+
+# Adjust posting age window or score threshold cutoff
+python scripts/ingest_dreamwork.py --days 7 --min-score 50 --limit 30
+```
+
+### 4. Generate 1-Click Tailored Resumes & Cover Letters
 In the Dashboard (`http://localhost:8088`):
 1. Click **✨ Tailor Resume & Cover Letter** on any job tile.
 2. The local LLM will synthesize a tailored resume with CAR/STAR bullet points and a matching cover letter.
