@@ -58,6 +58,7 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
   - **True JD Priority**: Pre-pended metadata cannot mask international or non-target physical locations found in the actual job description.
   - **Live Cleanse Utility**: `scripts/cleanup_invalid_jobs.py` re-evaluates database jobs against candidate profile constraints and purges/rejects disqualified jobs.
 - ✅ 1-Click Tailored Resume & Cover Letter Generator (`scripts/tailor_engine.py` & `dashboard.html`)
+- ✅ **DreamworkHQ Ingestor (`scripts/ingest_dreamwork.py`)**: Direct zero-npm connection to DreamworkHQ's public API for fast, ATS-direct job scraping, dynamic persona/profile-driven scoring, and SQLite deduplication.
 - ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
 - ✅ SQLite deduplication and multi-profile persistence
 - ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) with home residence & job search location controls, and Markdown output
@@ -89,7 +90,8 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 | File | Purpose |
 |---|---|
-| `scripts/auto_scour.py` | Main job scraper entry point |
+| `scripts/auto_scour.py` | Main job scraper entry point (Playwright + ATS) |
+| `scripts/ingest_dreamwork.py` | DreamworkHQ zero-npm direct API job harvester & scorer |
 | `base_skillset.json` | Your skills for job filtering |
 | `job_tracker.db` | SQLite deduplication DB |
 | `dashboard.html` | Job scraper visual dashboard |
@@ -110,7 +112,8 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 # From D:\DevWorkspace\TalentScout
 
 # --- Python Job Scraper & Unified Server ---
-python scripts/auto_scour.py        # Run job scraper
+python scripts/auto_scour.py        # Run job scraper (Playwright + ATS)
+python scripts/ingest_dreamwork.py   # Fast ingest from DreamworkHQ (zero-npm)
 .\start.bat                          # Start Unified Dashboard Server (localhost:8088)
 .\stop.bat                           # Stop TalentScout services (8088, 8085, 8000, 8080, 3001)
 
