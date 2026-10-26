@@ -8,6 +8,8 @@
     "validate": "node compiler/validate.js",
     "build": "node compiler/build.js",
     "build:pdf": "node compiler/build.js --pdf",
+    "story": "node compiler/storyEngine.js",
+    "story:first": "node compiler/storyEngine.js --first",
     "ats:greenhouse": "node compiler/adapters/greenhouse.js",
     "ats:workday": "node compiler/adapters/workday.js",
     "mcp": "cd mcp-server && npx tsx src/index.ts",

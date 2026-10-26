@@ -34,10 +34,11 @@ TalentScout is a **resume-as-code portfolio system** that:
 
 - ✅ **M1**: Scaffold complete — `package.json`, `resume.json`, `schema.json`, MCP `tsconfig.json`
 - ✅ **M2**: Compiler pipeline — `validate.js`, `build.js` (MD + HTML), `--pdf` flag
-- ✅ **M3**: Test suite — **29/29 tests passing** (schema matrix + compiler integrity)
+- ✅ **M3**: Test suite — **36/36 tests passing** (schema matrix + compiler + story engine integrity)
 - ✅ **M4**: MCP Server — 7 tools, stdio + HTTP transports, TypeScript strict
 - ✅ **M5**: ATS Adapters — Greenhouse + Workday
 - ✅ **M6**: Premium Landing Page — dark glassmorphism design, Focus Selector, MCP button, toast system
+- ✅ **M7**: Career Story Engine (Algorithmic NLG) — non-LLM narrative odyssey, dual voice (1st/3rd person), interactive web Story Mode, and standalone Markdown/HTML builds
 
 ---
 
@@ -60,6 +61,7 @@ TalentScout is a **resume-as-code portfolio system** that:
 | [schema/resume.schema.json](schema/resume.schema.json) | AJV JSON Schema for validation |
 | [compiler/validate.js](compiler/validate.js) | Run to validate resume.json |
 | [compiler/build.js](compiler/build.js) | Run to compile to MD + HTML + PDF |
+| [compiler/storyEngine.js](compiler/storyEngine.js) | Algorithmic NLG Career Story engine (Markdown + HTML) |
 | [compiler/adapters/greenhouse.js](compiler/adapters/greenhouse.js) | Greenhouse ATS export |
 | [compiler/adapters/workday.js](compiler/adapters/workday.js) | Workday ATS export |
 | [mcp-server/src/index.ts](mcp-server/src/index.ts) | MCP server — 7 agent tools |

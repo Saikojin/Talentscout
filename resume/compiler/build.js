@@ -34,6 +34,7 @@ const atsStyle = atsArg ? atsArg.split('=')[1].toUpperCase() : null;
 
 import { buildDocx } from './buildDocx.js';
 import { formatWorkEntryAts } from './atsFormatter.js';
+import { generateStoryMarkdown, generateStoryHtml } from './storyEngine.js';
 
 function ensureDist() {
   if (!existsSync(DIST)) mkdirSync(DIST, { recursive: true });
@@ -294,6 +295,22 @@ async function main() {
   const htmlPath = resolve(DIST, 'resume.html');
   writeFileSync(htmlPath, html, 'utf8');
   console.log(`✅  dist/resume.html`);
+
+  // Career Story (Markdown + HTML)
+  const perspectiveArg = process.argv.find(arg => arg.startsWith('--perspective='));
+  const perspective = perspectiveArg ? perspectiveArg.split('=')[1] : 'third';
+  const orderArg = process.argv.find(arg => arg.startsWith('--order='));
+  const order = orderArg ? orderArg.split('=')[1] : 'chronological';
+
+  const storyMd = generateStoryMarkdown(resume, { perspective, order });
+  const storyMdPath = resolve(DIST, 'story.md');
+  writeFileSync(storyMdPath, storyMd, 'utf8');
+  console.log(`✅  dist/story.md`);
+
+  const storyHtml = generateStoryHtml(storyMd, candidateName);
+  const storyHtmlPath = resolve(DIST, 'story.html');
+  writeFileSync(storyHtmlPath, storyHtml, 'utf8');
+  console.log(`✅  dist/story.html`);
 
   // PDF
   if (PDF_MODE) {

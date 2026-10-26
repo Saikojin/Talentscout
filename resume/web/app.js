@@ -1016,6 +1016,311 @@ function renderResume(resume) {
   return main;
 }
 
+// ─── View Mode State (Resume vs Story Mode) ──────────────────────────────────
+let currentViewMode = 'resume'; // 'resume' | 'story'
+let storyPerspective = 'third'; // 'third' | 'first'
+let storyOrder = 'chronological'; // 'chronological' | 'reverse'
+
+function setViewMode(mode) {
+  currentViewMode = mode;
+  const isStory = mode === 'story';
+
+  const btnResume = document.getElementById('btn-view-resume');
+  const btnStory = document.getElementById('btn-view-story');
+  if (btnResume) {
+    btnResume.classList.toggle('active', !isStory);
+    btnResume.setAttribute('aria-pressed', !isStory);
+  }
+  if (btnStory) {
+    btnStory.classList.toggle('active', isStory);
+    btnStory.setAttribute('aria-pressed', isStory);
+  }
+
+  const mainContent = document.getElementById('main-content');
+  const storyContent = document.getElementById('story-content');
+  const contentFilter = document.getElementById('content-filter');
+
+  if (mainContent) mainContent.style.display = isStory ? 'none' : '';
+  if (contentFilter) contentFilter.style.display = isStory ? 'none' : '';
+  if (storyContent) {
+    storyContent.style.display = isStory ? 'block' : 'none';
+    if (isStory && _resumeData) {
+      updateStoryBody(_resumeData);
+    }
+  }
+
+  showToast(isStory ? 'Switched to Story Mode (Career Odyssey)' : 'Switched to Traditional Resume', 'info', 2000);
+}
+
+function renderViewSwitcher() {
+  const wrap = el('div', { class: 'view-switcher-wrap', role: 'navigation', 'aria-label': 'Portfolio view modes' });
+  const switcher = el('div', { class: 'view-switcher', role: 'group', 'aria-label': 'Choose display mode' });
+
+  const btnResume = el('button', {
+    class: 'view-btn active',
+    id: 'btn-view-resume',
+    type: 'button',
+    'aria-pressed': 'true',
+  });
+  btnResume.innerHTML = '📋 Traditional Resume';
+  btnResume.addEventListener('click', () => setViewMode('resume'));
+
+  const btnStory = el('button', {
+    class: 'view-btn',
+    id: 'btn-view-story',
+    type: 'button',
+    'aria-pressed': 'false',
+  });
+  btnStory.innerHTML = '📖 Career Story (Odyssey)';
+  btnStory.addEventListener('click', () => setViewMode('story'));
+
+  switcher.append(btnResume, btnStory);
+  wrap.appendChild(switcher);
+  return wrap;
+}
+
+function renderStoryView(resume) {
+  const storySection = el('section', {
+    class: 'story-content',
+    id: 'story-content',
+    'aria-label': 'Career Story Odyssey',
+    style: 'display: none;',
+  });
+
+  // Story Controls Toolbar
+  const controls = el('div', { class: 'story-controls-wrap', role: 'toolbar', 'aria-label': 'Story controls' });
+
+  // Perspective Controls
+  const perspectiveGroup = el('div', { class: 'story-options-group' });
+  const pLabel = el('span', { class: 'story-option-label' });
+  pLabel.textContent = 'Voice:';
+  const pBtnGroup = el('div', { class: 'story-btn-group' });
+
+  const btnThird = el('button', {
+    class: 'story-pill-btn active',
+    id: 'story-voice-third',
+    type: 'button',
+  });
+  btnThird.textContent = '👤 Biography (3rd)';
+  btnThird.addEventListener('click', () => {
+    if (storyPerspective === 'third') return;
+    storyPerspective = 'third';
+    btnThird.classList.add('active');
+    btnFirst.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  const btnFirst = el('button', {
+    class: 'story-pill-btn',
+    id: 'story-voice-first',
+    type: 'button',
+  });
+  btnFirst.textContent = '🗣️ In My Words (1st)';
+  btnFirst.addEventListener('click', () => {
+    if (storyPerspective === 'first') return;
+    storyPerspective = 'first';
+    btnFirst.classList.add('active');
+    btnThird.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  pBtnGroup.append(btnThird, btnFirst);
+  perspectiveGroup.append(pLabel, pBtnGroup);
+
+  // Order Controls
+  const orderGroup = el('div', { class: 'story-options-group' });
+  const oLabel = el('span', { class: 'story-option-label' });
+  oLabel.textContent = 'Timeline:';
+  const oBtnGroup = el('div', { class: 'story-btn-group' });
+
+  const btnChrono = el('button', {
+    class: 'story-pill-btn active',
+    id: 'story-order-chrono',
+    type: 'button',
+  });
+  btnChrono.textContent = '⏳ 1999 → Present';
+  btnChrono.addEventListener('click', () => {
+    if (storyOrder === 'chronological') return;
+    storyOrder = 'chronological';
+    btnChrono.classList.add('active');
+    btnReverse.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  const btnReverse = el('button', {
+    class: 'story-pill-btn',
+    id: 'story-order-reverse',
+    type: 'button',
+  });
+  btnReverse.textContent = '⌛ Present → 1999';
+  btnReverse.addEventListener('click', () => {
+    if (storyOrder === 'reverse') return;
+    storyOrder = 'reverse';
+    btnReverse.classList.add('active');
+    btnChrono.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  oBtnGroup.append(btnChrono, btnReverse);
+  orderGroup.append(oLabel, oBtnGroup);
+
+  // Download Story Button
+  const dlStoryBtn = el('button', {
+    class: 'btn btn-secondary',
+    id: 'btn-download-story-md',
+    type: 'button',
+    title: 'Download complete story narrative as Markdown',
+  });
+  dlStoryBtn.innerHTML = '📄 Download Story (.md)';
+  dlStoryBtn.addEventListener('click', () => {
+    if (!_resumeData) return;
+    downloadStoryMarkdown(_resumeData);
+  });
+
+  controls.append(perspectiveGroup, orderGroup, dlStoryBtn);
+  storySection.appendChild(controls);
+
+  // Story Body Container (Dynamic target)
+  const storyBody = el('div', { id: 'story-body' });
+  storySection.appendChild(storyBody);
+
+  return storySection;
+}
+
+function updateStoryBody(resume) {
+  const storyBody = document.getElementById('story-body');
+  if (!storyBody) return;
+  storyBody.innerHTML = '';
+
+  if (!window.StoryEngine) {
+    storyBody.innerHTML = '<p style="color:#f85149;padding:1rem;">Story engine is still initializing...</p>';
+    return;
+  }
+
+  const story = window.StoryEngine.generateStoryChapters(resume, {
+    perspective: storyPerspective,
+    order: storyOrder,
+  });
+
+  // 1. Prologue
+  const prologueCard = el('div', { class: 'story-prologue' });
+  const proTitle = el('h3');
+  proTitle.innerHTML = '<span>🌟</span> Prologue: A Quarter-Century of Quality';
+  const proP = el('p');
+  proP.textContent = story.prologue;
+  prologueCard.append(proTitle, proP);
+  storyBody.appendChild(prologueCard);
+
+  // 2. Chapters Timeline
+  const timeline = el('div', { class: 'story-timeline' });
+  for (const ch of story.chapters) {
+    timeline.appendChild(renderStoryChapterCard(ch));
+  }
+  storyBody.appendChild(timeline);
+
+  // 3. Epilogue
+  const epilogueCard = el('div', { class: 'story-epilogue' });
+  const epiTitle = el('h3');
+  epiTitle.innerHTML = '<span>🚀</span> Epilogue: The AI & Autonomous Frontier';
+  const epiP = el('p');
+  epiP.textContent = story.epilogue;
+  epilogueCard.append(epiTitle, epiP);
+  storyBody.appendChild(epilogueCard);
+
+  // Re-apply focus highlight if a focus tag is active
+  if (activeFocus && activeFocus !== 'all') {
+    applyFocus(activeFocus);
+  }
+}
+
+function renderStoryChapterCard(ch) {
+  const card = el('article', {
+    class: 'story-chapter-card card',
+    'data-tags': JSON.stringify(ch.tags || []),
+    id: `chapter-${ch.chapterNumber}`,
+  });
+
+  const header = el('header', { class: 'story-chapter-header' });
+  const topRow = el('div', { class: 'story-chapter-top' });
+  const badge = el('span', { class: 'story-chapter-badge' });
+  badge.textContent = `Chapter ${ch.chapterNumber}`;
+  const dates = el('span', { class: 'story-chapter-dates' });
+  dates.textContent = `${ch.dateSpan}${ch.duration ? ` · (${ch.duration})` : ''}`;
+  topRow.append(badge, dates);
+
+  const titleGroup = el('div');
+  const company = el('h3', { class: 'story-chapter-company' });
+  company.textContent = ch.company;
+  const position = el('p', { class: 'story-chapter-position' });
+  position.textContent = `${ch.position}${ch.location ? ` — ${ch.location}` : ''}`;
+  titleGroup.append(company, position);
+
+  header.append(topRow, titleGroup);
+  card.appendChild(header);
+
+  // Prose paragraphs
+  const prose = el('div', { class: 'story-prose' });
+  for (const pText of ch.paragraphs) {
+    const p = el('p', { class: 'story-p' });
+    p.textContent = pText;
+    prose.appendChild(p);
+  }
+  card.appendChild(prose);
+
+  // Core Takeaway blockquote
+  if (ch.raw.lesson) {
+    const takeaway = el('blockquote', { class: 'story-takeaway' });
+    const icon = el('span', { class: 'story-takeaway-icon' });
+    icon.textContent = '💡';
+    const textWrap = el('div', { class: 'story-takeaway-text' });
+    const label = el('strong', { class: 'story-takeaway-label' });
+    label.textContent = 'Core Takeaway: ';
+    const quote = el('span', { class: 'story-takeaway-quote' });
+    quote.textContent = `“${ch.raw.lesson}”`;
+    textWrap.append(label, quote);
+    takeaway.append(icon, textWrap);
+    card.appendChild(takeaway);
+  }
+
+  // Tags pill row
+  const allTags = [...new Set([...(ch.tags || []), ...(ch.raw.tools || []).slice(0, 3)])];
+  if (allTags.length) {
+    const tagWrap = el('div', { class: 'card-tags story-tags' });
+    for (const t of allTags) {
+      const tag = el('span', { class: 'tag' });
+      tag.textContent = t;
+      tagWrap.appendChild(tag);
+    }
+    card.appendChild(tagWrap);
+  }
+
+  return card;
+}
+
+function downloadStoryMarkdown(resume) {
+  if (!window.StoryEngine) {
+    showToast('StoryEngine not loaded', 'warning');
+    return;
+  }
+  try {
+    const md = window.StoryEngine.generateStoryMarkdown(resume, {
+      perspective: storyPerspective,
+      order: storyOrder,
+    });
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${safeFilename(resume.basics.name)}_Career_Story_${storyPerspective}.md`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    showToast('Career Story downloaded (.md)', 'success');
+  } catch (err) {
+    showToast(`Story download failed: ${err.message}`, 'warning');
+  }
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
   document.body.appendChild(toastContainer);
@@ -1053,9 +1358,14 @@ async function boot() {
   // Render all sections
   app.appendChild(renderHero(resume.basics));
   app.appendChild(renderActionBar(resume.basics));
+  app.appendChild(renderViewSwitcher());
   app.appendChild(renderFocusSelector());
   app.appendChild(renderContentFilter());
   app.appendChild(renderResume(resume));
+  app.appendChild(renderStoryView(resume));
+
+  // Initialize story content
+  updateStoryBody(resume);
 
   // Footer
   const footer = el('footer');

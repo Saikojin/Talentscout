@@ -111,3 +111,38 @@ describe('Compiler — ATS Framework Formatting', () => {
     expect(md).toContain('Outcome:');
   });
 });
+
+describe('Compiler — Career Story Engine', () => {
+  it('dist/story.md exists and contains candidate name and prologue', () => {
+    expect(existsSync(resolve(ROOT, 'dist', 'story.md'))).toBe(true);
+    const md = readFileSync(resolve(ROOT, 'dist', 'story.md'), 'utf8');
+    expect(md).toContain(candidateName);
+    expect(md).toContain('## Prologue');
+    expect(md).toContain('## Epilogue');
+  });
+
+  it('dist/story.md contains all 18 chapters', () => {
+    const md = readFileSync(resolve(ROOT, 'dist', 'story.md'), 'utf8');
+    expect(md).toContain('## Chapter 1:');
+    expect(md).toContain('## Chapter 18:');
+    expect(md).toContain('Core Takeaway:');
+  });
+
+  it('dist/story.html exists and contains valid HTML structure', () => {
+    expect(existsSync(resolve(ROOT, 'dist', 'story.html'))).toBe(true);
+    const html = readFileSync(resolve(ROOT, 'dist', 'story.html'), 'utf8');
+    expect(html).toContain('<!DOCTYPE html>');
+    expect(html).toContain('<title>' + candidateName);
+    expect(html).toContain('lesson-callout');
+    expect(html).not.toContain('>undefined<');
+    expect(html).not.toContain('>null<');
+  });
+
+  it('supports first-person mode via compiler/storyEngine.js', async () => {
+    const { generateStoryChapters } = await import('../compiler/storyEngine.js');
+    const firstStory = generateStoryChapters(resume, { perspective: 'first' });
+    expect(firstStory.perspective).toBe('first');
+    expect(firstStory.prologue).toContain('my career has been defined');
+    expect(firstStory.chapters[0].paragraphs[0]).toMatch(/In .*?, I /);
+  });
+});
