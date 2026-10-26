@@ -730,7 +730,8 @@ flowchart TD
     });
   </script>
 
-  <!-- Resume app — deferred so config script above runs first -->
+  <!-- Resume app & Story engine — deferred so config script above runs first -->
+  <script src="resume/web/storyEngine.js" defer></script>
   <script src="resume/web/app.js" defer></script>
 
   <!-- Project view dependencies: Mermaid and Marked (non-deferred so they're available synchronously on tab click) -->
