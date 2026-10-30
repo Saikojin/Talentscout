@@ -291,6 +291,81 @@ export function generateChapter(job, index, total, nextJob = null, options = {})
   };
 }
 
+// ─── Back of the Book Synopsis ───────────────────────────────────────────────
+
+/**
+ * Generates an executive "Back of the Book" synopsis capturing the essence of the entire odyssey.
+ * 
+ * @param {Object} resumeData - Parsed resume.json
+ * @param {Object} [options] - Options (perspective: 'third'|'first')
+ * @returns {Object} Structured Back of the Book object
+ */
+export function generateBackOfTheBook(resumeData, options = {}) {
+  const perspective = options.perspective === 'first' ? 'first' : 'third';
+  const basics = resumeData.basics || {};
+  const candidateName = basics.name || 'Thomas S. Snyder';
+  const workEntries = resumeData.work || [];
+
+  // Calculate career duration
+  const sorted = [...workEntries].sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
+  const firstDate = sorted[0]?.startDate;
+  const lastDate = sorted[sorted.length - 1]?.endDate;
+  const careerDuration = firstDate ? calculateDateSpan(firstDate, lastDate) || '26+ years' : '26+ years';
+
+  const totalChapters = workEntries.length;
+
+  let tagline = '';
+  let synopsis = [];
+  let motto = '';
+
+  if (perspective === 'first') {
+    tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: my ${careerDuration} on the software quality frontier.`;
+
+    synopsis = [
+      `In an industry that moves fast and breaks things, I have dedicated more than a quarter-century to making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+      `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—I repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, I repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+      `More than a chronological record, this career odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+    ];
+
+    motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+  } else {
+    tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: 26+ years on the software quality frontier.`;
+
+    synopsis = [
+      `In an industry that moves fast and breaks things, ${candidateName} has spent more than a quarter-century making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+      `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—${candidateName} repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, Snyder repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+      `More than a chronological record, The Career Odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+    ];
+
+    motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+  }
+
+  const stats = [
+    { label: 'Chapters', value: `${totalChapters} Work Eras` },
+    { label: 'Span', value: `${careerDuration}` },
+    { label: 'Automation Baseline', value: '0 → 1,500+ Tests' },
+    { label: 'Manual Coverage', value: '85% Automated' },
+    { label: 'Frontier', value: 'Consoles · Cloud · MCP Agents' },
+    { label: 'Generation', value: '100% LLM-Free Deterministic' },
+  ];
+
+  return {
+    title: 'Back of the Book',
+    subtitle: 'The Career Odyssey Synopsis',
+    tagline,
+    synopsis,
+    motto,
+    stats,
+    edition: {
+      candidateName,
+      label: basics.label || 'Senior QA Engineer',
+      genre: 'Technical Biography · Quality Engineering',
+      isbn: 'ISBN 0-ENG-QUALITY-99-26',
+      publisher: 'TalentScout Living Resume Engine'
+    }
+  };
+}
+
 // ─── Full Story Odyssey ───────────────────────────────────────────────────────
 
 /**
@@ -326,6 +401,9 @@ export function generateStoryChapters(resumeData, options = {}) {
   const lastJob = order === 'chronological' ? workEntries[workEntries.length - 1] : workEntries[0];
   const careerDuration = firstJob && lastJob ? calculateDateSpan(firstJob.startDate, lastJob.endDate) : '25+ years';
 
+  // Back of the Book synopsis
+  const backOfTheBook = generateBackOfTheBook(resumeData, { perspective });
+
   // Generate Prologue
   let prologue = '';
   if (perspective === 'first') {
@@ -348,6 +426,7 @@ export function generateStoryChapters(resumeData, options = {}) {
     perspective,
     order,
     careerDuration,
+    backOfTheBook,
     prologue,
     chapters,
     epilogue
@@ -372,6 +451,28 @@ export function generateStoryMarkdown(resumeData, options = {}) {
   lines.push('');
   lines.push('---');
   lines.push('');
+
+  // Back of the Book synopsis
+  if (story.backOfTheBook) {
+    const bob = story.backOfTheBook;
+    lines.push('## 📕 Back of the Book');
+    lines.push(`> *"${bob.tagline}"*`);
+    lines.push('');
+    for (const p of bob.synopsis) {
+      lines.push(p);
+      lines.push('');
+    }
+    lines.push(`> 💡 **Core Mantra:** "${bob.motto}"`);
+    lines.push('');
+    lines.push('### Edition Specs & Vital Metrics');
+    for (const stat of bob.stats) {
+      lines.push(`- **${stat.label}:** ${stat.value}`);
+    }
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+  }
+
   lines.push('## Prologue');
   lines.push(story.prologue);
   lines.push('');
@@ -409,19 +510,36 @@ export function generateStoryMarkdown(resumeData, options = {}) {
  * Builds a standalone reader-friendly HTML document.
  */
 export function generateStoryHtml(markdownContent, candidateName) {
+  let md = markdownContent;
+
+  // Wrap Back of the Book section in card container
+  md = md.replace(/^## 📕 Back of the Book\n([\s\S]*?)\n---/m, (match, inner) => {
+    return `<div class="back-of-book-card">\n<h2>📕 Back of the Book</h2>\n${inner}\n</div>\n---`;
+  });
+
   // Simple markdown-to-html replacement for headings and blockquotes
-  let bodyHtml = markdownContent
+  let bodyHtml = md
     .replace(/^# (.+)$/gm, '<h1>$1</h1>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^\*([^\*]+)\*$/gm, '<p class="lead"><em>$1</em></p>')
-    .replace(/^> 💡 \*\*Core Takeaway:\*\* "(.+)"$/gm, '<div class="lesson-callout"><span class="lesson-icon">💡</span><strong>Core Takeaway:</strong> <em>“$1”</em></div>')
+    .replace(/^> 💡 \*\*Core (?:Takeaway|Mantra):\*\* "(.+)"$/gm, '<div class="lesson-callout"><span class="lesson-icon">💡</span><strong>Core Takeaway:</strong> <em>“$1”</em></div>')
+    .replace(/^> \*"([^\*]+)"\*$/gm, '<blockquote class="tagline-quote">“$1”</blockquote>')
     .replace(/^---$/gm, '<hr class="chapter-divider" />')
     .split('\n\n')
     .map(p => {
       p = p.trim();
       if (!p) return '';
-      if (p.startsWith('<h') || p.startsWith('<div') || p.startsWith('<hr')) return p;
+      if (p.startsWith('<h') || p.startsWith('<div') || p.startsWith('</div>') || p.startsWith('<hr') || p.startsWith('<blockquote')) {
+        return p;
+      }
+      if (p.includes('\n- ') || p.startsWith('- ')) {
+        const items = p.split('\n').filter(line => line.startsWith('- ')).map(line => {
+          const itemText = line.slice(2).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+          return `<li>${itemText}</li>`;
+        });
+        return `<ul class="stats-list">${items.join('')}</ul>`;
+      }
       return `<p>${p.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')}</p>`;
     })
     .filter(Boolean)
@@ -497,6 +615,29 @@ export function generateStoryHtml(markdownContent, candidateName) {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
       margin: 48px 0;
+    }
+    
+    .back-of-book-card {
+      background: linear-gradient(145deg, #161b22, #0d1117);
+      border: 1px solid rgba(210, 153, 34, 0.4);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 32px 0 48px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+    
+    .back-of-book-card h2 {
+      margin-top: 0;
+      color: var(--gold);
+    }
+    
+    .tagline-quote {
+      font-size: 1.22rem;
+      font-style: italic;
+      color: #fff;
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      margin: 16px 0 24px;
     }
     
     .lesson-callout {

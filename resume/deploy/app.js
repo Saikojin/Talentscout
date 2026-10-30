@@ -1247,6 +1247,71 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
       };
     }
 
+    function generateBackOfTheBook(resumeData, options = {}) {
+      const perspective = options.perspective === 'first' ? 'first' : 'third';
+      const basics = resumeData.basics || {};
+      const candidateName = basics.name || 'Thomas S. Snyder';
+      const workEntries = resumeData.work || [];
+
+      const sorted = [...workEntries].sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
+      const firstDate = sorted[0]?.startDate;
+      const lastDate = sorted[sorted.length - 1]?.endDate;
+      const careerDuration = firstDate ? calculateDateSpan(firstDate, lastDate) || '26+ years' : '26+ years';
+
+      const totalChapters = workEntries.length;
+
+      let tagline = '';
+      let synopsis = [];
+      let motto = '';
+
+      if (perspective === 'first') {
+        tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: my ${careerDuration} on the software quality frontier.`;
+
+        synopsis = [
+          `In an industry that moves fast and breaks things, I have dedicated more than a quarter-century to making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+          `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—I repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, I repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+          `More than a chronological record, this career odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+        ];
+
+        motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+      } else {
+        tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: 26+ years on the software quality frontier.`;
+
+        synopsis = [
+          `In an industry that moves fast and breaks things, ${candidateName} has spent more than a quarter-century making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+          `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—${candidateName} repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, Snyder repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+          `More than a chronological record, The Career Odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+        ];
+
+        motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+      }
+
+      const stats = [
+        { label: 'Chapters', value: `${totalChapters} Work Eras` },
+        { label: 'Span', value: `${careerDuration}` },
+        { label: 'Automation Baseline', value: '0 → 1,500+ Tests' },
+        { label: 'Manual Coverage', value: '85% Automated' },
+        { label: 'Frontier', value: 'Consoles · Cloud · MCP Agents' },
+        { label: 'Generation', value: '100% LLM-Free Deterministic' },
+      ];
+
+      return {
+        title: 'Back of the Book',
+        subtitle: 'The Career Odyssey Synopsis',
+        tagline,
+        synopsis,
+        motto,
+        stats,
+        edition: {
+          candidateName,
+          label: basics.label || 'Senior QA Engineer',
+          genre: 'Technical Biography · Quality Engineering',
+          isbn: 'ISBN 0-ENG-QUALITY-99-26',
+          publisher: 'TalentScout Living Resume Engine'
+        }
+      };
+    }
+
     function generateStoryChapters(resumeData, options = {}) {
       const perspective = options.perspective === 'first' ? 'first' : 'third';
       const order = options.order === 'reverse' ? 'reverse' : 'chronological';
@@ -1270,6 +1335,8 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
       const lastJob = order === 'chronological' ? workEntries[workEntries.length - 1] : workEntries[0];
       const careerDuration = firstJob && lastJob ? calculateDateSpan(firstJob.startDate, lastJob.endDate) : '25+ years';
 
+      const backOfTheBook = generateBackOfTheBook(resumeData, { perspective });
+
       let prologue = '';
       if (perspective === 'first') {
         prologue = `Over the course of ${careerDuration || 'more than two decades'}, my career has been defined by an obsession with software quality, technical resilience, and pragmatic automation. From testing foundational console games and operating system platforms to architecting modern web frameworks and integrating autonomous AI tooling, this is the story of challenges confronted, systems transformed, and lessons learned along the journey.`;
@@ -1290,6 +1357,7 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
         perspective,
         order,
         careerDuration,
+        backOfTheBook,
         prologue,
         chapters,
         epilogue
@@ -1305,6 +1373,27 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
       lines.push('');
       lines.push('---');
       lines.push('');
+
+      if (story.backOfTheBook) {
+        const bob = story.backOfTheBook;
+        lines.push('## 📕 Back of the Book');
+        lines.push(`> *"${bob.tagline}"*`);
+        lines.push('');
+        for (const p of bob.synopsis) {
+          lines.push(p);
+          lines.push('');
+        }
+        lines.push(`> 💡 **Core Mantra:** "${bob.motto}"`);
+        lines.push('');
+        lines.push('### Edition Specs & Vital Metrics');
+        for (const stat of bob.stats) {
+          lines.push(`- **${stat.label}:** ${stat.value}`);
+        }
+        lines.push('');
+        lines.push('---');
+        lines.push('');
+      }
+
       lines.push('## Prologue');
       lines.push(story.prologue);
       lines.push('');
@@ -1340,6 +1429,7 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
       formatDate,
       calculateDateSpan,
       generateChapter,
+      generateBackOfTheBook,
       generateStoryChapters,
       generateStoryMarkdown,
     };
@@ -1350,6 +1440,7 @@ if (typeof window !== 'undefined' && !window.StoryEngine) {
 let currentViewMode = 'resume'; // 'resume' | 'story'
 let storyPerspective = 'third'; // 'third' | 'first'
 let storyOrder = 'chronological'; // 'chronological' | 'reverse'
+let storyDisplayMode = 'all'; // 'all' | 'back-of-book' | 'chapters'
 
 function setViewMode(mode) {
   currentViewMode = mode;
@@ -1419,6 +1510,63 @@ function renderStoryView(resume) {
 
   // Story Controls Toolbar
   const controls = el('div', { class: 'story-controls-wrap', role: 'toolbar', 'aria-label': 'Story controls' });
+
+  // View Filter Controls (Complete Edition vs Back of the Book vs 18 Chapters)
+  const displayGroup = el('div', { class: 'story-options-group' });
+  const dLabel = el('span', { class: 'story-option-label' });
+  dLabel.textContent = 'View:';
+  const dBtnGroup = el('div', { class: 'story-btn-group' });
+
+  const btnAll = el('button', {
+    class: 'story-pill-btn active',
+    id: 'story-view-all',
+    type: 'button',
+    title: 'Show complete story edition (Back of the Book + Prologue + 18 Chapters + Epilogue)',
+  });
+  btnAll.textContent = '📚 Complete Edition';
+  btnAll.addEventListener('click', () => {
+    if (storyDisplayMode === 'all') return;
+    storyDisplayMode = 'all';
+    btnAll.classList.add('active');
+    btnBobOnly.classList.remove('active');
+    btnChaptersOnly.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  const btnBobOnly = el('button', {
+    class: 'story-pill-btn',
+    id: 'story-view-bob',
+    type: 'button',
+    title: 'Show the Back of the Book synopsis summary',
+  });
+  btnBobOnly.textContent = '📕 Back of the Book';
+  btnBobOnly.addEventListener('click', () => {
+    if (storyDisplayMode === 'back-of-book') return;
+    storyDisplayMode = 'back-of-book';
+    btnBobOnly.classList.add('active');
+    btnAll.classList.remove('active');
+    btnChaptersOnly.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  const btnChaptersOnly = el('button', {
+    class: 'story-pill-btn',
+    id: 'story-view-chapters',
+    type: 'button',
+    title: 'Show the chapter-by-chapter timeline',
+  });
+  btnChaptersOnly.textContent = '📖 18 Chapters';
+  btnChaptersOnly.addEventListener('click', () => {
+    if (storyDisplayMode === 'chapters') return;
+    storyDisplayMode = 'chapters';
+    btnChaptersOnly.classList.add('active');
+    btnAll.classList.remove('active');
+    btnBobOnly.classList.remove('active');
+    updateStoryBody(_resumeData);
+  });
+
+  dBtnGroup.append(btnAll, btnBobOnly, btnChaptersOnly);
+  displayGroup.append(dLabel, dBtnGroup);
 
   // Perspective Controls
   const perspectiveGroup = el('div', { class: 'story-options-group' });
@@ -1507,7 +1655,7 @@ function renderStoryView(resume) {
     downloadStoryMarkdown(_resumeData);
   });
 
-  controls.append(perspectiveGroup, orderGroup, dlStoryBtn);
+  controls.append(displayGroup, perspectiveGroup, orderGroup, dlStoryBtn);
   storySection.appendChild(controls);
 
   // Story Body Container (Dynamic target)
@@ -1515,6 +1663,69 @@ function renderStoryView(resume) {
   storySection.appendChild(storyBody);
 
   return storySection;
+}
+
+function renderBackOfTheBookCard(bob) {
+  const card = el('article', {
+    class: 'story-back-of-book card',
+    id: 'story-back-of-book',
+    'aria-label': 'Back of the Book Summary',
+  });
+
+  // Top book ribbon / metadata badge
+  const ribbon = el('div', { class: 'story-bob-ribbon' });
+  const badge = el('span', { class: 'story-bob-badge' });
+  badge.innerHTML = '📕 BACK OF THE BOOK';
+  const subtitle = el('span', { class: 'story-bob-subtitle' });
+  subtitle.textContent = bob.subtitle || 'The Career Odyssey Synopsis';
+  ribbon.append(badge, subtitle);
+
+  // Tagline quote
+  const tagline = el('blockquote', { class: 'story-bob-tagline' });
+  tagline.textContent = `“${bob.tagline}”`;
+
+  // Synopsis paragraphs
+  const synopsisWrap = el('div', { class: 'story-bob-synopsis' });
+  for (const pText of bob.synopsis) {
+    const p = el('p', { class: 'story-p' });
+    p.textContent = pText;
+    synopsisWrap.appendChild(p);
+  }
+
+  // Stats Grid
+  const statsGrid = el('div', { class: 'story-bob-stats' });
+  for (const stat of bob.stats) {
+    const statItem = el('div', { class: 'story-bob-stat-item' });
+    const statVal = el('span', { class: 'story-bob-stat-val' });
+    statVal.textContent = stat.value;
+    const statLbl = el('span', { class: 'story-bob-stat-lbl' });
+    statLbl.textContent = stat.label;
+    statItem.append(statVal, statLbl);
+    statsGrid.appendChild(statItem);
+  }
+
+  // Core Mantra Callout
+  const mantraBox = el('div', { class: 'story-bob-mantra' });
+  const mantraIcon = el('span', { class: 'story-takeaway-icon' });
+  mantraIcon.textContent = '💡';
+  const mantraContent = el('div', { class: 'story-takeaway-text' });
+  const mantraLabel = el('strong', { class: 'story-takeaway-label' });
+  mantraLabel.textContent = 'Core Mantra: ';
+  const mantraText = el('span', { class: 'story-takeaway-quote' });
+  mantraText.textContent = `“${bob.motto}”`;
+  mantraContent.append(mantraLabel, mantraText);
+  mantraBox.append(mantraIcon, mantraContent);
+
+  // Footer metadata / barcode mock
+  const footerBar = el('div', { class: 'story-bob-footer' });
+  const genre = el('span');
+  genre.textContent = bob.edition?.genre || 'Technical Biography · Quality Engineering';
+  const isbn = el('span', { class: 'story-bob-isbn' });
+  isbn.textContent = `${bob.edition?.isbn || 'ISBN 0-ENG-QUALITY-99-26'} · ${bob.edition?.publisher || 'TalentScout Engine'}`;
+  footerBar.append(genre, isbn);
+
+  card.append(ribbon, tagline, synopsisWrap, statsGrid, mantraBox, footerBar);
+  return card;
 }
 
 function updateStoryBody(resume) {
@@ -1532,30 +1743,40 @@ function updateStoryBody(resume) {
     order: storyOrder,
   });
 
-  // 1. Prologue
-  const prologueCard = el('div', { class: 'story-prologue' });
-  const proTitle = el('h3');
-  proTitle.innerHTML = '<span>🌟</span> Prologue: A Quarter-Century of Quality';
-  const proP = el('p');
-  proP.textContent = story.prologue;
-  prologueCard.append(proTitle, proP);
-  storyBody.appendChild(prologueCard);
+  const showBob = storyDisplayMode === 'all' || storyDisplayMode === 'back-of-book';
+  const showChapters = storyDisplayMode === 'all' || storyDisplayMode === 'chapters';
 
-  // 2. Chapters Timeline
-  const timeline = el('div', { class: 'story-timeline' });
-  for (const ch of story.chapters) {
-    timeline.appendChild(renderStoryChapterCard(ch));
+  // 1. Back of the Book Card
+  if (showBob && story.backOfTheBook) {
+    storyBody.appendChild(renderBackOfTheBookCard(story.backOfTheBook));
   }
-  storyBody.appendChild(timeline);
 
-  // 3. Epilogue
-  const epilogueCard = el('div', { class: 'story-epilogue' });
-  const epiTitle = el('h3');
-  epiTitle.innerHTML = '<span>🚀</span> Epilogue: The AI & Autonomous Frontier';
-  const epiP = el('p');
-  epiP.textContent = story.epilogue;
-  epilogueCard.append(epiTitle, epiP);
-  storyBody.appendChild(epilogueCard);
+  if (showChapters) {
+    // 2. Prologue
+    const prologueCard = el('div', { class: 'story-prologue' });
+    const proTitle = el('h3');
+    proTitle.innerHTML = '<span>🌟</span> Prologue: A Quarter-Century of Quality';
+    const proP = el('p');
+    proP.textContent = story.prologue;
+    prologueCard.append(proTitle, proP);
+    storyBody.appendChild(prologueCard);
+
+    // 3. Chapters Timeline
+    const timeline = el('div', { class: 'story-timeline' });
+    for (const ch of story.chapters) {
+      timeline.appendChild(renderStoryChapterCard(ch));
+    }
+    storyBody.appendChild(timeline);
+
+    // 4. Epilogue
+    const epilogueCard = el('div', { class: 'story-epilogue' });
+    const epiTitle = el('h3');
+    epiTitle.innerHTML = '<span>🚀</span> Epilogue: The AI & Autonomous Frontier';
+    const epiP = el('p');
+    epiP.textContent = story.epilogue;
+    epilogueCard.append(epiTitle, epiP);
+    storyBody.appendChild(epilogueCard);
+  }
 
   // Re-apply focus highlight if a focus tag is active
   if (activeFocus && activeFocus !== 'all') {

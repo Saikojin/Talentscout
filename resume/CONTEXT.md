@@ -34,11 +34,11 @@ TalentScout is a **resume-as-code portfolio system** that:
 
 - ✅ **M1**: Scaffold complete — `package.json`, `resume.json`, `schema.json`, MCP `tsconfig.json`
 - ✅ **M2**: Compiler pipeline — `validate.js`, `build.js` (MD + HTML), `--pdf` flag
-- ✅ **M3**: Test suite — **36/36 tests passing** (schema matrix + compiler + story engine integrity)
+- ✅ **M3**: Test suite — **38/38 tests passing** (schema matrix + compiler + story engine + back of the book integrity)
 - ✅ **M4**: MCP Server — 7 tools, stdio + HTTP transports, TypeScript strict
 - ✅ **M5**: ATS Adapters — Greenhouse + Workday
 - ✅ **M6**: Premium Landing Page — dark glassmorphism design, Focus Selector, MCP button, toast system
-- ✅ **M7**: Career Story Engine (Algorithmic NLG) — non-LLM narrative odyssey, dual voice (1st/3rd person), interactive web Story Mode, and standalone Markdown/HTML builds
+- ✅ **M7**: Career Story Engine (Algorithmic NLG) — non-LLM narrative odyssey, dual voice (1st/3rd person), "Back of the Book" executive jacket summary, interactive web Story Mode, and standalone Markdown/HTML builds
 
 ---
 
