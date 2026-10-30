@@ -145,4 +145,21 @@ describe('Compiler — Career Story Engine', () => {
     expect(firstStory.prologue).toContain('my career has been defined');
     expect(firstStory.chapters[0].paragraphs[0]).toMatch(/In .*?, I /);
   });
+
+  it('generates Back of the Book synopsis via compiler/storyEngine.js', async () => {
+    const { generateBackOfTheBook } = await import('../compiler/storyEngine.js');
+    const bob = generateBackOfTheBook(resume, { perspective: 'third' });
+    expect(bob.title).toBe('Back of the Book');
+    expect(bob.tagline).toContain('26+ years on the software quality frontier');
+    expect(bob.synopsis.length).toBe(3);
+    expect(bob.stats.length).toBeGreaterThanOrEqual(4);
+    expect(bob.motto).toContain('Quality is never an afterthought');
+  });
+
+  it('dist/story.md contains Back of the Book section and tagline', () => {
+    const md = readFileSync(resolve(ROOT, 'dist', 'story.md'), 'utf8');
+    expect(md).toContain('## 📕 Back of the Book');
+    expect(md).toContain('software quality frontier');
+    expect(md).toContain('Core Mantra:');
+  });
 });

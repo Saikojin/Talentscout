@@ -264,6 +264,73 @@
     };
   }
 
+  // ─── Back of the Book Synopsis ─────────────────────────────────────────────
+
+  function generateBackOfTheBook(resumeData, options = {}) {
+    const perspective = options.perspective === 'first' ? 'first' : 'third';
+    const basics = resumeData.basics || {};
+    const candidateName = basics.name || 'Thomas S. Snyder';
+    const workEntries = resumeData.work || [];
+
+    const sorted = [...workEntries].sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
+    const firstDate = sorted[0]?.startDate;
+    const lastDate = sorted[sorted.length - 1]?.endDate;
+    const careerDuration = firstDate ? calculateDateSpan(firstDate, lastDate) || '26+ years' : '26+ years';
+
+    const totalChapters = workEntries.length;
+
+    let tagline = '';
+    let synopsis = [];
+    let motto = '';
+
+    if (perspective === 'first') {
+      tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: my ${careerDuration} on the software quality frontier.`;
+
+      synopsis = [
+        `In an industry that moves fast and breaks things, I have dedicated more than a quarter-century to making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+        `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—I repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, I repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+        `More than a chronological record, this career odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+      ];
+
+      motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+    } else {
+      tagline = `From cartridge burners and bare-metal debuggers to cloud APIs and autonomous AI agents: 26+ years on the software quality frontier.`;
+
+      synopsis = [
+        `In an industry that moves fast and breaks things, ${candidateName} has spent more than a quarter-century making sure software actually delivers. From the unforgiving release demands of Nintendo 64 cartridges and the original Xbox console to enterprise cloud messaging and modern AI agent pipelines, this is the inside account of an engineering journey that treats software quality not as a final roadblock, but as the primary catalyst for organizational velocity.`,
+        `Across eighteen distinct chapters—spanning Microsoft, NVIDIA, Monolith Productions, and Smartsheet—${candidateName} repeatedly confronted the quintessential crucible of software development: engineering teams paralyzed by manual regression testing, entrenched skepticism toward automation, and elusive defects lurking between hardware drivers and distributed microservices. Armed with frameworks like Karate DSL, diagnostic forensics, and relentless tenacity, Snyder repeatedly built automation suites from a dead-zero baseline to over 1,500 tests, restoring developer speed and proving that test automation creates the freedom for high-impact exploratory testing.`,
+        `More than a chronological record, The Career Odyssey captures a hard-won philosophy of technical leadership: the most potent defense against software entropy isn't academic perfectionism—it is speaking up early, building transparent feedback loops from day zero, and championing resilient quality across every layer of the stack.`
+      ];
+
+      motto = `Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence.`;
+    }
+
+    const stats = [
+      { label: 'Chapters', value: `${totalChapters} Work Eras` },
+      { label: 'Span', value: `${careerDuration}` },
+      { label: 'Automation Baseline', value: '0 → 1,500+ Tests' },
+      { label: 'Manual Coverage', value: '85% Automated' },
+      { label: 'Frontier', value: 'Consoles · Cloud · MCP Agents' },
+      { label: 'Generation', value: '100% LLM-Free Deterministic' },
+    ];
+
+    return {
+      title: 'Back of the Book',
+      subtitle: 'The Career Odyssey Synopsis',
+      tagline,
+      synopsis,
+      motto,
+      stats,
+      edition: {
+        candidateName,
+        label: basics.label || 'Senior QA Engineer',
+        genre: 'Technical Biography · Quality Engineering',
+        isbn: 'ISBN 0-ENG-QUALITY-99-26',
+        publisher: 'TalentScout Living Resume Engine'
+      }
+    };
+  }
+
   // ─── Full Story Odyssey ─────────────────────────────────────────────────────
 
   function generateStoryChapters(resumeData, options = {}) {
@@ -289,6 +356,8 @@
     const lastJob = order === 'chronological' ? workEntries[workEntries.length - 1] : workEntries[0];
     const careerDuration = firstJob && lastJob ? calculateDateSpan(firstJob.startDate, lastJob.endDate) : '25+ years';
 
+    const backOfTheBook = generateBackOfTheBook(resumeData, { perspective });
+
     let prologue = '';
     if (perspective === 'first') {
       prologue = `Over the course of ${careerDuration || 'more than two decades'}, my career has been defined by an obsession with software quality, technical resilience, and pragmatic automation. From testing foundational console games and operating system platforms to architecting modern web frameworks and integrating autonomous AI tooling, this is the story of challenges confronted, systems transformed, and lessons learned along the journey.`;
@@ -309,6 +378,7 @@
       perspective,
       order,
       careerDuration,
+      backOfTheBook,
       prologue,
       chapters,
       epilogue
@@ -324,6 +394,28 @@
     lines.push('');
     lines.push('---');
     lines.push('');
+
+    // Back of the Book
+    if (story.backOfTheBook) {
+      const bob = story.backOfTheBook;
+      lines.push('## 📕 Back of the Book');
+      lines.push(`> *"${bob.tagline}"*`);
+      lines.push('');
+      for (const p of bob.synopsis) {
+        lines.push(p);
+        lines.push('');
+      }
+      lines.push(`> 💡 **Core Mantra:** "${bob.motto}"`);
+      lines.push('');
+      lines.push('### Edition Specs & Vital Metrics');
+      for (const stat of bob.stats) {
+        lines.push(`- **${stat.label}:** ${stat.value}`);
+      }
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+    }
+
     lines.push('## Prologue');
     lines.push(story.prologue);
     lines.push('');
@@ -360,6 +452,7 @@
     formatDate,
     calculateDateSpan,
     generateChapter,
+    generateBackOfTheBook,
     generateStoryChapters,
     generateStoryMarkdown
   };
