@@ -1,0 +1,42 @@
+[
+  {
+    "name": "job hunting sux (Jordan Mazer)",
+    "url": "https://www.jobhuntingsux.com/",
+    "feed": ""
+  },
+  {
+    "name": "a16z Jobs",
+    "url": "https://a16zjobs.substack.com/",
+    "feed": "https://a16zjobs.substack.com/feed"
+  },
+  {
+    "name": "Ali Rohde Jobs",
+    "url": "https://alirohdejobs.substack.com/",
+    "feed": "https://alirohdejobs.substack.com/feed"
+  },
+  {
+    "name": "next play",
+    "url": "https://nextplayso.substack.com/",
+    "feed": "https://nextplayso.substack.com/feed"
+  },
+  {
+    "name": "Nonlinear News",
+    "url": "https://nonlinearnews.com/",
+    "feed": ""
+  },
+  {
+    "name": "Beyond Bay St.",
+    "url": "https://beyondbayst.substack.com/",
+    "feed": "https://beyondbayst.substack.com/feed"
+  },
+  {
+    "name": "Why You Should Join",
+    "url": "https://whyyoushouldjoin.substack.com/",
+    "feed": "https://whyyoushouldjoin.substack.com/feed"
+  },
+  {
+    "name": "Web of Jobs",
+    "url": "https://webofjobs.substack.com/",
+    "feed": "https://webofjobs.substack.com/feed"
+  }
+]

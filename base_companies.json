@@ -483,5 +483,155 @@
     "location": "San Francisco, CA / Remote",
     "ats_type": "workday",
     "ats_url": "https://zendesk.wd1.myworkdayjobs.com/zendesk"
+  },
+  {
+    "name": "Speedrun Product Engineer (Jordan Mazer)",
+    "careers_url": "https://speedrun-talent-network.com/product-engineer/",
+    "category": "Venture & Startups"
+  },
+  {
+    "name": "Neo Scholars",
+    "careers_url": "https://neo.com/scholars",
+    "category": "Fellowship & Mentorship"
+  },
+  {
+    "name": "Z Fellows",
+    "careers_url": "https://www.zfellows.com/",
+    "category": "Fellowship & Accelerator"
+  },
+  {
+    "name": "Kleiner Perkins Fellows",
+    "careers_url": "https://www.kleinerperkins.com/fellows/",
+    "category": "Fellowship & Accelerator"
+  },
+  {
+    "name": "Pear Fellows",
+    "careers_url": "https://pear.vc/fellows/",
+    "category": "Fellowship & Accelerator"
+  },
+  {
+    "name": "a16z College Talent",
+    "careers_url": "https://a16z.com/college-talent/",
+    "category": "Talent Network"
+  },
+  {
+    "name": "Underdog.io",
+    "careers_url": "https://underdog.io/",
+    "category": "Startup Talent Network"
+  },
+  {
+    "name": "Cosign",
+    "careers_url": "https://cosign.co/",
+    "category": "Startup Talent Network"
+  },
+  {
+    "name": "Jobbie",
+    "careers_url": "https://jobbie.bot/",
+    "category": "AI Job Search Agent"
+  },
+  {
+    "name": "4A Games",
+    "careers_url": "https://www.4a-games.com.mt/careers",
+    "category": "Gaming (AAA)"
+  },
+  {
+    "name": "4J Studios",
+    "careers_url": "https://4jstudios.com/careers/",
+    "category": "Gaming (Console)"
+  },
+  {
+    "name": "Arcanaut Studios",
+    "careers_url": "https://www.arcanautstudios.com/careers",
+    "category": "Gaming (Indie)"
+  },
+  {
+    "name": "Archetype Entertainment",
+    "careers_url": "https://www.archetype-entertainment.com/en-US",
+    "category": "Gaming (AAA Sci-Fi)"
+  },
+  {
+    "name": "Awaceb",
+    "careers_url": "https://www.awaceb.com/",
+    "category": "Gaming (Indie)"
+  },
+  {
+    "name": "BKOM Studios",
+    "careers_url": "https://jobs.bkom.com/",
+    "category": "Gaming (Full-Service)"
+  },
+  {
+    "name": "Blowfish Studios",
+    "careers_url": "https://www.blowfishstudios.com/careers",
+    "category": "Gaming (Multi-platform)"
+  },
+  {
+    "name": "Bossa Studios",
+    "careers_url": "https://www.bossagames.com/jobs",
+    "category": "Gaming (Simulation/Indie)"
+  },
+  {
+    "name": "Cyanide Studios",
+    "careers_url": "https://cyanide-studio.com/en/join-us/",
+    "category": "Gaming (RPG/Action)"
+  },
+  {
+    "name": "Deck Nine Games",
+    "careers_url": "https://www.deckninegames.com/careers",
+    "category": "Gaming (Narrative)"
+  },
+  {
+    "name": "Enduring Games",
+    "careers_url": "https://enduring.games/jobs/",
+    "category": "Gaming (Co-dev)"
+  },
+  {
+    "name": "Crytek",
+    "careers_url": "https://www.crytek.com/career",
+    "category": "Gaming & Engine (CryEngine)"
+  },
+  {
+    "name": "Virtuos",
+    "careers_url": "https://www.virtuosgames.com/careers/",
+    "category": "Gaming (Co-dev)"
+  },
+  {
+    "name": "Keywords Studios",
+    "careers_url": "https://www.keywordsstudios.com/careers/",
+    "category": "Gaming (QA & Localization)"
+  },
+  {
+    "name": "Scopely",
+    "careers_url": "https://scopely.com/join-us/",
+    "category": "Gaming (Mobile & Cross-platform)"
+  },
+  {
+    "name": "Riot Games",
+    "careers_url": "https://www.riotgames.com/en/work-with-us",
+    "category": "Gaming (Esports & AAA)"
+  },
+  {
+    "name": "Light & Wonder",
+    "careers_url": "https://www.lnw.com/careers/",
+    "category": "Gaming & Casino Tech"
+  },
+  {
+    "name": "Sony PlayStation Studios",
+    "careers_url": "https://www.playstation.com/en-us/corporate/playstation-jobs/",
+    "category": "Gaming (PlayStation)"
+  },
+  {
+    "name": "Super Spline Studios",
+    "careers_url": "https://supersplinestudios.com/careers/",
+    "category": "Gaming (Animation)"
+  },
+  {
+    "name": "Roboto Games",
+    "careers_url": "https://robotogames.com/careers",
+    "category": "Gaming (Multiplayer)"
+  },
+  {
+    "name": "iam8bit",
+    "careers_url": "https://www.iam8bit.com/pages/careers",
+    "category": "Gaming & Publishing"
   }
 ]

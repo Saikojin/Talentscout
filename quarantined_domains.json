@@ -1,0 +1,16 @@
+[
+  {
+    "domain": "ai.outscal.com",
+    "name": "Outscal (AI/Games)",
+    "url": "https://ai.outscal.com/",
+    "reason": "DNS_UNREACHABLE: [Errno 11001] getaddrinfo failed",
+    "quarantined_at": "2026-11-05T11:27:02.560826"
+  },
+  {
+    "domain": "www.cloudpeeps.com",
+    "name": "CloudPeeps",
+    "url": "https://www.cloudpeeps.com/jobs",
+    "reason": "DNS_UNREACHABLE: [Errno 11002] getaddrinfo failed",
+    "quarantined_at": "2026-11-05T11:27:02.560826"
+  }
+]

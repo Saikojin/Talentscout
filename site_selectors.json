@@ -5,7 +5,10 @@
         "title_selector": ".base-search-card__title",
         "company_selector": ".base-search-card__subtitle",
         "job_url_selector": ".base-card__full-link",
-        "location_selector": ".job-search-card__location, .base-search-card__metadata span"
+        "location_selector": ".job-search-card__location, .base-search-card__metadata span",
+        "pagination_type": "offset",
+        "offset_param": "start",
+        "items_per_page": 25
     },
     "Indeed": {
         "search_url": "https://www.indeed.com/jobs?q={search_term}&l={location}",
@@ -13,7 +16,11 @@
         "title_selector": "h2.jobTitle",
         "company_selector": "[data-testid='company-name']",
         "job_url_selector": "h2.jobTitle a",
-        "location_selector": "[data-testid='text-location'], .companyLocation"
+        "location_selector": "[data-testid='text-location'], .companyLocation",
+        "pagination_type": "offset",
+        "offset_param": "start",
+        "items_per_page": 10,
+        "pagination_selector": "nav[aria-label*='pagination'], ul.pagination-list"
     },
     "BuiltIn": {
         "search_url": "https://builtin.com/jobs/seattle?search={search_term}",
@@ -21,7 +28,11 @@
         "title_selector": "a.card-alias-after-overlay",
         "company_selector": "a[href^='/company/'] span",
         "job_url_selector": "a.card-alias-after-overlay",
-        "location_selector": ".job-location, .font-barlow"
+        "location_selector": ".job-location, .font-barlow",
+        "pagination_type": "page_param",
+        "page_param": "page",
+        "items_per_page": 20,
+        "pagination_selector": ".pagination__page, .page-item"
     },
     "Dice": {
         "search_url": "https://www.dice.com/jobs?q={search_term}&location={location}",
@@ -29,7 +40,11 @@
         "title_selector": "a[href*='/job-detail/'][class*='font-semibold']",
         "company_selector": "a[href*='/company-profile/'] p",
         "job_url_selector": "a[href*='/job-detail/'][class*='font-semibold']",
-        "location_selector": "[data-cy='search-result-location'], .location"
+        "location_selector": "[data-cy='search-result-location'], .location",
+        "pagination_type": "page_param",
+        "page_param": "page",
+        "items_per_page": 20,
+        "pagination_selector": "ul.pagination, [data-cy='pagination']"
     },
     "Glassdoor": {
         "search_url": "https://www.glassdoor.com/Job/seattle-wa-us-senior-qa-engineer-jobs-SRCH_IL.0,13_IC1150505_KO14,32.htm",
@@ -52,7 +67,10 @@
         "title_selector": "a.title-link",
         "company_selector": "div[class*='Company']",
         "job_url_selector": "a.title-link",
-        "location_selector": "[data-testid='job-location'], div[class*='Location']"
+        "location_selector": "[data-testid='job-location'], div[class*='Location']",
+        "pagination_type": "page_param",
+        "page_param": "page_number",
+        "items_per_page": 25
     },
     "SimplyHired": {
         "search_url": "https://www.simplyhired.com/search?q={search_term}&l={location}",
@@ -60,7 +78,10 @@
         "title_selector": "h2 a",
         "company_selector": "a[href*='/browse-jobs/companies/']",
         "job_url_selector": "h2 a",
-        "location_selector": "[data-testid='searchSerpJobLocation']"
+        "location_selector": "[data-testid='searchSerpJobLocation']",
+        "pagination_type": "page_param",
+        "page_param": "pn",
+        "items_per_page": 20
     },
     "Monster": {
         "search_url": "https://www.monster.com/jobs/search?q={search_term}&where={location}",
@@ -68,7 +89,10 @@
         "title_selector": "a.title-link",
         "company_selector": "div[class*='Company']",
         "job_url_selector": "a.title-link",
-        "location_selector": "[data-testid='job-location'], div[class*='Location']"
+        "location_selector": "[data-testid='job-location'], div[class*='Location']",
+        "pagination_type": "page_param",
+        "page_param": "page",
+        "items_per_page": 25
     },
     "Hiring Cafe": {
         "search_url": "https://hiring.cafe/?search={search_term}&location={location}",
@@ -93,10 +117,11 @@
     },
     "Remote Game Jobs": {
         "search_url": "https://remotegamejobs.com/search?q={search_term}",
-        "job_card_selector": "a.has-text-black",
-        "title_selector": "strong",
-        "company_selector": "small",
-        "job_url_selector": "a.has-text-black"
+        "job_card_selector": "a.card, a.has-text-black",
+        "title_selector": ".body .title, strong",
+        "company_selector": ".body .sub, small",
+        "job_url_selector": "a.card, a.has-text-black",
+        "location_selector": ".body .row, span.tag"
     },
     "GameJobs.co": {
         "search_url": "https://gamejobs.co/search?q={search_term}",
@@ -376,5 +401,285 @@
         "company_selector": "div.company a",
         "job_url_selector": "h3.title a",
         "location_selector": "span.location"
+    },
+    "a16z Portfolio Jobs": {
+        "search_url": "https://portfoliojobs.a16z.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Sequoia Capital Jobs": {
+        "search_url": "https://jobs.sequoiacap.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "General Catalyst Jobs": {
+        "search_url": "https://jobs.generalcatalyst.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Khosla Ventures Jobs": {
+        "search_url": "https://jobs.khoslaventures.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Kleiner Perkins Jobs": {
+        "search_url": "https://jobs.kleinerperkins.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Accel Jobs": {
+        "search_url": "https://jobs.accel.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Lightspeed Jobs": {
+        "search_url": "https://jobs.lsvp.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Thrive Capital Jobs": {
+        "search_url": "https://jobs.thrivecap.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Bessemer Venture Partners Jobs": {
+        "search_url": "https://jobs.bvp.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Felicis Ventures Jobs": {
+        "search_url": "https://jobs.felicis.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Lux Capital Jobs": {
+        "search_url": "https://jobs.luxcapital.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Contrary Capital Jobs": {
+        "search_url": "https://jobs.contrary.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Battery Ventures Jobs": {
+        "search_url": "https://jobs.battery.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "NEA Jobs": {
+        "search_url": "https://careers.nea.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Insight Partners Jobs": {
+        "search_url": "https://jobs.insightpartners.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Menlo Ventures Jobs": {
+        "search_url": "https://jobs.menlovc.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Bain Capital Ventures Jobs": {
+        "search_url": "https://jobs.baincapitalventures.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Notable Capital Jobs": {
+        "search_url": "https://jobs.ggvc.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "Antler Jobs": {
+        "search_url": "https://careers.antler.co/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "BITKRAFT Ventures Jobs": {
+        "search_url": "https://careers.bitkraft.vc/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "8VC Jobs": {
+        "search_url": "https://jobs.8vc.com/jobs?q={search_term}&locations={location}",
+        "job_card_selector": "[data-testid='job-list-item'], .job-list-job, .job-card",
+        "title_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "company_selector": "a.job-list-job-company-link, a[href*='/companies/'], [itemprop='hiringOrganization']",
+        "job_url_selector": "[data-testid='job-title-link'], h2.job-list-job-title a, a[href*='/jobs/'], a[href*='/job/']",
+        "location_selector": "[itemprop='jobLocation'], .job-list-badges, [class*='location']"
+    },
+    "CRV Consider": {
+        "search_url": "https://consider.com/boards/crv?q={search_term}",
+        "job_card_selector": "[data-testid='job-row'], [class*='job'], div.row",
+        "title_selector": "a[href*='/job'], h3",
+        "company_selector": "[class*='company']",
+        "job_url_selector": "a[href*='/job']",
+        "location_selector": "[class*='location']"
+    },
+    "Greylock Portfolio Jobs": {
+        "search_url": "https://greylock.com/jobs/portfolio-jobs/?query={search_term}",
+        "job_card_selector": "div[class*='job'], div.row, [class*='card']",
+        "title_selector": "a[href*='job=']",
+        "company_selector": "a[href*='/companies/'], h4, h5",
+        "job_url_selector": "a[href*='job='], a[href*='lever.co'], a[href*='greenhouse.io']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Index Ventures Startup Jobs": {
+        "search_url": "https://www.indexventures.com/startup-jobs?search={search_term}",
+        "job_card_selector": "[class*='job-item'], [class*='jobCard'], tr, div.border",
+        "title_selector": "a[href*='/jobs/'], h3",
+        "company_selector": "a[href*='/companies/']",
+        "job_url_selector": "a[href*='/jobs/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Pear VC Jobs (Ashby)": {
+        "search_url": "https://jobs.ashbyhq.com/Pear-VC",
+        "job_card_selector": "a[href*='/Pear-VC/']",
+        "title_selector": "h3, span",
+        "company_selector": "h2, h1",
+        "job_url_selector": "a[href*='/Pear-VC/']",
+        "location_selector": "[class*='location'], p"
+    },
+    "YC Work at a Startup": {
+        "search_url": "https://www.workatastartup.com/jobs/v2?query={search_term}",
+        "job_card_selector": "a[href*='/jobs/']:not([href*='role'])",
+        "title_selector": "h3, span.variant2-wipe",
+        "company_selector": "p.font-semibold",
+        "job_url_selector": "a[href*='/jobs/']:not([href*='role'])",
+        "location_selector": "p.line-clamp-2"
+    },
+    "Top Startups": {
+        "search_url": "https://topstartups.io/jobs/?q={search_term}",
+        "job_card_selector": "div.card.card-body#item-card-filter",
+        "title_selector": "#job-title, h5",
+        "company_selector": "#startup-website-link h7, a[href*='utm_source=topstartups'] h7",
+        "job_url_selector": "a[href*='jobs.ashbyhq.com'], a[href*='greenhouse.io'], a[href*='lever.co'], a:has(#job-title)",
+        "location_selector": "h7:has(i.fa-map-marker-alt)"
+    },
+    "Startups Gallery": {
+        "search_url": "https://startups.gallery",
+        "job_card_selector": "[class*='card'], [class*='startup'], a[href*='/company/']",
+        "title_selector": "h3, h4",
+        "company_selector": "h2, h3",
+        "job_url_selector": "a[href*='/company/'], a[href*='/jobs/']",
+        "location_selector": "[class*='location']"
+    },
+    "OutGeek Women in Tech": {
+        "search_url": "https://outgeek.org",
+        "job_card_selector": "[class*='job'], [class*='card'], article",
+        "title_selector": "h2, h3, a",
+        "company_selector": "[class*='company']",
+        "job_url_selector": "a[href*='/job/'], a",
+        "location_selector": "[class*='location']"
+    },
+    "ASGC (All Star Games Careers)": {
+        "search_url": "https://jobs.asgc.gg/",
+        "job_card_selector": "tr.border-b, tbody tr",
+        "title_selector": "td:nth-child(3)",
+        "company_selector": "td:nth-child(1)",
+        "job_url_selector": "a[href*='http']:has-text('Apply'), a[href*='http']",
+        "location_selector": "td:nth-child(6), td:nth-child(7), td:nth-child(8)"
+    },
+    "Games Jobs Index": {
+        "search_url": "https://gamesjobsindex.com/?q={search_term}",
+        "job_card_selector": "li.vgj-card-item",
+        "title_selector": ".vgj-card-title",
+        "company_selector": ".vgj-card-studio",
+        "job_url_selector": ".vgj-card",
+        "location_selector": ".vgj-card-location, .vgj-card-body"
+    },
+    "Hitmarker": {
+        "search_url": "https://hitmarker.net/jobs?keyword={search_term}",
+        "job_card_selector": "article.job-feed-card, [class*='job-feed-card']",
+        "title_selector": "h3",
+        "company_selector": "span.truncate.font-medium, div:has(> span.font-slab) span.truncate",
+        "job_url_selector": "a[href*='/jobs/']",
+        "location_selector": "div.flex.gap-x-1.5 span.truncate, div.text-alpha-6, span:has-text('USA'), span:has-text('Remote')"
+    },
+    "DevQuest": {
+        "search_url": "https://devquest.gg/?q={search_term}",
+        "job_card_selector": ".rtop, div:has(> .rmain)",
+        "title_selector": "a.title",
+        "company_selector": ".studio",
+        "job_url_selector": "a.title",
+        "location_selector": ".loc, [class*='loc'], .studioline"
+    },
+    "Games Jobs Direct": {
+        "search_url": "https://www.gamesjobsdirect.com/",
+        "job_card_selector": "a.slick-slide, [class*='slick-slide']",
+        "title_selector": "strong, h3, h4",
+        "company_selector": "span, p",
+        "job_url_selector": "a[href*='/job/']",
+        "location_selector": "span, p"
+    },
+    "Work With Indies": {
+        "search_url": "https://www.workwithindies.com/search?query={search_term}",
+        "job_card_selector": "div.search-result-item, a.job-card",
+        "title_selector": "a.search-title, .job-card-title, h3",
+        "company_selector": ".job-card-text.bold, a.search-title",
+        "job_url_selector": "a.search-title, a.job-card",
+        "location_selector": ".job-card-text, .search-result-item"
     }
 }
