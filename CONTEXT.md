@@ -10,6 +10,11 @@
 TalentScout is a **Python-based automated job scraping and tracking system**. Its core features:
 
 - **Multi-site scraping** via Playwright (headless, JS-rendered)
+- **Stealth Anti-Bot Evasion (`scripts/browser_stealth.py`)**: Zero-dependency evasion layer masking `navigator.webdriver`, injecting realistic plugins/languages, and waiting for silent Turnstile/CAPTCHA challenges to self-solve.
+- **Per-Domain Rate Limiting & Circuit Breakers (`scripts/rate_limiter.py`)**: Concurrency ceilings (e.g. 1-tab for LinkedIn, Indeed, Glassdoor), randomized inter-request delay jitter (2.5s–4.0s), and automated 5-minute cooldown circuit breakers on HTTP 429.
+- **Crawler Block Telemetry & Rejection Analytics (`scripts/scour_telemetry.py`)**: Captures HTTP status blocks (403, 429, 503), WAF challenges (Cloudflare Turnstile, CAPTCHA), and login-walls, outputting formatted terminal reports and `logs/scour_summary_latest.json`.
+- **Deep Scour Engine (`scripts/scour_deep.py`)**: Page-N scouring ignoring page 1 results, with page capacity survey mode (`--detect-pages-only`).
+- **Endpoint Health & Dead Domain Quarantine (`scripts/verify_site_health.py`)**: Sweeps all target URLs across configurations, resolves DNS health, and maintains `quarantined_domains.json`.
 - **Skill-based filtering** using `base_skillset.json`
 - **SQLite deduplication** via `job_tracker.db`
 - **Dashboard output & scoring** to `dashboard.html` (`http://localhost:8088`) and `jobs_to_review.md`
@@ -49,6 +54,11 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 ### Python Job Scraper & Tailoring Engine (active)
 - ✅ Multi-site scraping with Playwright
+- ✅ **Stealth Anti-Bot Provider (`scripts/browser_stealth.py`)**: Masks `navigator.webdriver`, injects realistic plugins/languages, and includes a transient challenge resolver to automatically pass silent Turnstile/Cloudflare challenges (eliminating ZipRecruiter/Indeed 403s).
+- ✅ **Per-Domain Rate Limiter & Circuit Breakers (`scripts/rate_limiter.py`)**: Restricts sensitive domains (LinkedIn, Indeed, Glassdoor) to 1-tab concurrency and 2.5s–4.0s jitter delay, with an automatic 5-minute circuit breaker cooldown on HTTP 429.
+- ✅ **Endpoint Health & Dead Domain Sweeper (`scripts/verify_site_health.py`)**: Non-blocking DNS auditor that identifies and quarantines dead domains into `quarantined_domains.json`, eliminating DNS / Unreachable errors from future scours.
+- ✅ **Crawler Block Telemetry & Rejection Analytics (`scripts/scour_telemetry.py`)**: Intercepts HTTP status codes (`403`, `429`, `503`), bot shields (Cloudflare Turnstile, CAPTCHA, PerimeterX, DataDome), and authentication walls (e.g. LinkedIn `/login`). Outputs rich ASCII terminal summary and JSON telemetry logs in `logs/scour_summary_latest.json`.
+- ✅ **Deep Scour & Pagination Engine (`scripts/scour_deep.py` & `scripts/pagination_utils.py`)**: Scours page N results with `--page N`, `--skip-page-one`, and survey mode `--detect-pages-only` to discover site page capacity.
 - ✅ Dynamic Profile & Scoring Engine (`scripts/profile.py` + `scripts/scorer.py` + `scripts/location_utils.py`) with customizable weights, dynamic candidate location properties (`country`, `state`, `city`, `postal_code`), configurable search constraints (`allowed_countries`, `target_states`, `preferred_cities`, `allow_remote`, `require_local_or_remote`), 50-state detection, and city/state disambiguation (e.g. `Redmond, OR` vs `Redmond, WA`).
 - ✅ **Location Integrity & Safety Nets**:
   - **No Search Query Fallback**: `auto_scour.py` never overwrites missing card locations with the search keyword (`Seattle`).
@@ -90,8 +100,16 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 
 | File | Purpose |
 |---|---|
-| `scripts/auto_scour.py` | Main job scraper entry point (Playwright + ATS) |
+| `scripts/auto_scour.py` | Main job scraper entry point (Playwright + ATS + Telemetry + Rate Limiter + Stealth) |
+| `scripts/scour_deep.py` | Deep scour entrypoint (page N discovery, skips page 1) |
+| `scripts/browser_stealth.py` | Anti-bot evasion context provider and transient challenge resolver |
+| `scripts/rate_limiter.py` | Per-domain concurrency limits, jitter delay, and circuit breaker engine |
+| `scripts/verify_site_health.py` | Offline DNS and endpoint health auditor with quarantine export |
+| `scripts/scour_telemetry.py` | Crawler block detection, rejection bucketing, and report generator |
+| `scripts/pagination_utils.py` | Page-N URL builder and site page capacity extractor |
 | `scripts/ingest_dreamwork.py` | DreamworkHQ zero-npm direct API job harvester & scorer |
+| `quarantined_domains.json` | Unreachable and dead domains identified by site health audit |
+| `site_selectors.json` | Selectors and pagination schemas for scraped job boards |
 | `base_skillset.json` | Your skills for job filtering |
 | `job_tracker.db` | SQLite deduplication DB |
 | `dashboard.html` | Job scraper visual dashboard |
@@ -101,8 +119,6 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 | `resume/compiler/build.js` | Compile to MD + HTML + PDF |
 | `resume/mcp-server/src/index.ts` | MCP server (7 agent tools) |
 | `resume/web/index.html` | Portfolio landing page |
-| `resume/docs/project_vision.md` | Master Vision document |
-| `resume/docs/conversation_history.md` | Origin session summary + open items |
 
 ---
 
@@ -112,10 +128,13 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 # From D:\DevWorkspace\TalentScout
 
 # --- Python Job Scraper & Unified Server ---
-python scripts/auto_scour.py        # Run job scraper (Playwright + ATS)
-python scripts/ingest_dreamwork.py   # Fast ingest from DreamworkHQ (zero-npm)
-.\start.bat                          # Start Unified Dashboard Server (localhost:8088)
-.\stop.bat                           # Stop TalentScout services (8088, 8085, 8000, 8080, 3001)
+python scripts/auto_scour.py        # Run job scraper (Playwright + ATS + Stealth + Throttle)
+python scripts/auto_scour.py --detect-pages-only  # Quick audit of page capacity & bot blocks
+python scripts/scour_deep.py --page 2             # Deep scour page 2 (skips page 1)
+python scripts/verify_site_health.py              # Audit endpoint health & quarantine dead domains
+python scripts/ingest_dreamwork.py  # Fast ingest from DreamworkHQ (zero-npm)
+.\start.bat                         # Start Unified Dashboard Server (localhost:8088)
+.\stop.bat                          # Stop TalentScout services (8088, 8085, 8000, 8080, 3001)
 
 # --- Resume Engine (from resume/) ---
 cd resume
