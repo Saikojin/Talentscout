@@ -79,7 +79,7 @@ def detect_dom_challenge(title: str, body_text: str, current_url: str = "") -> O
 class ScourTelemetry:
     """
     Central collector for crawler telemetry, block events, blacklist skips,
-    rejection reasons, page depth discovery, and overall scour yield.
+    rejection reasons, page depth discovery, selector drift events, and overall scour yield.
     """
     def __init__(self):
         self.start_time = datetime.datetime.now()
@@ -95,6 +95,7 @@ class ScourTelemetry:
         }
         self.page_counts: Dict[str, Dict[str, Any]] = {}
         self.throttle_metrics: Dict[str, Any] = {}
+        self.selector_drifts: List[Dict[str, Any]] = []
         self.yield_stats = {
             "discovered": 0,
             "processed": 0,
@@ -125,6 +126,54 @@ class ScourTelemetry:
             "reason": reason,
             "timestamp": datetime.datetime.now().isoformat()
         })
+
+    def record_selector_drift(
+        self,
+        site: str,
+        url: str,
+        drift_type: str,
+        selector: str,
+        details: str = "",
+        rescued: bool = False,
+        rescued_count: int = 0
+    ):
+        """
+        Record a DOM selector drift event where a configured selector failed to match
+        or extract required attributes on an unblocked page.
+        """
+        self.selector_drifts.append({
+            "site": site,
+            "url": url,
+            "drift_type": drift_type,
+            "selector": selector,
+            "details": details,
+            "rescued": rescued,
+            "rescued_count": rescued_count,
+            "timestamp": datetime.datetime.now().isoformat()
+        })
+
+    def get_drift_stats(self) -> Dict[str, Any]:
+        """Return aggregated counts of selector drift events by category and rescue rate."""
+        counts = {
+            "card_selector": 0,
+            "link_selector": 0,
+            "title_selector": 0,
+            "company_selector": 0,
+            "rescued_sites": 0,
+            "rescued_jobs": 0,
+            "total_drifts": len(self.selector_drifts)
+        }
+        for d in self.selector_drifts:
+            t = d.get("drift_type", "other")
+            if t in counts:
+                counts[t] += 1
+            if d.get("rescued"):
+                counts["rescued_sites"] += 1
+                counts["rescued_jobs"] += d.get("rescued_count", 0)
+        return counts
+
+    def total_drifts(self) -> int:
+        return len(self.selector_drifts)
 
     def record_rejection(self, job_title: str, company: str, reasons: List[str]):
         """Categorize and record a disqualified job."""
@@ -211,6 +260,26 @@ class ScourTelemetry:
             lines.append(" [+] Crawler Blocks: 0 detected (all active sites accessible)")
             lines.append("-" * 70)
 
+        # 2b. DOM Selector Drift Section
+        if self.selector_drifts:
+            drift_stats = self.get_drift_stats()
+            lines.append(f" [!] DOM SELECTOR DRIFT DETECTED ({drift_stats['total_drifts']} drift events):")
+            if drift_stats['card_selector'] > 0:
+                lines.append(f"     * Card Selectors Failed: {drift_stats['card_selector']} sites")
+            if drift_stats['link_selector'] > 0:
+                lines.append(f"     * Link Selectors Failed: {drift_stats['link_selector']} occurrences (avoided search URL fallback)")
+            if drift_stats['title_selector'] > 0:
+                lines.append(f"     * Title Selectors Failed: {drift_stats['title_selector']} occurrences")
+            if drift_stats['company_selector'] > 0:
+                lines.append(f"     * Company Selectors Failed: {drift_stats['company_selector']} occurrences")
+            if drift_stats['rescued_sites'] > 0:
+                lines.append(f"     * Rescued via Heuristics: {drift_stats['rescued_sites']} site(s) ({drift_stats['rescued_jobs']} jobs saved)")
+            lines.append("     Sample Selector Drift:")
+            for d in self.selector_drifts[:5]:
+                status_str = f"Rescued {d['rescued_count']} jobs" if d.get('rescued') else "0 cards / Failed"
+                lines.append(f"       - {d['site']:18} [{d['drift_type']}]: '{d['selector']}' -> {status_str}")
+            lines.append("-" * 70)
+
         # 3. Blacklist Skips Section
         if self.blacklist_skips:
             targets = [s['target'] for s in self.blacklist_skips]
@@ -269,6 +338,8 @@ class ScourTelemetry:
             "duration_seconds": (datetime.datetime.now() - self.start_time).total_seconds(),
             "yield": self.yield_stats,
             "blocks": self.blocks,
+            "selector_drifts": self.selector_drifts,
+            "drift_stats": self.get_drift_stats(),
             "blacklist_skips": self.blacklist_skips,
             "rejections": {
                 cat: [

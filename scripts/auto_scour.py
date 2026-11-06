@@ -21,6 +21,14 @@ try:
     from scripts.pagination_utils import extract_page_count, build_page_url
     from scripts.browser_stealth import create_stealth_context, resolve_transient_challenge
     from scripts.rate_limiter import DomainThrottle, normalize_domain
+    from scripts.selector_heuristics import (
+        find_fallback_cards,
+        extract_fallback_title,
+        extract_fallback_link,
+        extract_fallback_company,
+        extract_fallback_location,
+        is_likely_job_url,
+    )
 except ImportError:
     print("Error: Could not import local modules. Make sure you are running from the project root.")
     sys.exit(1)
@@ -171,6 +179,51 @@ def auto_blacklist(url: str, error_str: str, blacklist_set: set = None) -> None:
     except Exception as ex:
         print(f"[!] Could not update blacklist: {ex}")
 
+async def extract_links_smart_fallback(page, url, name, comp_country=None, priority=2):
+    """Extract job posting links using link heuristics when selectors are missing or drifted."""
+    try:
+        current_url = page.url
+        expected_host = urlparse(url).netloc
+        if not current_url or expected_host not in current_url:
+            print(f"      [!] Page redirected away from {url} (now at {current_url}), skipping link extraction.")
+            return []
+        links_data = await page.evaluate("""() => {
+            return Array.from(document.querySelectorAll("a")).map(a => ({
+                href: a.getAttribute("href") || a.href || "",
+                text: a.innerText || ""
+            }));
+        }""")
+    except Exception as e:
+        print(f"      [!] Error extracting links: {e}")
+        return []
+
+    jobs = []
+    keywords = ["/job", "/career", "/req", "/position", "jobid=", "opening", "opportunity", "role"]
+    for data in links_data:
+        href = data.get("href", "")
+        text = data.get("text", "")
+        if href and text and text.strip():
+            href_lower = href.lower()
+            if any(k in href_lower for k in keywords):
+                if "search" not in href_lower and "login" not in href_lower and "mailto:" not in href_lower and not is_non_job_url(href):
+                    full_url = href if href.startswith('http') else urljoin(url, href)
+                    if not is_non_job_url(full_url) and is_likely_job_url(full_url, url):
+                        jobs.append({
+                            "title": text.strip(),
+                            "company": name,
+                            "url": full_url,
+                            "location": "",
+                            "country": comp_country,
+                            "priority": priority
+                        })
+
+    unique_jobs = {}
+    for j in jobs:
+        if j["url"] not in unique_jobs:
+            unique_jobs[j["url"]] = j
+    return list(unique_jobs.values())
+
+
 async def scrape_company(context, company, semaphore, blacklist_set=None, telemetry=None, throttle=None):
     name = company["name"]
     url = company["careers_url"]
@@ -265,60 +318,33 @@ async def scrape_company(context, company, semaphore, blacklist_set=None, teleme
             
             if not card_sel:
                 print(f"[*] No selectors defined for {name}. Using smart fallback to find job links...")
-                try:
-                    current_url = page.url
-                    expected_host = urlparse(url).netloc
-                    if not current_url or expected_host not in current_url:
-                        print(f"      [!] Page redirected away from {url} (now at {current_url}), skipping link extraction.")
-                        links_data = []
-                    else:
-                        links_data = await page.evaluate('''() => {
-                            return Array.from(document.querySelectorAll("a")).map(a => ({
-                                href: a.getAttribute("href") || a.href || "",
-                                text: a.innerText || ""
-                            }));
-                        }''')
-                except Exception as e:
-                    print(f"      [!] Error extracting links: {e}")
-                    links_data = []
-                    
-                for data in links_data:
-                    href = data.get("href", "")
-                    text = data.get("text", "")
-                    if href and text and text.strip():
-                        href_lower = href.lower()
-                        keywords = ["/job", "/career", "/req", "/position", "jobid=", "opening", "opportunity", "role"]
-                        if any(k in href_lower for k in keywords):
-                            if "search" not in href_lower and "login" not in href_lower and "mailto:" not in href_lower and not is_non_job_url(href):
-                                full_url = href if href.startswith('http') else urljoin(url, href)
-                                if not is_non_job_url(full_url):
-                                    jobs.append({
-                                        "title": text.strip(),
-                                        "company": name,
-                                        "url": full_url,
-                                        "location": "",
-                                        "country": comp_country,
-                                        "priority": 2
-                                    })
-                
-                unique_jobs = {}
-                for j in jobs:
-                    if j["url"] not in unique_jobs:
-                        unique_jobs[j["url"]] = j
-                
-                jobs = list(unique_jobs.values())
+                jobs = await extract_links_smart_fallback(page, url, name, comp_country, priority=2)
                 print(f"[*] Smart fallback found {len(jobs)} potential job links.")
                 await page.close()
                 return jobs[:30]
-                
-            try:
-                await page.wait_for_selector(card_sel, timeout=10000)
-            except Exception:
-                log(f"[!] Could not find any job cards ('{card_sel}') on this page.")
-                await page.close()
-                return []
 
-            cards = await page.locator(card_sel).all()
+            cards = []
+            try:
+                await page.wait_for_selector(card_sel, timeout=7000)
+                cards = await page.locator(card_sel).all()
+            except Exception:
+                cards = []
+
+            if not cards:
+                log(f"[!] Primary card selector '{card_sel}' failed for {name}. Attempting smart fallback...")
+                fb_jobs = await extract_links_smart_fallback(page, url, name, comp_country, priority=2)
+                if fb_jobs:
+                    print(f"  [*] [HEURISTIC] Rescued {len(fb_jobs)} jobs for {name} using link heuristics.")
+                    if telemetry:
+                        telemetry.record_selector_drift(name, url, "card_selector", card_sel, f"Rescued {len(fb_jobs)} jobs via fallback", rescued=True, rescued_count=len(fb_jobs))
+                    await page.close()
+                    return fb_jobs[:30]
+                else:
+                    log(f"[!] Could not find any job cards ('{card_sel}') or links on this page.")
+                    if telemetry:
+                        telemetry.record_selector_drift(name, url, "card_selector", card_sel, "0 jobs found (card selector + fallback failed)", rescued=False)
+                    await page.close()
+                    return []
             log(f"[*] Found {len(cards)} job postings for {name}. Analyzing...")
             
             for idx, card in enumerate(cards[:30]):
@@ -394,20 +420,25 @@ async def scrape_company(context, company, semaphore, blacklist_set=None, teleme
                         links = await card.locator("a").all()
                         for link in links:
                             href = await link.get_attribute("href")
-                            if href:
+                            if href and is_likely_job_url(href, url):
                                 job_href = href
                                 break
+
+                    if not job_href:
+                        job_href = await extract_fallback_link(card, url)
                                 
                     if job_href and not job_href.startswith('http'):
                         job_href = urljoin(url, job_href)
                         
-                    if job_href and is_non_job_url(job_href):
+                    if not job_href or not is_likely_job_url(job_href, url) or is_non_job_url(job_href):
+                        if telemetry:
+                            telemetry.record_selector_drift(name, url, "link_selector", company.get("job_url_selector") or "a", "No valid job link found; card dropped")
                         continue
 
                     jobs.append({
                         "title": title.strip(),
                         "company": company_text.strip(),
-                        "url": job_href or url,
+                        "url": job_href,
                         "location": comp_loc,
                         "country": comp_country,
                         "priority": 1
@@ -526,14 +557,28 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                 
             # Wait for job cards to load
             card_sel = config.get("job_card_selector")
-            try:
-                await page.wait_for_selector(card_sel, timeout=10000)
-            except Exception:
-                print(f"[!] Could not find any job cards ('{card_sel}') on this page.")
-                await page.close()
-                return []
+            cards = []
+            if card_sel:
+                try:
+                    await page.wait_for_selector(card_sel, timeout=7000)
+                    cards = await page.locator(card_sel).all()
+                except Exception:
+                    cards = []
 
-            cards = await page.locator(card_sel).all()
+            if not cards:
+                rescued_sel, fb_cards = await find_fallback_cards(page)
+                if fb_cards:
+                    print(f"  [*] [HEURISTIC] Primary selector '{card_sel}' yielded 0 cards for {site_name}. Rescued {len(fb_cards)} cards using '{rescued_sel}'.")
+                    cards = fb_cards
+                    if telemetry:
+                        telemetry.record_selector_drift(site_name, url, "card_selector", card_sel or "None", f"Rescued {len(cards)} cards using '{rescued_sel}'", rescued=True, rescued_count=len(cards))
+                else:
+                    print(f"[!] Could not find any job cards ('{card_sel}') on this page.")
+                    if telemetry:
+                        telemetry.record_selector_drift(site_name, url, "card_selector", card_sel or "None", "0 cards found (primary + fallback failed)", rescued=False)
+                    await page.close()
+                    return []
+
             log(f"[*] Found {len(cards)} job cards. Analyzing...")
             
             jobs = []
@@ -547,11 +592,39 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                         if any(p in clower for p in old_phrases):
                             continue
 
-                    title_el = card.locator(config.get("title_selector")).first
-                    company_el = card.locator(config.get("company_selector")).first
-                    
-                    title = await title_el.text_content() if await title_el.count() else "Unknown Title"
-                    company = await company_el.text_content() if await company_el.count() else "Unknown Company"
+                    title_sel = config.get("title_selector")
+                    title = ""
+                    if title_sel:
+                        try:
+                            title_el = card.locator(title_sel).first
+                            if await title_el.count():
+                                title = (await title_el.text_content() or "").strip()
+                        except Exception:
+                            pass
+                    if not title or title == "Unknown Title":
+                        fb_title = await extract_fallback_title(card)
+                        if fb_title:
+                            title = fb_title
+                        else:
+                            title = "Unknown Title"
+                            if telemetry:
+                                telemetry.record_selector_drift(site_name, url, "title_selector", title_sel or "None", "Fell back to 'Unknown Title'")
+
+                    comp_sel = config.get("company_selector")
+                    company = ""
+                    if comp_sel:
+                        try:
+                            company_el = card.locator(comp_sel).first
+                            if await company_el.count():
+                                company = (await company_el.text_content() or "").strip()
+                        except Exception:
+                            pass
+                    if not company or company == "Unknown Company":
+                        fb_comp = await extract_fallback_company(card, candidate_title=title)
+                        if fb_comp:
+                            company = fb_comp
+                        else:
+                            company = "Unknown Company"
                     
                     loc_sel = config.get("location_selector")
                     card_location = ""
@@ -563,16 +636,7 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                         except Exception:
                             pass
                     if not card_location:
-                        for fallback_sel in [".job-search-card__location", ".base-search-card__metadata span", ".companyLocation", "[data-testid='text-location']", ".job-location", ".location"]:
-                            try:
-                                f_el = card.locator(fallback_sel).first
-                                if await f_el.count():
-                                    txt = (await f_el.text_content() or "").strip()
-                                    if txt and len(txt) > 2 and "ago" not in txt.lower() and "apply" not in txt.lower():
-                                        card_location = txt
-                                        break
-                            except Exception:
-                                pass
+                        card_location = await extract_fallback_location(card)
 
                     job_href = None
                     try:
@@ -594,13 +658,21 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                                     break
                     
                     if not job_href:
-                        url_el = card.locator(config.get("job_url_selector")).first
-                        job_href = await url_el.get_attribute("href") if await url_el.count() else None
+                        j_sel = config.get("job_url_selector")
+                        if j_sel:
+                            url_el = card.locator(j_sel).first
+                            if await url_el.count():
+                                job_href = await url_el.get_attribute("href")
+
+                    if not job_href:
+                        job_href = await extract_fallback_link(card, url)
                     
                     if job_href and not job_href.startswith('http'):
                         job_href = urljoin(url, job_href)
                         
-                    if job_href and is_non_job_url(job_href):
+                    if not job_href or not is_likely_job_url(job_href, url) or is_non_job_url(job_href):
+                        if telemetry:
+                            telemetry.record_selector_drift(site_name, url, "link_selector", config.get("job_url_selector") or "a", "No valid job link found; card dropped to prevent search URL poisoning")
                         continue
 
                     title = title.strip()
@@ -619,7 +691,7 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                     jobs.append({
                         "title": title,
                         "company": company,
-                        "url": job_href or url,
+                        "url": job_href,
                         "location": card_location,
                         "country": None,
                         "searched_location": location,

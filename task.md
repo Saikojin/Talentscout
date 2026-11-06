@@ -1,83 +1,88 @@
-# Task Checklist: Crawler Failure Prevention & Anti-Block Resilience
+# Task Checklist: DOM Selector Drift Detection, Telemetry & Self-Healing
 
 ## Intent Understanding
-> **Core Objective:** Implement a comprehensive anti-block resilience suite across TalentScout's scouring pipeline to eliminate the 1,297 failures observed in production logs: introducing a zero-dependency Playwright stealth provider to bypass silent JS/CAPTCHA challenges (ZipRecruiter/Indeed 403s), a per-domain throttle and circuit breaker engine to prevent burst and cumulative rate-limiting (LinkedIn 429s), and an automated DNS quarantine utility to clean up dead domain endpoints (714 unreachable failures).
+> **Core Objective:** Eliminate silent crawler failures caused by DOM Selector Drift (where sites update HTML layouts, leading to zero job cards or fallback to search URLs). Instrument granular drift telemetry into `ScourTelemetry`, build an offline selector auditor tool (`scripts/audit_selectors.py`), implement smart fallback heuristic extraction to rescue broken selectors, stop search-URL queue poisoning (125 instances in latest run), and repair drifted selectors in `site_selectors.json`.
 
 ---
 
 ## Task DAG & Verification Contracts
 
-- [x] **Task 1: Stealth Browser Context & Challenge Resolver (`scripts/browser_stealth.py`, `scripts/test_browser_stealth.py`)**
+- [x] **Task 1: Selector Drift Telemetry in `ScourTelemetry` (`scripts/scour_telemetry.py`, `scripts/test_scour_telemetry.py`)**
   - [GATE: QA]
   - Priority: 0
   - Dependencies: None
-  - Design pure `scripts/browser_stealth.py`:
-    - `create_stealth_context(browser, user_agent=None) -> BrowserContext`:
-      - Masks `navigator.webdriver = undefined`.
-      - Mocks realistic `navigator.plugins`, `navigator.languages`, and `window.chrome` runtime objects.
-      - Sets authentic modern Windows Chrome headers (`Sec-Ch-Ua`, `Sec-Ch-Ua-Mobile`, `Sec-Ch-Ua-Platform`, `Accept-Language`).
-      - Sets authentic 1920x1080 viewport and America/Los_Angeles timezone.
-    - `resolve_transient_challenge(page, timeout_seconds=5) -> bool`:
-      - Detects initial Cloudflare/Turnstile/CAPTCHA challenges.
-      - Waits 3–5 seconds for the challenge token to self-resolve and redirect before declaring the page blocked.
-  - **Verification command:** `python -m unittest scripts/test_browser_stealth.py` (7/7 passing)
+  - Design additions to `scripts/scour_telemetry.py`:
+    - `record_selector_drift(site, url, drift_type, selector, details, rescued=False, rescued_count=0)`:
+      - `drift_type` in `["card_selector", "link_selector", "title_selector", "company_selector"]`.
+      - Aggregates drift counts by type and tracks rescued vs hard failures.
+    - Update `format_summary()`:
+      - Add dedicated `[!] DOM SELECTOR DRIFT DETECTED` section showing breakdown of broken selectors.
+    - Update `to_dict()` and export in `logs/scour_summary_latest.json`.
+  - **Verification command:** `python -m unittest scripts/test_scour_telemetry.py` (11/11 passing)
 
-- [x] **Task 2: Per-Domain Throttle & Circuit Breaker Engine (`scripts/rate_limiter.py`, `scripts/test_rate_limiter.py`)**
+- [x] **Task 2: Heuristic Smart Fallback Engine (`scripts/selector_heuristics.py`, `scripts/test_selector_heuristics.py`)**
   - [GATE: QA]
   - Priority: 0
   - Dependencies: None
-  - Design `scripts/rate_limiter.py`:
-    - `DomainThrottle` class:
-      - Per-domain concurrency limits (e.g., `linkedin.com`: max 1 concurrent tab; `indeed.com`: max 1; `glassdoor.com`: max 1; others: max 3).
-      - Randomized inter-request delay jitter (e.g., 2.5s–4.0s for sensitive domains, 0.5s–1.0s for others).
-      - `acquire(url) -> bool` and `release(url)`: non-blocking acquisition that respects cooldowns.
-      - `trip_circuit_breaker(url, reason, cooldown_seconds=300)`: activates domain penalty box on HTTP 429.
-      - `is_in_cooldown(url) -> tuple[bool, float, str]`: checks remaining cooldown seconds.
-  - **Verification command:** `python -m unittest scripts/test_rate_limiter.py` (6/6 passing)
+  - Design `scripts/selector_heuristics.py`:
+    - `find_fallback_cards(page_or_locator)`: inspects semantic elements (`article`, `li[data-testid*="job"]`, `div[data-testid*="job-card"]`, `div[data-job-id]`, `div[class*="job"]`).
+    - `extract_fallback_title(card)`: inspects headings `h1, h2, h3, h4`, `a[class*="title"]`, `[data-testid*="title"]`, `strong`.
+    - `extract_fallback_link(card, base_url)`: searches anchors inside card for job paths (`/job/`, `/jobs/`, `/viewjob`, `/posting/`, `/position/`, `jobid=`), validating against `is_non_job_url` and rejecting `base_url`.
+  - **Verification command:** `python -m unittest scripts/test_selector_heuristics.py` (10/10 passing)
 
-- [x] **Task 3: Integrate Stealth & Rate Throttling into Scour Loop (`scripts/auto_scour.py`, `scripts/test_scour_stealth_throttle.py`)**
+- [x] **Task 3: Integrate Drift Telemetry & Fallbacks into Scour Loop (`scripts/auto_scour.py`, `scripts/test_scour_selector_drift.py`)**
   - [GATE: QA]
   - Priority: 1
   - Dependencies: Task 1, Task 2
   - In `auto_scour.py`:
-    - Initialize browser with `create_stealth_context()` instead of bare context.
-    - Instantiate shared `DomainThrottle` in `main()` and pass to `scrape_site`, `scrape_company`, and `fetch_job_description`.
     - In `scrape_site`:
-      - Check `throttle.is_in_cooldown(url)`: if in cooldown, skip immediately and record telemetry without firing network request.
-      - Acquire domain lock via `await throttle.acquire(url)` before navigation; release in `finally:`.
-      - On challenge signature, attempt `await resolve_transient_challenge(page)`.
-      - On HTTP 429 or repeated 403, call `throttle.trip_circuit_breaker(url, "HTTP 429 Rate Limited", cooldown=300)`.
-    - In Phase 2 `worker()`:
-      - Ensure JD fetching respects domain throttle and immediately bypasses jobs whose domain is in active cooldown.
-  - **Verification command:** `python -m unittest scripts/test_scour_stealth_throttle.py` (3/3 passing)
+      - When `wait_for_selector(card_sel)` times out or yields 0 cards on an unblocked page (HTTP 200, no challenge):
+        - Call `find_fallback_cards(page)`.
+        - If rescued: record telemetry `card_selector` drift with `rescued=True` and parse the cards.
+        - If 0 cards: record `card_selector` drift with `rescued=False` and exit cleanly.
+      - In card loop:
+        - If link extraction fails: attempt `extract_fallback_link()`. If still none, **do NOT** fall back to search URL—record `link_selector` drift and skip the card.
+        - If title is `"Unknown Title"`: attempt `extract_fallback_title()`. If still none, record `title_selector` drift.
+    - In `scrape_company`:
+      - If `card_sel` times out, fall back to smart link scraper and record `card_selector` drift instead of aborting with `[]`.
+  - **Verification command:** `python -m unittest scripts/test_scour_selector_drift.py` (3/3 passing)
 
-- [x] **Task 4: DNS / Dead Domain Auto-Quarantine & Pruning Utility (`scripts/verify_site_health.py`, `scripts/test_site_health.py`)**
+- [x] **Task 4: Standalone Offline Selector Auditor CLI (`scripts/audit_selectors.py`, `scripts/test_audit_selectors.py`)**
   - [GATE: QA]
   - Priority: 1
   - Dependencies: None
-  - Design `scripts/verify_site_health.py`:
-    - Sweeps all search configs, company career URLs, and ATS URLs in `job_tracker.db`, `job_search_sites.json`, and `base_companies.json`.
-    - Non-blocking DNS and HTTP probe with 5-second timeout.
-    - Automatically flags or prunes dead domains (resolving the 714 `DNS / Unreachable` errors).
-    - Writes unreachable domains to `quarantined_domains.json` with timestamp and failure reason.
-    - CLI options: `--audit-only`, `--prune-dead-domains`, `--timeout 5`.
-  - **Verification command:** `python -m unittest scripts/test_site_health.py` (4/4 passing)
+  - Design `scripts/audit_selectors.py`:
+    - Probe search URLs defined in `site_selectors.json` with Playwright stealth context.
+    - CLI flags: `--site <Name>`, `--all`, `--drift-only`, `--fix`.
+    - Validates presence of card selector, title selector, job URL selector, company selector.
+    - Outputs diagnostic table: extracted cards, sample title, sample URL, and status (`OK`, `DRIFT`, `BLOCKED`).
+  - **Verification command:** `python -m unittest scripts/test_audit_selectors.py` (3/3 passing)
 
-- [x] **Task 5: End-to-End Validation & Living Documentation Update (`CONTEXT.md`, `README.md`, full test sweep)**
+- [x] **Task 5: Repair Top Drifted Selectors in `site_selectors.json`**
   - [GATE: QA]
   - Priority: 2
-  - Dependencies: Task 3, Task 4
-  - Execute full test suite (`python -m unittest discover -s scripts -p "test_*.py"`).
-  - Verify zero unhandled exceptions and 100% pass rate.
-  - Update `README.md` and `CONTEXT.md` with stealth context details, domain rate limiter rules, and site health CLI usage.
-  - **Verification command:** `python -m unittest discover -s scripts -p "test_*.py"` (60/60 passing)
+  - Dependencies: Task 4
+  - Audit and update broken selectors for top impacted sites:
+    - ZipRecruiter (PASS: 20 cards extracted).
+    - Google Careers (PASS: 20 cards extracted, direct URLs resolved).
+    - Dice (PASS: 8 cards extracted, direct URLs resolved).
+    - Glassdoor (PASS: 16 cards extracted, job listing URLs resolved).
+    - Microsoft Careers (PASS: 45 cards extracted, direct `/careers/job/` URLs resolved).
+  - **Verification command:** `python scripts/audit_selectors.py` (6/6 passing)
+
+- [x] **Task 6: End-to-End Test Suite Pass & Living Documentation Update (`CONTEXT.md`, `README.md`)**
+  - [GATE: QA]
+  - Priority: 2
+  - Dependencies: Task 3, Task 5
+  - Run full test suite: `python -m unittest discover -s scripts -p "test_*.py"`.
+  - Update `README.md` and `CONTEXT.md` with selector drift metrics, fallback architecture, and `audit_selectors.py` usage.
+  - **Verification command:** `python -m unittest discover -s scripts -p "test_*.py"` (77/77 passing)
 
 ---
 
 ## Seikojin QA Gatekeeping Checklist
-- [x] 100% test pass rate across all new unit/integration tests with `python -m unittest`.
-- [x] No regression on existing 40 unit and integration tests (60 total tests passing).
-- [x] Zero unhandled Playwright navigation exceptions on challenged or throttled sites.
-- [x] LinkedIn requests adhere to 1-tab concurrency and 2.5s+ jitter delay.
-- [x] Circuit breaker trips cleanly on 429 without crashing worker queues.
-- [x] `logs/scour_summary_latest.json` accurately reflects circuit breaker skips and challenge resolution stats.
+- [x] Zero search URLs queued as Job Descriptions in Phase 2.
+- [x] 100% test pass rate across new and existing tests (`test_*.py`) — 77/77 tests passing.
+- [x] `logs/scour_summary_latest.json` exposes structured `selector_drifts` and `drift_stats`.
+- [x] Terminal summary table displays high-density `DOM SELECTOR DRIFT DETECTED` metrics.
+- [x] `scripts/audit_selectors.py` can audit single or multiple sites cleanly with stealth browser contexts.

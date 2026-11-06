@@ -75,6 +75,59 @@ class TestScourTelemetry(unittest.TestCase):
         self.assertEqual(self.telemetry.page_counts["BuiltIn"]["page_count"], 8)
         self.assertEqual(self.telemetry.page_counts["BuiltIn"]["total_jobs"], 192)
 
+    def test_record_selector_drift(self):
+        # 1. Card drift (failed)
+        self.telemetry.record_selector_drift(
+            "Microsoft Careers",
+            "https://careers.microsoft.com",
+            "card_selector",
+            "div.job-tile",
+            "0 cards matched",
+            rescued=False
+        )
+        # 2. Card drift (rescued)
+        self.telemetry.record_selector_drift(
+            "Wellfound",
+            "https://wellfound.com/jobs",
+            "card_selector",
+            ".startup-card",
+            "Rescued via heuristics",
+            rescued=True,
+            rescued_count=15
+        )
+        # 3. Link drift
+        self.telemetry.record_selector_drift(
+            "Google Careers",
+            "https://www.google.com/about/careers/applications/jobs/results",
+            "link_selector",
+            "a.gc-card__title",
+            "No direct href found, avoided search URL fallback"
+        )
+        # 4. Title drift
+        self.telemetry.record_selector_drift(
+            "ZipRecruiter",
+            "https://ziprecruiter.com/jobs",
+            "title_selector",
+            "h2.title",
+            "Fell back to 'Unknown Title'"
+        )
+
+        drift_stats = self.telemetry.get_drift_stats()
+        self.assertEqual(drift_stats["card_selector"], 2)
+        self.assertEqual(drift_stats["link_selector"], 1)
+        self.assertEqual(drift_stats["title_selector"], 1)
+        self.assertEqual(drift_stats["company_selector"], 0)
+        self.assertEqual(drift_stats["rescued_sites"], 1)
+        self.assertEqual(drift_stats["rescued_jobs"], 15)
+        self.assertEqual(drift_stats["total_drifts"], 4)
+        self.assertEqual(self.telemetry.total_drifts(), 4)
+
+        summary_text = self.telemetry.format_summary()
+        self.assertIn("DOM SELECTOR DRIFT DETECTED", summary_text)
+        self.assertIn("Microsoft Careers", summary_text)
+        self.assertIn("Wellfound", summary_text)
+        self.assertIn("Rescued 15 jobs", summary_text)
+
     def test_summary_and_json_export(self):
         self.telemetry.record_job_discovered(50)
         self.telemetry.record_job_processed(30)
@@ -82,6 +135,7 @@ class TestScourTelemetry(unittest.TestCase):
         self.telemetry.record_block("Glassdoor", "https://glassdoor.com", "HTTP 403 Forbidden")
         self.telemetry.record_rejection("QA Lead", "Apex", ["Disqualified Skill: Java"])
         self.telemetry.record_page_count("BuiltIn", 5, 120)
+        self.telemetry.record_selector_drift("Indeed", "https://indeed.com", "card_selector", ".job_seen_beacon", "0 cards")
 
         summary_text = self.telemetry.format_summary()
         self.assertIn("SCOUR SUMMARY REPORT", summary_text)
@@ -89,6 +143,7 @@ class TestScourTelemetry(unittest.TestCase):
         self.assertIn("HTTP 403 Forbidden", summary_text)
         self.assertIn("Disqualified Skill", summary_text)
         self.assertIn("BuiltIn", summary_text)
+        self.assertIn("DOM SELECTOR DRIFT DETECTED", summary_text)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             out_file = os.path.join(tmpdir, "telemetry.json")
@@ -98,7 +153,8 @@ class TestScourTelemetry(unittest.TestCase):
                 data = json.load(f)
             self.assertEqual(data["yield"]["discovered"], 50)
             self.assertEqual(data["yield"]["passed"], 10)
-            self.assertEqual(len(data["blocks"]), 1)
+            self.assertEqual(len(data["selector_drifts"]), 1)
+            self.assertEqual(data["drift_stats"]["card_selector"], 1)
 
 if __name__ == "__main__":
     unittest.main()
