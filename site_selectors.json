@@ -37,9 +37,9 @@
     "Dice": {
         "search_url": "https://www.dice.com/jobs?q={search_term}&location={location}",
         "job_card_selector": "div.flex.flex-col.gap-6.rounded-lg.border",
-        "title_selector": "a[href*='/job-detail/'][class*='font-semibold']",
-        "company_selector": "a[href*='/company-profile/'] p",
-        "job_url_selector": "a[href*='/job-detail/'][class*='font-semibold']",
+        "title_selector": "h1, [data-cy='card-title-link'], a[href*='/job-detail/']",
+        "company_selector": "a[href*='/company-profile/'], [data-cy='search-result-company-name']",
+        "job_url_selector": "a[href*='/job-detail/'], a[data-testid='job-detail-open-in-new-tab-btn']",
         "location_selector": "[data-cy='search-result-location'], .location",
         "pagination_type": "page_param",
         "page_param": "page",
@@ -49,9 +49,9 @@
     "Glassdoor": {
         "search_url": "https://www.glassdoor.com/Job/seattle-wa-us-senior-qa-engineer-jobs-SRCH_IL.0,13_IC1150505_KO14,32.htm",
         "job_card_selector": "li[class*='jobListItem']",
-        "title_selector": "a[class*='jobTitle']",
-        "company_selector": "div[class*='employerName']",
-        "job_url_selector": "a[class*='jobTitle']",
+        "title_selector": "a[data-test='job-title'], a[class*='jobTitle']",
+        "company_selector": "[data-test='employer-name'], div[class*='employerName'], span[class*='employerName']",
+        "job_url_selector": "a[data-test='job-title'], a[data-test='job-link'], a[class*='jobTitle']",
         "location_selector": "[data-test='emp-location']"
     },
     "Outscal": {
@@ -110,10 +110,10 @@
     },
     "ZipRecruiter": {
         "search_url": "https://www.ziprecruiter.com/Jobs/Search?search={search_term}&location={location}",
-        "job_card_selector": "div.job_result_two_pane_v2",
-        "title_selector": "h2",
-        "company_selector": "[class*='company_name']",
-        "job_url_selector": "a[class*='job_link']"
+        "job_card_selector": "article.job_result, div.job_result_two_pane_v2, [data-testid='job-card']",
+        "title_selector": "h2, a[class*='job_link'], [data-testid*='title']",
+        "company_selector": "[class*='company_name'], a[data-testid*='company']",
+        "job_url_selector": "a[class*='job_link'], a[href*='/job/'], a[href*='/jobs/']"
     },
     "Remote Game Jobs": {
         "search_url": "https://remotegamejobs.com/search?q={search_term}",
@@ -140,17 +140,18 @@
     },
     "Google Careers": {
         "search_url": "https://www.google.com/about/careers/applications/jobs/results/?q={search_term}&location={location}",
-        "job_card_selector": "li.lLd3Je",
-        "title_selector": ".QJPWVe",
+        "job_card_selector": "li.lLd3Je, [data-job-id]",
+        "title_selector": ".QJPWVe, h2, a[aria-label*='Learn more about']",
         "company_selector": ".RP7SMd",
-        "job_url_selector": "a.WpHeLc"
+        "job_url_selector": "a.WpHeLc, a[href*='jobs/results/'], a[aria-label*='Learn more about']"
     },
     "Microsoft Careers": {
         "search_url": "https://jobs.careers.microsoft.com/global/en/search?q={search_term}",
-        "job_card_selector": "div[data-automation-id='job-card']",
-        "title_selector": "button[aria-label*='Job title']",
+        "job_card_selector": "div[role='listitem'], div[data-test-id='job-listing']",
+        "title_selector": "div[class*='title-'], a[href*='/job/']",
         "company_selector": "div[aria-label*='Microsoft']",
-        "job_url_selector": "a[href*='/job/']"
+        "job_url_selector": "a[href*='/job/'], a[href*='/careers/job/']",
+        "location_selector": "div[class*='fieldValue-']"
     },
     "Greenhouse Boards (Classic)": {
         "search_url": "https://boards.greenhouse.io/",

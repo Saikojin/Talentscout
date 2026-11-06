@@ -9,6 +9,8 @@ TalentScout is an automated agentic job scraper that utilizes Playwright to find
 - **Stealth Anti-Bot Evasion**: Zero-dependency evasion layer (`scripts/browser_stealth.py`) masking `navigator.webdriver`, injecting realistic plugins/languages, and waiting for silent Turnstile/CAPTCHA challenges to self-solve.
 - **Per-Domain Rate Limiting & Circuit Breakers**: Concurrency ceilings (e.g. 1-tab for LinkedIn, Indeed, Glassdoor), randomized inter-request delay jitter (2.5s–4.0s), and automated 5-minute cooldown circuit breakers on HTTP 429.
 - **Crawler Block Telemetry**: Real-time detection and structured classification of HTTP blocks (`403 Forbidden`, `429 Rate Limited`, `503 Service Unavailable`), Cloudflare challenges / Turnstile, and forced authentication walls.
+- **DOM Selector Drift Telemetry & Self-Healing**: Real-time detection of broken selectors, heuristic layout rescue (`scripts/selector_heuristics.py`), and protection against search URL queue poisoning.
+- **Offline Selector Auditor**: Standalone CLI tool (`scripts/audit_selectors.py`) to benchmark and diagnose CSS selectors across `site_selectors.json`.
 - **Deep Scour & Page Capacity Discovery**: Scour beyond page 1 using `--page N` or `scripts/scour_deep.py`, automatically detecting how many pages each site has available.
 - **Endpoint Health & Dead Domain Quarantine**: Offline sweeper (`scripts/verify_site_health.py`) that audits DNS health across all target URLs and quarantines dead domains.
 - **Rejection Breakdown & Blacklist Audit**: High-density ASCII summary tables and persistent JSON logs (`logs/scour_summary_latest.json`) reporting exact rejection reasons and pre-filtered blacklist stats.
@@ -99,15 +101,35 @@ python scripts/scour_deep.py --detect-pages-only
 python scripts/scour_deep.py --page 2 --dry-run
 ```
 
-### 4. Crawler Block Telemetry & Rejection Analytics
+### 4. DOM Selector Drift Detection & Offline Auditor
+TalentScout actively monitors and guards against DOM Selector Drift (when job boards change layout classes or component trees):
+- **Selector Drift Telemetry**: Tracks Hard Card Drift, Link Drift, Title Drift, and Company Drift directly into `ScourTelemetry` and persistent JSON reports (`logs/scour_summary_latest.json`).
+- **Heuristic Smart Fallbacks (`scripts/selector_heuristics.py`)**: Automatically probes semantic HTML elements (`article`, `li[data-testid*='job']`, `div[data-testid*='job-card']`) to rescue job postings when brittle class names change.
+- **Queue Poisoning Protection**: Discards cards lacking identifiable job links instead of falling back to search page URLs, eliminating redundant Phase 2 JD scrapes.
+- **Offline Selector Auditor Tool (`scripts/audit_selectors.py`)**: Quickly benchmark and diagnose selectors across `site_selectors.json` without running a full scour:
+```powershell
+# Audit all default top platforms (LinkedIn, Indeed, BuiltIn, Dice, Glassdoor, ZipRecruiter)
+python scripts/audit_selectors.py
+
+# Audit a specific job board
+python scripts/audit_selectors.py --site Dice
+python scripts/audit_selectors.py --site "Microsoft Careers"
+python scripts/audit_selectors.py --site "Google Careers"
+
+# Export structured audit results to JSON
+python scripts/audit_selectors.py --all --json-out logs/selector_audit.json
+```
+
+### 5. Crawler Block Telemetry & Rejection Analytics
 At the end of every scour run (`auto_scour.py` and `scour_deep.py`), TalentScout outputs an ASCII summary table and saves detailed JSON telemetry to `logs/scour_summary_latest.json`:
 - **Crawler Blocks & Bot Defenses**: Detects HTTP `403 Forbidden`, `429 Rate Limited`, `503 Service Unavailable`, Cloudflare challenges / Turnstile, and forced authentication redirects (e.g. LinkedIn `/login`).
+- **DOM Selector Drift**: Reports broken selectors, rescued sites/jobs, and link-poisoning bypasses.
 - **Throttle & Circuit Breaker Telemetry**: Reports active domain cooldowns and requests spared/bypassed.
 - **Blacklist & Quarantine Telemetry**: Summarizes pre-filtered domains and blacklisted companies skipped upfront.
 - **Rejection Breakdown**: Categorized rejection counts (`Location / Foreign Country`, `Disqualified Skill`, `Negative Title Keyword`, `Empty JD SafetyNet`, `Low Score`) with sample roles.
 - **Page Capacity Discovered**: Reports the total number of pages and estimated job count detected per site.
 
-### 5. Verify Endpoint Health & Quarantine Dead Domains
+### 6. Verify Endpoint Health & Quarantine Dead Domains
 Sweep configured job boards and company career sites to identify dead endpoints (resolving DNS / Unreachable errors):
 ```powershell
 # Scan all target domains and save unreachable endpoints to quarantined_domains.json
@@ -120,7 +142,7 @@ python scripts/verify_site_health.py --timeout 3.0 --concurrency 40
 python scripts/verify_site_health.py --prune-dead-domains
 ```
 
-### 6. Fast Job Discovery with DreamworkHQ (Zero-NPM Direct API)
+### 7. Fast Job Discovery with DreamworkHQ (Zero-NPM Direct API)
 Quickly harvest and score fresh roles directly from DreamworkHQ's public API without launching browser instances or installing npm packages:
 
 ```powershell
@@ -140,7 +162,7 @@ python scripts/ingest_dreamwork.py --dry-run --limit 10
 python scripts/ingest_dreamwork.py --days 7 --min-score 50 --limit 30
 ```
 
-### 7. Generate 1-Click Tailored Resumes & Cover Letters
+### 8. Generate 1-Click Tailored Resumes & Cover Letters
 In the Dashboard (`http://localhost:8088`):
 1. Click **✨ Tailor Resume & Cover Letter** on any job tile.
 2. The local LLM will synthesize a tailored resume with CAR/STAR bullet points and a matching cover letter.
