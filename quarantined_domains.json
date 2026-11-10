@@ -12,5 +12,19 @@
     "url": "https://www.cloudpeeps.com/jobs",
     "reason": "DNS_UNREACHABLE: [Errno 11002] getaddrinfo failed",
     "quarantined_at": "2026-11-05T11:27:02.560826"
+  },
+  {
+    "domain": "remoteimpact.io",
+    "name": "Remote Impact",
+    "url": "https://remoteimpact.io/",
+    "reason": "EXPIRED_DOMAIN: Domain expired and squatted/hijacked by third-party streaming site.",
+    "quarantined_at": "2026-11-09T22:24:35.060286"
+  },
+  {
+    "domain": "remjobs.works",
+    "name": "RemJobs",
+    "url": "https://remjobs.works/",
+    "reason": "HTTP_404: Endpoint unreachable / dead domain.",
+    "quarantined_at": "2026-11-09T22:24:35.060306"
   }
 ]

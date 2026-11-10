@@ -146,8 +146,8 @@
   },
   {
     "name": "RunPod",
-    "careers_url": "https://speedrun-talent-network.com/companies/runpod",
-    "category": "DevTools, Data & AI",
+    "careers_url": "https://www.runpod.io/careers",
+    "category": "AI Developer Cloud & GPU Infrastructure",
     "location": "Remote"
   },
   {
@@ -633,5 +633,210 @@
     "name": "iam8bit",
     "careers_url": "https://www.iam8bit.com/pages/careers",
     "category": "Gaming & Publishing"
+  },
+  {
+    "name": "Skild AI",
+    "careers_url": "https://www.skild.ai/career",
+    "category": "Robotics & Physical AI"
+  },
+  {
+    "name": "Syllo",
+    "careers_url": "https://syllo.ai/",
+    "category": "Legaltech & Applied AI"
+  },
+  {
+    "name": "microagi",
+    "careers_url": "https://www.microagi.ai",
+    "category": "Embodied AI & Industrial Robotics"
+  },
+  {
+    "name": "Nova Intelligence",
+    "careers_url": "https://www.novaintelligence.com/careers",
+    "category": "Enterprise AI & ERP Systems"
+  },
+  {
+    "name": "Nous Research",
+    "careers_url": "https://nousresearch.com/",
+    "category": "Open-Source LLMs & AI Research"
+  },
+  {
+    "name": "Glow",
+    "careers_url": "https://www.glowcyber.com/",
+    "category": "Agentic Endpoint Security"
+  },
+  {
+    "name": "Fluidstack",
+    "careers_url": "https://fluidstack.io/",
+    "category": "AI Compute Infrastructure & Data Centers"
+  },
+  {
+    "name": "ElevenLabs",
+    "careers_url": "https://elevenlabs.io/careers",
+    "category": "AI Voice & Audio Foundation Models"
+  },
+  {
+    "name": "Onyx Security",
+    "careers_url": "https://www.onyx.security/careers",
+    "category": "Secure AI Control Plane"
+  },
+  {
+    "name": "Ema",
+    "careers_url": "https://www.ema.co/careers",
+    "category": "Enterprise AI Agents"
+  },
+  {
+    "name": "Nscale",
+    "careers_url": "https://www.nscale.com/careers",
+    "category": "Full-Stack AI Infrastructure"
+  },
+  {
+    "name": "Wonderful",
+    "careers_url": "https://wonderful.ai/",
+    "category": "Enterprise AI Agent Platform"
+  },
+  {
+    "name": "Artisan",
+    "careers_url": "https://artisan.co/careers",
+    "category": "Autonomous AI Employees"
+  },
+  {
+    "name": "Emerald AI",
+    "careers_url": "https://www.emeraldai.co/",
+    "category": "Data Center Power Flexibility & Climate AI"
+  },
+  {
+    "name": "Nevis",
+    "careers_url": "https://neviswealth.com/",
+    "category": "AI for Wealth Management"
+  },
+  {
+    "name": "Canals",
+    "careers_url": "https://canals.ai/",
+    "category": "AI for Industrial Supply Chains"
+  },
+  {
+    "name": "Triomics",
+    "careers_url": "https://www.triomics.com/careers",
+    "category": "Generative AI for Oncology"
+  },
+  {
+    "name": "vLLM",
+    "careers_url": "https://vllm.ai/",
+    "category": "LLM Inference Engine & Open Source Systems"
+  },
+  {
+    "name": "CrewAI",
+    "careers_url": "https://www.crewai.com/careers",
+    "category": "Multi-Agent AI Platform"
+  },
+  {
+    "name": "PixVerse",
+    "careers_url": "https://pixverse.ai/en/careers",
+    "category": "Generative AI Video Platform"
+  },
+  {
+    "name": "Ledgebrook",
+    "careers_url": "https://www.ledgebrook.com/careers",
+    "category": "AI-Native Specialty Insurance"
+  },
+  {
+    "name": "Granola",
+    "careers_url": "https://www.granola.ai/careers",
+    "category": "AI Meeting Notepad & Workspace"
+  },
+  {
+    "name": "Grammarly",
+    "careers_url": "https://www.grammarly.com/careers",
+    "category": "AI Writing Assistant"
+  },
+  {
+    "name": "TENEX.AI",
+    "careers_url": "https://tenex.ai/",
+    "category": "AI-Native Managed Detection and Response (MDR)"
+  },
+  {
+    "name": "Novee Security",
+    "careers_url": "https://novee.security/careers/",
+    "category": "Autonomous AI Penetration Testing"
+  },
+  {
+    "name": "Seekr",
+    "careers_url": "https://www.seekr.com/careers/",
+    "category": "Explainable Enterprise AI Platform"
+  },
+  {
+    "name": "Exaforce",
+    "careers_url": "https://www.exaforce.com/careers",
+    "category": "Agentic SOC Platform"
+  },
+  {
+    "name": "OpenEvidence",
+    "careers_url": "https://www.openevidence.com/",
+    "category": "AI Copilot for Clinicians & Healthcare"
+  },
+  {
+    "name": "Zafran Security",
+    "careers_url": "https://www.zafran.io/careers",
+    "category": "AI Threat Exposure Management"
+  },
+  {
+    "name": "BuiltIn",
+    "careers_url": "https://builtin.com/company/careers",
+    "category": "Tech Job Board & Media Platform"
+  },
+  {
+    "name": "Himalayas",
+    "careers_url": "https://himalayas.app/",
+    "category": "Remote Tech Job Board"
+  },
+  {
+    "name": "Cryptocurrency Jobs",
+    "careers_url": "https://cryptocurrencyjobs.co/",
+    "category": "Web3 & Crypto Job Platform"
+  },
+  {
+    "name": "Arc.dev",
+    "careers_url": "https://arc.dev/about",
+    "category": "Remote Developer Matching Network"
+  },
+  {
+    "name": "NoDesk",
+    "careers_url": "https://nodesk.co/about/",
+    "category": "Digital Nomad & Remote Work Platform"
+  },
+  {
+    "name": "Welcome to the Jungle (Otta)",
+    "careers_url": "https://www.welcometothejungle.com/",
+    "category": "Curated Tech Job Recommendations"
+  },
+  {
+    "name": "Climatebase",
+    "careers_url": "https://climatebase.org/about",
+    "category": "Climate Tech Job Platform"
+  },
+  {
+    "name": "Techjobs",
+    "careers_url": "https://techjobs.co/",
+    "category": "Software Engineering Job Directory"
+  },
+  {
+    "name": "DailyRemote",
+    "careers_url": "https://dailyremote.com/about",
+    "category": "Daily Curated Remote Job Directory"
+  },
+  {
+    "name": "TrueUp",
+    "careers_url": "https://www.trueup.io/",
+    "category": "Tech Job Marketplace & Layoff Analytics"
+  },
+  {
+    "name": "PostJobFree",
+    "careers_url": "https://www.postjobfree.com/",
+    "category": "Tech & Operations Job Aggregator"
+  },
+  {
+    "name": "Pangian",
+    "careers_url": "https://pangian.com/",
+    "category": "Global Remote Professional Community"
   }
 ]

@@ -682,5 +682,109 @@
         "company_selector": ".job-card-text.bold, a.search-title",
         "job_url_selector": "a.search-title, a.job-card",
         "location_selector": ".job-card-text, .search-result-item"
+    },
+    "AI Jobs": {
+        "search_url": "https://aijobs.net/?q={search_term}",
+        "job_card_selector": "div[class*='job'], li[class*='job'], article, a[href*='/hiring/jobs/'], tr",
+        "title_selector": "h2, h3, a[href*='/jobs/'], a",
+        "company_selector": "[class*='company'], span",
+        "job_url_selector": "a[href*='/hiring/jobs/'], a[href*='/job/'], a",
+        "location_selector": "[class*='location'], span"
+    },
+    "Himalayas Remote Jobs": {
+        "search_url": "https://himalayas.app/jobs?q={search_term}",
+        "job_card_selector": "[data-testid='job-card'], article, div[class*='JobCard'], div.border",
+        "title_selector": "h2, h3, a[href*='/jobs/']",
+        "company_selector": "a[href*='/companies/'], [class*='company']",
+        "job_url_selector": "a[href*='/jobs/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Cryptocurrency Jobs": {
+        "search_url": "https://cryptocurrencyjobs.co/?query={search_term}",
+        "job_card_selector": "li[class*='job'], article, div[class*='job-card']",
+        "title_selector": "h2 a, h3 a, a[href*='/engineering/'], a[href*='/marketing/'], a",
+        "company_selector": "[class*='company'], h3",
+        "job_url_selector": "a[href*='/engineering/'], a[href*='/marketing/'], a[href*='/design/'], a[href*='/finance/'], a",
+        "location_selector": "[class*='location'], span"
+    },
+    "Arc.dev Remote Jobs": {
+        "search_url": "https://arc.dev/remote-jobs?search={search_term}",
+        "job_card_selector": "div[class*='job-card'], div[class*='JobCard'], article, [data-testid*='job']",
+        "title_selector": "h2, h3, a[href*='/remote-jobs/']",
+        "company_selector": "[class*='company'], a[href*='/companies/']",
+        "job_url_selector": "a[href*='/remote-jobs/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "NoDesk Remote Jobs": {
+        "search_url": "https://nodesk.co/remote-jobs/",
+        "job_card_selector": "tr, li[class*='job'], div[class*='job'], a[href*='/remote-jobs/']",
+        "title_selector": "h2, h3, span, a",
+        "company_selector": "[class*='company'], span",
+        "job_url_selector": "a[href*='/remote-jobs/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Welcome to the Jungle (Otta)": {
+        "search_url": "https://www.welcometothejungle.com/en/jobs?query={search_term}&refinementList%5Boffices.country_code%5D%5B%5D=US",
+        "job_card_selector": "article, div[data-testid='job-card'], li[class*='ais-Hits-item']",
+        "title_selector": "h4, h3, a[href*='/jobs/']",
+        "company_selector": "[data-testid='company-name'], [class*='company']",
+        "job_url_selector": "a[href*='/jobs/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Climatebase Jobs": {
+        "search_url": "https://climatebase.org/jobs?q={search_term}",
+        "job_card_selector": "div[class*='JobCard'], article, div[class*='job-card'], li",
+        "title_selector": "h3, h2, a[href*='/job/']",
+        "company_selector": "a[href*='/company/'], [class*='company']",
+        "job_url_selector": "a[href*='/job/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "BuiltIn Remote Tech Jobs": {
+        "search_url": "https://builtin.com/jobs/remote?search={search_term}",
+        "job_card_selector": "[data-id='job-card'], div[class*='job-item'], div[id*='job-card']",
+        "title_selector": "h2 a, a[data-id='job-card-title'], a[href*='/job/']",
+        "company_selector": "[data-id='company-title'], [class*='company-name']",
+        "job_url_selector": "a[data-id='job-card-title'], a[href*='/job/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "Techjobs": {
+        "search_url": "https://techjobs.co/?s={search_term}",
+        "job_card_selector": "article, div.job, li.job, [class*='job-card']",
+        "title_selector": "h2, h3, a",
+        "company_selector": "[class*='company']",
+        "job_url_selector": "a",
+        "location_selector": "[class*='location']"
+    },
+    "DailyRemote Software Jobs": {
+        "search_url": "https://dailyremote.com/remote-software-development-jobs?search={search_term}",
+        "job_card_selector": "article, div[class*='job-item'], [class*='job-card'], li",
+        "title_selector": "h2, h3, a[href*='/remote-job/']",
+        "company_selector": "[class*='company-name'], [class*='company']",
+        "job_url_selector": "a[href*='/remote-job/']",
+        "location_selector": "[class*='location'], span"
+    },
+    "TrueUp Jobs": {
+        "search_url": "https://www.trueup.io/jobs?q={search_term}",
+        "job_card_selector": "div[class*='card'], tr, div[class*='item'], article",
+        "title_selector": "h3, h4, a[href*='/co/']",
+        "company_selector": "[class*='company'], strong",
+        "job_url_selector": "a[href*='/co/'], a",
+        "location_selector": "[class*='location'], span"
+    },
+    "Post Job Free Tech": {
+        "search_url": "https://www.postjobfree.com/jobs?q={search_term}&l=Remote",
+        "job_card_selector": ".snippet, [class*='jobCard'], div[class*='item']",
+        "title_selector": "h3 a, a[href*='/job/']",
+        "company_selector": "[class*='company'], span.colorCompany",
+        "job_url_selector": "a[href*='/job/']",
+        "location_selector": "[class*='location'], span.colorLocation"
+    },
+    "Pangian Remote Community": {
+        "search_url": "https://pangian.com/job-travel/?search_keywords={search_term}",
+        "job_card_selector": "li.job_listing, div.job_listing, article",
+        "title_selector": "h3, h4, a",
+        "company_selector": "[class*='company']",
+        "job_url_selector": "a",
+        "location_selector": "[class*='location']"
     }
 }

@@ -1697,6 +1697,318 @@
                 "job_type": "Full-time",
                 "remote": true
             }
+        },
+        {
+            "name": "AI Jobs",
+            "url": "https://aijobs.net/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Himalayas Remote Jobs",
+            "url": "https://himalayas.app/jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Cryptocurrency Jobs",
+            "url": "https://cryptocurrencyjobs.co/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Arc.dev Remote Jobs",
+            "url": "https://arc.dev/remote-jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "NoDesk Remote Jobs",
+            "url": "https://nodesk.co/remote-jobs/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Welcome to the Jungle (Otta)",
+            "url": "https://www.welcometothejungle.com/en/jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Climatebase Jobs",
+            "url": "https://climatebase.org/jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "BuiltIn Remote Tech Jobs",
+            "url": "https://builtin.com/jobs/remote",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Techjobs",
+            "url": "https://techjobs.co/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "DailyRemote Software Jobs",
+            "url": "https://dailyremote.com/remote-software-development-jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "TrueUp Jobs",
+            "url": "https://www.trueup.io/jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Post Job Free Tech",
+            "url": "https://www.postjobfree.com/jobs",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
+        },
+        {
+            "name": "Pangian Remote Community",
+            "url": "https://pangian.com/job-travel/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Test Automation Architect",
+                "Full Stack Developer",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "remote": true
+            }
         }
     ],
     "global_keywords": [

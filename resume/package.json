@@ -18,6 +18,7 @@
     "deploy": "npm run build && npm run deploy:stage && npx gh-pages -d deploy",
     "build:docx": "node compiler/build.js --docx",
     "build:microsoft": "node compiler/buildMicrosoftDossier.js",
+    "build:roles": "node compiler/buildRolePackages.js",
     "dev": "node scripts/watch.js",
     "dev:browser": "concurrently \"npm run dev\" \"browser-sync start --server web --files dist\"",
     "test": "npx vitest run --reporter=default --reporter=./tests/spacetime-reporter.js"
