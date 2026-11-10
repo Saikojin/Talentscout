@@ -11,7 +11,7 @@ async def fetch_jobs(session, company_name, ats_url):
     
     api_url = f"https://apply.workable.com/api/v3/accounts/{slug}/jobs"
     headers = {"Content-Type": "application/json"}
-    payload = {"limit": 100}
+    payload = {}
     
     try:
         async with session.post(api_url, json=payload, headers=headers, timeout=15) as resp:
