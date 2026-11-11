@@ -786,5 +786,17 @@
         "company_selector": "[class*='company']",
         "job_url_selector": "a",
         "location_selector": "[class*='location']"
+    },
+    "Layoffs & Hires": {
+        "search_url": "https://layoffsandhires.com/",
+        "search_input_selector": "input[type='search'], input[placeholder*='Search']",
+        "expand_button_selector": "button.matches-more",
+        "job_card_selector": "section.matches ol.matches-list li",
+        "title_selector": "span.matches-name",
+        "company_selector": "span.matches-name",
+        "job_url_selector": "a",
+        "location_selector": "",
+        "is_career_directory": true,
+        "max_cards": 60
     }
 }

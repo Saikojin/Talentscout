@@ -89,6 +89,12 @@ def init_db():
             site_cols = [col[1] for col in cursor.fetchall()]
             if 'location_selector' not in site_cols:
                 cursor.execute("ALTER TABLE sites ADD COLUMN location_selector TEXT")
+            if 'search_input_selector' not in site_cols:
+                cursor.execute("ALTER TABLE sites ADD COLUMN search_input_selector TEXT")
+            if 'expand_button_selector' not in site_cols:
+                cursor.execute("ALTER TABLE sites ADD COLUMN expand_button_selector TEXT")
+            if 'is_career_directory' not in site_cols:
+                cursor.execute("ALTER TABLE sites ADD COLUMN is_career_directory INTEGER DEFAULT 0")
             
             # Create search_configs table
             cursor.execute("""
@@ -376,7 +382,8 @@ def get_all_search_configs():
             # Join with sites to make it easy to use in auto_scour.py
             cursor.execute("""
                 SELECT c.*, s.name as site_name, s.search_url, s.job_card_selector, 
-                       s.title_selector, s.company_selector, s.job_url_selector
+                       s.title_selector, s.company_selector, s.job_url_selector, s.location_selector,
+                       s.search_input_selector, s.expand_button_selector, s.is_career_directory
                 FROM search_configs c
                 JOIN sites s ON c.site_id = s.id
             """)

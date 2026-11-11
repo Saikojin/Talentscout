@@ -16,6 +16,10 @@ TalentScout is an automated agentic job scraper that utilizes Playwright to find
 - **Rejection Breakdown & Blacklist Audit**: High-density ASCII summary tables and persistent JSON logs (`logs/scour_summary_latest.json`) reporting exact rejection reasons and pre-filtered blacklist stats.
 - **Skill Filtering**: Define your skills and disqualified keywords to automatically reject bad fits before you even see them.
 - **DreamworkHQ Direct Ingestion**: Fast, zero-npm job discovery via DreamworkHQ's public API (`scripts/ingest_dreamwork.py`). Extracts direct employer ATS links (Greenhouse, Lever, Workday, BambooHR, etc.) with pre-parsed tech stacks and full descriptions.
+- **Layoffs & Hires (layoffsandhires.com) Integration**:
+  - Interactive SPA search with dynamic input typing (`search_input_selector`) and results expansion (`expand_button_selector`) in `scripts/auto_scour.py`.
+  - Ingestion tool (`scripts/ingest_layoffs_and_hires.py`) syncing 3,462+ hiring companies with ATS detection (Workday, Greenhouse, Ashby, Lever, Workable, etc.) into `base_companies.json` and SQLite `companies`.
+  - Fast token search using `/search/t/{prefix}.json` inverted indices for instant offline company hiring discovery.
 - **Dynamic Multi-Persona Support**: Automatically adapts to whichever candidate profile is active in SQLite or custom skillset JSON files (`--skillset`). Enables any profession (Engineering, Data Science, QA, Product, DevOps) to search and score jobs against their own criteria.
 - **Local Database Tracking**: Uses a local SQLite database (`job_tracker.db`) to log scraped jobs and prevent re-evaluating the same URL twice.
 - **Dashboard Output & Scoring**: Generates an integrated HTML dashboard (`http://localhost:8088`) and a Markdown list (`jobs_to_review.md`) with multi-axis scoring.

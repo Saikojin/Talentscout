@@ -97,7 +97,23 @@ NON_JOB_SUBSTRINGS = [
     "#",
 ]
 
-def is_likely_job_url(href: str, base_url: str = "") -> bool:
+KNOWN_ATS_DOMAINS = [
+    "greenhouse.io",
+    "myworkdayjobs.com",
+    "lever.co",
+    "ashbyhq.com",
+    "workable.com",
+    "smartrecruiters.com",
+    "bamboohr.com",
+    "recruitee.com",
+    "teamtailor.com",
+    "jobvite.com",
+    "join.com",
+    "personio.de",
+    "personio.com",
+]
+
+def is_likely_job_url(href: str, base_url: str = "", allow_career_portals: bool = False) -> bool:
     """Validate whether an anchor href represents an individual job posting."""
     if not href:
         return False
@@ -143,6 +159,12 @@ def is_likely_job_url(href: str, base_url: str = "") -> bool:
     segments = [s for s in path.split("/") if s]
     if len(segments) >= 2 and any(seg.isdigit() for seg in segments):
         return True
+
+    # Recognize career portals or known ATS domains (e.g. from company directories or Layoffs & Hires)
+    netloc_lower = parsed.netloc.lower()
+    if any(ats in netloc_lower for ats in KNOWN_ATS_DOMAINS) or allow_career_portals:
+        if parsed.path.strip("/") or parsed.query:
+            return True
 
     return False
 
