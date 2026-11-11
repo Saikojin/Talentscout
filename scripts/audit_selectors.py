@@ -95,15 +95,39 @@ async def audit_single_site(
                 await page.close()
                 return result
 
-        # 3. Test primary card selector
+        # 3. Dynamic search input typing & card selector
+        search_input_sel = config.get("search_input_selector")
+        if search_input_sel:
+            try:
+                await page.wait_for_selector(search_input_sel, timeout=7000)
+                input_el = page.locator(search_input_sel).first
+                if await input_el.count():
+                    await input_el.fill(keyword)
+                    await asyncio.sleep(1.0)
+            except Exception as e:
+                result["details"] = f"Failed to type in search input '{search_input_sel}': {e}"
+
         card_sel = config.get("job_card_selector")
         cards = []
         if card_sel:
             try:
-                await page.wait_for_selector(card_sel, timeout=5000)
+                await page.wait_for_selector(card_sel, timeout=7000)
                 cards = await page.locator(card_sel).all()
             except Exception:
                 cards = []
+
+        # Expandable results pane (e.g. Layoffs & Hires)
+        expand_btn_sel = config.get("expand_button_selector")
+        if expand_btn_sel:
+            try:
+                expand_btn = page.locator(expand_btn_sel).first
+                if await expand_btn.count():
+                    await expand_btn.click()
+                    await asyncio.sleep(0.5)
+                    if card_sel:
+                        cards = await page.locator(card_sel).all()
+            except Exception:
+                pass
 
         result["cards_found"] = len(cards)
 
@@ -199,8 +223,16 @@ async def audit_single_site(
 
         result["sample_company"] = extracted_company or "Unknown Company"
 
+        if config.get("is_career_directory"):
+            if not extracted_company or extracted_company == "Unknown Company":
+                extracted_company = extracted_title
+            if not extracted_title or extracted_title == "Unknown Title":
+                extracted_title = f"{keyword} ({extracted_company})"
+            result["sample_title"] = extracted_title
+            result["sample_company"] = extracted_company
+
         # 6. Overall verdict
-        if not extracted_url or not is_likely_job_url(extracted_url, search_url):
+        if not extracted_url or not is_likely_job_url(extracted_url, search_url, allow_career_portals=config.get("is_career_directory", False)):
             result["status"] = "DRIFT_LINK"
             result["details"] = f"Cards found ({len(cards)}), but job_url_selector failed or matched search page URL"
         elif not extracted_title or extracted_title == "Unknown Title":

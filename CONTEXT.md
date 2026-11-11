@@ -73,6 +73,11 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
   - **Live Cleanse Utility**: `scripts/cleanup_invalid_jobs.py` re-evaluates database jobs against candidate profile constraints and purges/rejects disqualified jobs.
 - ✅ 1-Click Tailored Resume & Cover Letter Generator (`scripts/tailor_engine.py` & `dashboard.html`)
 - ✅ **DreamworkHQ Ingestor (`scripts/ingest_dreamwork.py`)**: Direct zero-npm connection to DreamworkHQ's public API for fast, ATS-direct job scraping, dynamic persona/profile-driven scoring, and SQLite deduplication.
+- ✅ **Layoffs & Hires (layoffsandhires.com) Integration (`scripts/ingest_layoffs_and_hires.py` & `scripts/auto_scour.py`)**:
+  - **Dynamic SPA Scouring**: Playwright automation supporting `search_input_selector` and `expand_button_selector` to interactively type queries into single-page application search boxes and expand the results pane ("Show more") to extract up to 60 direct company career portals per search.
+  - **Company & ATS Directory Ingestion**: Ingests and synchronizes all 3,462+ companies from `https://layoffsandhires.com/search/companies.json` into `base_companies.json` and SQLite `companies` table, automatically classifying ATS platforms (Workday, Greenhouse, Ashby, Lever, Workable, SmartRecruiters, etc.).
+  - **Offline Inverted Index API Search**: Fast token-level lookup via `/search/t/{prefix}.json` instantly identifying companies actively hiring for given keywords and their direct careers/ATS search URLs without browser overhead.
+  - **Career Directory Mode**: Built-in support for `is_career_directory` configs in `auto_scour.py`, `audit_selectors.py`, and `selector_heuristics.py`.
 - ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
 - ✅ SQLite deduplication and multi-profile persistence
 - ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) with home residence & job search location controls, and Markdown output

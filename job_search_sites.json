@@ -2009,6 +2009,28 @@
                 "job_type": "Full-time",
                 "remote": true
             }
+        },
+        {
+            "name": "Layoffs & Hires",
+            "url": "https://layoffsandhires.com/",
+            "search_terms": [
+                "Senior QA Engineer",
+                "SDET",
+                "Senior Test Engineer",
+                "QA",
+                "Automation Engineer",
+                "AI",
+                "Python Engineer"
+            ],
+            "locations": [
+                "Remote",
+                "Seattle, WA",
+                "Redmond, WA"
+            ],
+            "filters": {
+                "job_type": "Full-time",
+                "is_career_directory": true
+            }
         }
     ],
     "global_keywords": [

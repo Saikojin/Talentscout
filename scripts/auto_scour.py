@@ -117,7 +117,7 @@ FATAL_NAV_ERRORS = (
 )
 
 # SPA hosts that require networkidle instead of domcontentloaded
-SPA_HOSTS = ("notion.site", "notion.so")
+SPA_HOSTS = ("notion.site", "notion.so", "layoffsandhires.com")
 
 NON_JOB_URL_PATTERNS = [
     r'/c/[^/]+-jobs',
@@ -555,6 +555,19 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                 await page.close()
                 return []
                 
+            # If site requires dynamic search input typing (e.g. Layoffs & Hires)
+            search_input_sel = config.get("search_input_selector")
+            if search_input_sel:
+                try:
+                    await page.wait_for_selector(search_input_sel, timeout=7000)
+                    input_el = page.locator(search_input_sel).first
+                    if await input_el.count():
+                        log(f"  [*] Typing search query '{search_term}' into '{search_input_sel}'...")
+                        await input_el.fill(search_term)
+                        await asyncio.sleep(1.0)
+                except Exception as e:
+                    log(f"[!] Warning: Failed to type into search input '{search_input_sel}': {e}")
+
             # Wait for job cards to load
             card_sel = config.get("job_card_selector")
             cards = []
@@ -564,6 +577,21 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                     cards = await page.locator(card_sel).all()
                 except Exception:
                     cards = []
+
+            # If site has an expandable results pane (e.g. Layoffs & Hires "Show more" button)
+            expand_btn_sel = config.get("expand_button_selector")
+            if expand_btn_sel:
+                try:
+                    expand_btn = page.locator(expand_btn_sel).first
+                    if await expand_btn.count():
+                        btn_txt = (await expand_btn.text_content() or "").strip()
+                        log(f"  [*] Expanding results via '{expand_btn_sel}' ({btn_txt})...")
+                        await expand_btn.click()
+                        await asyncio.sleep(0.5)
+                        if card_sel:
+                            cards = await page.locator(card_sel).all()
+                except Exception as e:
+                    log(f"  [-] Expand button '{expand_btn_sel}' not clicked or not present: {e}")
 
             if not cards:
                 rescued_sel, fb_cards = await find_fallback_cards(page)
@@ -581,9 +609,10 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
 
             log(f"[*] Found {len(cards)} job cards. Analyzing...")
             
+            max_cards = config.get("max_cards", 60 if config.get("expand_button_selector") else 30)
             jobs = []
-            for idx, card in enumerate(cards[:30]):
-                log(f"    - Processing card {idx+1}/{min(len(cards), 30)}...")
+            for idx, card in enumerate(cards[:max_cards]):
+                log(f"    - Processing card {idx+1}/{min(len(cards), max_cards)}...")
                 try:
                     card_text = await card.text_content()
                     if card_text:
@@ -670,7 +699,7 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                     if job_href and not job_href.startswith('http'):
                         job_href = urljoin(url, job_href)
                         
-                    if not job_href or not is_likely_job_url(job_href, url) or is_non_job_url(job_href):
+                    if not job_href or not is_likely_job_url(job_href, url, allow_career_portals=config.get("is_career_directory", False)) or is_non_job_url(job_href):
                         if telemetry:
                             telemetry.record_selector_drift(site_name, url, "link_selector", config.get("job_url_selector") or "a", "No valid job link found; card dropped to prevent search URL poisoning")
                         continue
@@ -687,6 +716,21 @@ async def scrape_site(context, site_name, site_info, config, search_term, locati
                                     break
                         except Exception:
                             pass
+
+                    # Directory format specialization (e.g. Layoffs & Hires)
+                    if config.get("is_career_directory"):
+                        if not company or company == "Unknown Company":
+                            company = title
+                        job_count_str = ""
+                        try:
+                            cnt_el = card.locator(".matches-n, [class*='is-hire'], [class*='num']").first
+                            if await cnt_el.count():
+                                job_count_str = (await cnt_el.text_content() or "").strip()
+                        except Exception:
+                            pass
+                        title = f"{search_term} ({job_count_str})" if job_count_str else f"{search_term} ({company})"
+                        if not card_location:
+                            card_location = location
                     
                     jobs.append({
                         "title": title,
@@ -948,6 +992,14 @@ async def main(args=None):
     
     seed_default_profile()
     search_configs = get_all_search_configs()
+    selectors_cache = load_json(CONFIG_FILE)
+    if isinstance(selectors_cache, dict):
+        for cfg in search_configs:
+            sname = cfg.get("site_name")
+            if sname and sname in selectors_cache:
+                for k, v in selectors_cache[sname].items():
+                    if k not in cfg or cfg[k] is None or cfg[k] == "":
+                        cfg[k] = v
     companies = get_all_companies()
     blacklist = load_json(BLACKLIST_FILE)
     if not isinstance(blacklist, list):
