@@ -51,6 +51,8 @@ def init_db():
                 cursor.execute("ALTER TABLE jobs ADD COLUMN location TEXT")
             if 'country' not in columns:
                 cursor.execute("ALTER TABLE jobs ADD COLUMN country TEXT")
+            if 'description' not in columns:
+                cursor.execute("ALTER TABLE jobs ADD COLUMN description TEXT")
                 
             # Create profiles table
             cursor.execute("""
@@ -215,6 +217,22 @@ def update_job_status(job_id, status):
             return cursor.rowcount > 0
         except sqlite3.Error as e:
             print(f"Error updating job status: {e}")
+            return False
+        finally:
+            conn.close()
+    return False
+
+def update_job_description(job_id, description):
+    """Store or update the full job description text for a job."""
+    conn = create_connection()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE jobs SET description = ? WHERE id = ?", (description or "", job_id))
+            conn.commit()
+            return cursor.rowcount > 0
+        except sqlite3.Error as e:
+            print(f"Error updating job description: {e}")
             return False
         finally:
             conn.close()

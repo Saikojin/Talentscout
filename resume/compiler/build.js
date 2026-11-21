@@ -95,6 +95,10 @@ function buildMarkdown(r) {
         for (const bullet of atsBullets) {
           lines.push(`- ${bullet}`);
         }
+        const techKeywords = [...new Set([...(job.toolsUsed || []), ...(job.skillsUsed || [])])];
+        if (techKeywords.length) {
+          lines.push(`\n**Tech Stack & Keywords:** ${techKeywords.join(' · ')}`);
+        }
       } else {
         if (job.highlights?.length && isFieldActive('highlights')) {
           for (const h of job.highlights) lines.push(`- ${h}`);

@@ -94,6 +94,7 @@
             "additionalProperties": false,
             "properties": {
               "CAR": { "type": "array", "items": { "type": "string" } },
+              "CARL": { "type": "array", "items": { "type": "string" } },
               "STAR": { "type": "array", "items": { "type": "string" } },
               "LPS": { "type": "array", "items": { "type": "string" } },
               "ELITE": { "type": "array", "items": { "type": "string" } },

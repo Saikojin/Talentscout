@@ -11,9 +11,10 @@
  * For EACH role, generates:
  *   - Career_Story.md, Career_Story.html, Career_Story.docx (Role-tailored Career Odyssey + D:\DevWorkspace chapters)
  *   - Cover_Letter.md, Cover_Letter.docx (With visually highlighted [[...]] manual keyword insertion slots)
- *   - Role-tailored Resumes (.docx and .md) in all 6 known ATS styles:
+ *   - Role-tailored Resumes (.docx and .md) in all 7 known ATS styles:
  *       * Resume_Standard (.docx / .md)
  *       * Resume_ATS_CAR (.docx / .md)   — Challenge -> Action -> Result
+ *       * Resume_ATS_CARL (.docx / .md)  — Context -> Action -> Result -> Learning
  *       * Resume_ATS_STAR (.docx / .md)  — Situation -> Task -> Action -> Result
  *       * Resume_ATS_LPS (.docx / .md)   — Leadership -> Problem-Solving -> Strategy/Success
  *       * Resume_ATS_ELITE (.docx / .md) — Elevate -> Leverage -> Illustrate -> Transfer -> Execute
@@ -39,7 +40,7 @@ import {
   HighlightColor
 } from 'docx';
 
-import { formatWorkEntryAts } from './atsFormatter.js';
+import { formatWorkEntryAts, ATS_STYLES } from './atsFormatter.js';
 import { generateStoryHtml } from './storyEngine.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1850,7 +1851,6 @@ async function main() {
     mkdirSync(OUT_BASE, { recursive: true });
   }
 
-  const ATS_STYLES = ['CAR', 'STAR', 'LPS', 'ELITE', 'WHO'];
   let totalFiles = 0;
 
   console.log('🚀 Building Role Packages across 4 Mapped Engineering Archetypes...\n');
@@ -1898,6 +1898,7 @@ async function main() {
         description: job.summary,
         achievements_STAR: formatWorkEntryAts(job, 'STAR'),
         achievements_CAR: formatWorkEntryAts(job, 'CAR'),
+        achievements_CARL: formatWorkEntryAts(job, 'CARL'),
       })),
       skills: (roleResume.skills ?? []).map((s) => ({
         skillCategory: s.name,

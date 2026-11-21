@@ -1,5 +1,5 @@
 # Thomas S. Snyder — The Career Odyssey
-*Senior QA Engineer — Test Automation & AI-Assisted Development*
+*Principal QA Architect — Test Automation, Agentic AI Harnesses & MCP Systems*
 
 ---
 
@@ -15,8 +15,8 @@ More than a chronological record, The Career Odyssey captures a hard-won philoso
 > 💡 **Core Mantra:** "Quality is never an afterthought or a bureaucratic gate. It is an active discipline engineered into every commit—freeing developers to build with unwavering confidence."
 
 ### Edition Specs & Vital Metrics
-- **Chapters:** 18 Work Eras
-- **Span:** 26 years, 4 months
+- **Chapters:** 19 Work Eras
+- **Span:** 27 years, 4 months
 - **Automation Baseline:** 0 → 1,500+ Tests
 - **Manual Coverage:** 85% Automated
 - **Frontier:** Consoles · Cloud · MCP Agents
@@ -25,7 +25,7 @@ More than a chronological record, The Career Odyssey captures a hard-won philoso
 ---
 
 ## Prologue
-Over the course of 26 years, 4 months, Thomas S. Snyder has traversed the evolving landscape of software quality engineering. From the high-stakes discipline of early console titles and operating systems to cloud APIs, enterprise test automation, and AI-assisted workflows, this narrative chronicles the technical crucible, key milestones, and architectural insights that shaped Thomas S. Snyder's career.
+Over the course of 27 years, 4 months, Thomas S. Snyder has traversed the evolving landscape of software quality engineering. From the high-stakes discipline of early console titles and operating systems to cloud APIs, enterprise test automation, and AI-assisted workflows, this narrative chronicles the technical crucible, key milestones, and architectural insights that shaped Thomas S. Snyder's career.
 
 ## Chapter 1: Nintendo of America (Aug 1999 – Mar 2000 · (7 months))
 **Quality Assurance Engineer** — *Redmond, WA*
@@ -291,9 +291,24 @@ Stepping onto the team meant confronting a significant challenge: navigating ent
 
 The effort culminated in a major milestone: built Karate test suites from zero baseline to cover 85% of manual testing with 1500+ tests. Furthermore, freed up QA bandwidth so developers/PMs entrusted the team with advanced exploratory testing.
 
-Reflecting on this chapter, the defining takeaway became clear: speak up louder when adding automation and introducing process/documentation improvements.
+Reflecting on this chapter, the defining takeaway became clear: speak up louder when adding automation and introducing process/documentation improvements. These accomplishments formed the foundational springboard for what came next at SeikoClaw / Independent AI & Agentic Systems R&D.
 
 > 💡 **Core Takeaway:** "Speak up louder when adding automation and introducing process/documentation improvements"
+
+---
+
+## Chapter 19: SeikoClaw / Independent AI & Agentic Systems R&D (Dec 2025 – Present · (1 year))
+**Principal Agentic Harness & AI Quality Systems Architect** — *Redmond, WA / Remote*
+
+SeikoClaw / Independent AI & Agentic Systems R&D marked an impactful milestone starting in Dec 2025, with Thomas S. Snyder serving as Principal Agentic Harness & AI Quality Systems Architect in Redmond, WA / Remote. Architected an end-to-end agentic engineering ecosystem combining multi-agent orchestration harnesses, custom Model Context Protocol (MCP) servers, tiered semantic memory, self-healing local LLM inference, and deterministic AI verification gates across enterprise web, mobile, and 3D game engines.
+
+At the heart of the engagement lay a demanding hurdle: preventing AI coding agents from hallucinating APIs, drifting across 250k+ token sessions, or issuing 'soft-pass' self-certifications on broken builds. Compounding this, stabilizing local GPU GGUF inference under strict 12GB VRAM constraints when native C++ llama_decode errors crashed stateless workers. The technical response was disciplined: deploying Python, TypeScript, Node.js, and MCP SDK to champion Agentic Harness Engineering, Multi-Agent Orchestration, and Model Context Protocol (MCP).
+
+The results yielded immediate, measurable dividends: proved 100% defect containment across 12 architectural and QA dimensions in controlled A/B harness benchmarking (ClawExerMart vs. RawExerMart). Furthermore, cut Jetpack Compose mobile E2E runtime by ~50% vs. Appium 2 via custom Pure-ADB XML bounds and logcat synchronization harnesses.
+
+The engagement forged a lasting operational insight: separating the autonomous actor from an isolated adversarial verifier—backed by runtime receipts and falsification gates—is mandatory for trustworthy AI engineering.
+
+> 💡 **Core Takeaway:** "Separating the autonomous actor from an isolated adversarial verifier—backed by runtime receipts and falsification gates—is mandatory for trustworthy AI engineering"
 
 ---
 

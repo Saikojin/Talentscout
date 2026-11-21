@@ -95,6 +95,18 @@ describe('Compiler — ATS Framework Formatting', () => {
     expect(md).toContain('Result:');
   });
 
+  it('builds resume with --ats=CARL flag successfully', () => {
+    execSync('node compiler/build.js --ats=CARL', { cwd: ROOT, stdio: 'pipe' });
+    const md = readFileSync(resolve(ROOT, 'dist', 'resume.md'), 'utf8');
+    expect(md).toContain('CARL Framework');
+    expect(md).toContain('Context:');
+    expect(md).toContain('Action:');
+    expect(md).toContain('Result:');
+    expect(md).toContain('Learning:');
+    expect(md).toContain('Tech Stack & Keywords:');
+    expect(md).not.toContain('..');
+  });
+
   it('builds resume with --ats=STAR flag successfully', () => {
     execSync('node compiler/build.js --ats=STAR', { cwd: ROOT, stdio: 'pipe' });
     const md = readFileSync(resolve(ROOT, 'dist', 'resume.md'), 'utf8');
@@ -121,10 +133,10 @@ describe('Compiler — Career Story Engine', () => {
     expect(md).toContain('## Epilogue');
   });
 
-  it('dist/story.md contains all 18 chapters', () => {
+  it('dist/story.md contains all chapters matching work history', () => {
     const md = readFileSync(resolve(ROOT, 'dist', 'story.md'), 'utf8');
     expect(md).toContain('## Chapter 1:');
-    expect(md).toContain('## Chapter 18:');
+    expect(md).toContain(`## Chapter ${resume.work.length}:`);
     expect(md).toContain('Core Takeaway:');
   });
 
