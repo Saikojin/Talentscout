@@ -224,6 +224,8 @@ export async function buildDocx(resume, outputPath, isActive = () => true, atsSt
       if (atsStyle) {
         const atsBullets = formatWorkEntryAts(job, atsStyle);
         addSubSection(`Impact & Achievements (${atsStyle} Framework)`, atsBullets);
+        const techKeywords = [...new Set([...(job.toolsUsed || []), ...(job.skillsUsed || [])])];
+        if (techKeywords.length) addChipLine('Tech Stack & Keywords', techKeywords);
       } else {
         if (job.highlights && job.highlights.length && isActive('highlights')) {
           for (const highlight of job.highlights) addBullet(highlight);

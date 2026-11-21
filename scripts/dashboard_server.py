@@ -2,7 +2,7 @@ import os
 import sys
 import json
 from fastapi import FastAPI, HTTPException, UploadFile, File
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -383,27 +383,72 @@ async def test_profile_llm(profile_id: int, req: Optional[LLMTestReq] = None):
 class TailorRequest(BaseModel):
     model: Optional[str] = None
     provider: Optional[str] = None
+    cover_letter_tone: Optional[str] = "jd_informed"
+    job_description: Optional[str] = None
+
+
+class CoverLetterRequest(BaseModel):
+    tone: str = "jd_informed"
+    job_description: Optional[str] = None
+    model: Optional[str] = None
+    provider: Optional[str] = None
+
 
 @app.post("/api/jobs/{job_id}/tailor")
 async def generate_tailored_resume(job_id: int, req: Optional[TailorRequest] = None):
-    """Generate tailored resume and cover letter for a given job."""
+    """Generate all 7 ATS resume styles (Standard, CARL, CAR, STAR, LPS, ELITE, WHO) and all 4 cover letter audiences."""
     model_name = req.model if req else None
     provider = req.provider if req else None
+    cover_letter_tone = (req.cover_letter_tone if (req and req.cover_letter_tone) else "jd_informed")
+    job_description = req.job_description if req else None
     try:
-        result = tailor_engine.tailor_for_job(job_id, model_name=model_name, provider=provider)
+        result = tailor_engine.tailor_for_job(
+            job_id,
+            model_name=model_name,
+            provider=provider,
+            cover_letter_tone=cover_letter_tone,
+            job_description=job_description,
+        )
         return result
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.post("/api/jobs/{job_id}/cover_letter")
+async def regenerate_job_cover_letter(job_id: int, req: CoverLetterRequest):
+    """Regenerate a specific cover letter audience (jd_informed, hr, cto, ceo) with optional Job Description."""
+    try:
+        return tailor_engine.regenerate_cover_letter(
+            job_id,
+            tone=req.tone,
+            job_description=req.job_description,
+            model_name=req.model,
+            provider=req.provider,
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/jobs/{job_id}/tailor")
 async def get_tailored_resume(job_id: int):
-    """Check if tailored resume & cover letter already exist for a job."""
+    """Check if tailored resumes & cover letters already exist for a job."""
     existing = tailor_engine.get_existing_tailored_package(job_id)
     if not existing:
         return {"exists": False}
     return existing
+
+
+@app.get("/api/jobs/{job_id}/tailor/download/{filename}")
+async def download_tailored_file(job_id: int, filename: str):
+    """Download a specific generated .md or .docx file from a job's tailored package."""
+    file_path = tailor_engine.get_tailored_file_path(job_id, filename)
+    if not file_path:
+        raise HTTPException(status_code=404, detail="Tailored file not found")
+    return FileResponse(path=file_path, filename=os.path.basename(file_path))
 
 if __name__ == "__main__":
     import uvicorn

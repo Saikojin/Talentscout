@@ -1,12 +1,12 @@
 {
   "basics": {
     "name": "Thomas S. Snyder",
-    "label": "Senior QA Engineer — Test Automation & AI-Assisted Development",
+    "label": "Principal QA Architect — Test Automation, Agentic AI Harnesses & MCP Systems",
     "image": "",
     "email": "Mr.Thomas.Snyder@gmail.com",
     "phone": "please email",
     "url": "https://www.linkedin.com/in/mr-thomas-snyder/",
-    "summary": "Senior Software Test Engineer with 25+ years across Microsoft, Smartsheet, OpenMarket, and mobile/console game ecosystems. Builds automation from scratch, elevates QA practices across organizations, and reduces time-to-release through tight feedback loops with stakeholders. Integrates AI tooling — including custom MCP-based agents — into testing and development workflows.",
+    "summary": "Principal-level Software Quality Architect and Agentic AI Systems Engineer with 26+ years across Microsoft, Smartsheet, OpenMarket, NVIDIA, and Xbox/Nintendo ecosystems. Builds zero-to-one test automation suites (0% to 85% coverage, 1,500+ Karate tests), elevates QA governance across organizations, and engineers production multi-agent AI harnesses, Model Context Protocol (MCP) servers, tiered semantic memory sidecars, self-healing local LLM runtimes, and deterministic Anti-Soft-Pass AI evaluation gates.",
     "location": {
       "address": "17325 NE 85th PL Apt C-105",
       "postalCode": "98052",
@@ -33,6 +33,76 @@
     ]
   },
   "work": [
+    {
+      "name": "SeikoClaw / Independent AI & Agentic Systems R&D",
+      "position": "Principal Agentic Harness & AI Quality Systems Architect",
+      "url": "https://github.com/Saikojin/seikoclaw-harness",
+      "startDate": "2025-12-01",
+      "endDate": "",
+      "summary": "Architected an end-to-end agentic engineering ecosystem combining multi-agent orchestration harnesses, custom Model Context Protocol (MCP) servers, tiered semantic memory, self-healing local LLM inference, and deterministic AI verification gates across enterprise web, mobile, and 3D game engines.",
+      "highlights": [
+        "Built SeikoClaw-Harness (130+ modular agent skills, 24 core engineering directives, 5-stage isolated 'Goldfish' spec reviews, and adversarial falsification gates) validated via controlled A/B benchmarking (ClawExerMart vs. RawExerMart)",
+        "Engineered OpenBrain tiered cognitive memory sidecar (SQLite + ChromaDB vector search + C#/.NET 8 WASM SpacetimeDB) with Headroom Kompress token compression and tiktoken preflight context budgeting",
+        "Built LocalMind & LLMWorkbench self-healing local GGUF inference runtimes (llama.cpp / CUDA / psutil auto-tuning) recovering transparently from native VRAM decode overflows",
+        "Authored TalentScout stealth Playwright job platform with HTTP 429 circuit breakers, DOM selector drift self-healing, 7-tool TypeScript MCP server, and multi-ATS / multi-audience tailoring engine",
+        "Engineered custom Pure-ADB Android test harnesses (~50% faster than Appium 2) and 70+ headless Unreal Engine 5.8 C++ automation specs alongside Blender/Godot/Unity MCP pipelines"
+      ],
+      "tags": ["ai", "agents", "mcp", "automation", "qa", "evals", "leadership", "open-source"],
+      "location": "Redmond, WA / Remote",
+      "keyResponsibilities": [
+        "Architect multi-agent skill routers, pre-execution safety guardrails, and deterministic Anti-Soft-Pass QA verification gates",
+        "Design and maintain TypeScript and Python Model Context Protocol (MCP) servers integrating live editors, local LLMs, and vector memory",
+        "Build automated AI skill-routing evaluation suites (eval-skills), vocabulary collision linters, and controlled A/B harness benchmarks",
+        "Develop resilient browser automation, Pure-ADB mobile harnesses, and multi-engine headless CI test pipelines"
+      ],
+      "skillsUsed": [
+        "Agentic Harness Engineering",
+        "Multi-Agent Orchestration",
+        "Model Context Protocol (MCP)",
+        "AI Evaluation & Red-Teaming",
+        "Context & Memory Engineering",
+        "Test Automation",
+        "Systems Diagnostics"
+      ],
+      "toolsUsed": [
+        "Python",
+        "TypeScript",
+        "Node.js",
+        "MCP SDK",
+        "Playwright",
+        "Karate DSL",
+        "FastAPI",
+        "SQLite",
+        "ChromaDB",
+        "SpacetimeDB",
+        "llama.cpp / GGUF",
+        "Antigravity (AGY)",
+        "Vitest",
+        "Pytest",
+        "Unreal Engine 5 / Unity 6 / Godot 4 / Blender MCP"
+      ],
+      "challenges": [
+        "Preventing AI coding agents from hallucinating APIs, drifting across 250k+ token sessions, or issuing 'soft-pass' self-certifications on broken builds",
+        "Stabilizing local GPU GGUF inference under strict 12GB VRAM constraints when native C++ llama_decode errors crashed stateless workers",
+        "Eliminating brittle DOM selector breakage and heavy Appium server overhead across autonomous web and mobile verification pipelines"
+      ],
+      "wins": [
+        "Proved 100% defect containment across 12 architectural and QA dimensions in controlled A/B harness benchmarking (ClawExerMart vs. RawExerMart)",
+        "Cut Jetpack Compose mobile E2E runtime by ~50% vs. Appium 2 via custom Pure-ADB XML bounds and logcat synchronization harnesses",
+        "Delivered 38/38 passing Vitest compiler specs, 70+ headless UE 5.8 C++ tests, and zero-downtime self-healing local GGUF inference"
+      ],
+      "lessonsLearned": [
+        "Separating the autonomous actor from an isolated adversarial verifier—backed by runtime receipts and falsification gates—is mandatory for trustworthy AI engineering",
+        "Deterministic compilers and native protocol levers (ADB, CDP, MCP) consistently outperform bloated middleware and unnecessary LLM calls"
+      ],
+      "atsBullets": {
+        "CARL": [
+          "Context: Un-harnessed AI coding agents suffered from multi-session context drift and 'soft-pass' test certifications across complex full-stack and 3D builds. Action: Architected SeikoClaw-Harness (130+ skills, 24 directives, 5-stage Goldfish spec reviews, and Anti-Soft-Pass QA gates) using Python, TypeScript, and MCP. Result: Demonstrated superior defect containment across 12 engineering dimensions in controlled A/B benchmarking (ClawExerMart vs. RawExerMart). Learning: Separating autonomous code generation from isolated adversarial verification and hard runtime receipts eliminates silent AI regressions.",
+          "Context: Long-running agentic workflows hit context window exhaustion while local 12GB VRAM GGUF workers suffered native C++ llama_decode crashes. Action: Built OpenBrain (SQLite + ChromaDB + SpacetimeDB WASM tiered memory with token compression) and LocalMind (psutil auto-tuned, self-healing llama.cpp GGUF server). Result: Delivered persistent cross-session recall and zero-crash local inference exposed over FastAPI and MCP. Learning: Pairing tiered semantic memory with hardware-aware recovery loops makes local AI dependable in production workflows.",
+          "Context: Traditional Appium mobile suites and brittle web scrapers suffered slow execution and frequent DOM/selector breakage. Action: Engineered custom Pure-ADB Android harnesses (Java/Python XML bounds + logcat sync) and TalentScout's stealth Playwright engine with HTTP 429 circuit breakers and DOM drift heuristics. Result: Cut mobile E2E execution time by ~50% vs. Appium 2 and achieved resilient autonomous job discovery and resume compilation. Learning: Dropping down to native protocols (ADB, CDP, deterministic compilers) delivers order-of-magnitude gains in speed and reliability."
+        ]
+      }
+    },
     {
       "name": "Smartsheet",
       "position": "Senior QA Engineer",
@@ -873,9 +943,11 @@
       "startDate": "1999-01-01",
       "endDate": "",
       "courses": [
+        "Agentic Harness Architecture — multi-agent orchestration, skill routing evals, and deterministic falsification gates",
+        "Model Context Protocol (MCP) — custom TypeScript and Python MCP server engineering for live IDE, DCC, and QA tools",
+        "Local AI & Semantic Memory — llama.cpp GGUF self-healing inference, ChromaDB vector search, SQLite/SpacetimeDB memory compression",
         "Karate DSL — BDD API and UI test automation framework",
-        "Playwright — browser automation and end-to-end testing",
-        "AI-assisted development with Antigravity, ChatGPT, Copilot, and custom MCP agents",
+        "Playwright — stealth browser automation, selector drift heuristics, and end-to-end testing",
         "AWS cloud services and Kubernetes orchestration",
         "WinDbg and symbol-connected stack trace analysis"
       ]
@@ -910,9 +982,33 @@
       "tags": ["qa", "performance"]
     },
     {
+      "name": "Agentic Harness & AI Evaluation Engineering",
+      "level": "Expert",
+      "keywords": [
+        "Multi-Agent Orchestration",
+        "Model Context Protocol (MCP)",
+        "AI Evaluation Pipelines (Evals)",
+        "Adversarial Red-Teaming",
+        "Anti-Soft-Pass Verification Gates",
+        "Tiered Semantic Memory (ChromaDB / SQLite / SpacetimeDB)",
+        "Context & Token Compression",
+        "Local GGUF / llama.cpp Inference",
+        "Prompt & Spec Architecture"
+      ],
+      "tags": ["ai", "agents", "mcp", "evals", "automation", "qa"]
+    },
+    {
       "name": "AI-Assisted Development & Testing",
-      "level": "Advanced",
-      "keywords": ["Antigravity (AGY)", "ChatGPT", "GitHub Copilot", "MCP agents", "AI-based test generation", "AI-based coding"],
+      "level": "Expert",
+      "keywords": [
+        "Antigravity (AGY)",
+        "Claude / Gemini / OpenAI APIs",
+        "GitHub Copilot",
+        "MCP Agent Tooling",
+        "AI-Driven Test Generation",
+        "Agentic Workflow Automation",
+        "Local LLM / SDXL Pipelines"
+      ],
       "tags": ["ai", "automation", "qa"]
     },
     {
@@ -970,39 +1066,55 @@
   ],
   "projects": [
     {
-      "name": "seikoclaw-harness",
-      "description": "A custom MCP-based AI agent harness and skill router built to orchestrate AI-assisted coding, testing, and development workflows. Demonstrates hands-on AI tooling and agent engineering capabilities.",
+      "name": "SeikoClaw-Harness",
+      "description": "Production-grade autonomous agentic engineering OS and QA gatekeeping harness orchestrating 130+ specialized skills, 24 core engineering directives, isolated 5-stage spec reviews, and deterministic Anti-Soft-Pass verification gates.",
       "highlights": [
-        "Skill router for directing AI agents to specialized capabilities",
-        "Integrates with Antigravity (AGY) agentic coding assistant",
-        "Demonstrates practical AI-assisted development in a real engineering context"
+        "Engineered Tier 2 Skill Routing Evals (eval-skills) with automated frontmatter linting and pairwise vocabulary collision detection",
+        "Implemented 5-stage isolated 'Goldfish' specification reviews (/spec-review), adversarial red-teaming (/interrogate), and falsification gates (gate:disproof)",
+        "Proved harness efficacy via controlled 12-dimension A/B benchmarking (ClawExerMart vs. RawExerMart) and pre-execution shell guardrails"
       ],
-      "keywords": ["MCP", "AI agents", "Antigravity", "Node.js", "TypeScript"],
+      "keywords": ["MCP", "Multi-Agent Systems", "AI Evals", "Python", "TypeScript", "Playwright", "Vitest", "Antigravity"],
       "startDate": "2024-01-01",
       "endDate": "",
       "url": "https://github.com/Saikojin/seikoclaw-harness",
-      "roles": ["Creator", "Maintainer"],
+      "roles": ["Creator", "Principal Architect"],
       "entity": "Personal",
       "type": "application",
-      "tags": ["ai", "automation", "open-source"]
+      "tags": ["ai", "agents", "mcp", "automation", "qa", "open-source"]
+    },
+    {
+      "name": "OpenBrain & LocalMind (LLMWorkbench)",
+      "description": "Tiered cognitive memory sidecar (SQLite + ChromaDB + .NET 8 WASM SpacetimeDB) paired with a self-healing local GGUF inference engine (llama.cpp / CUDA) and FastAPI/MCP orchestration workbench.",
+      "highlights": [
+        "Designed 4-tier agent memory lifecycle with vector semantic search, Headroom Kompress / DAG token compression, and tiktoken preflight context budgeting",
+        "Built hardware auto-tuning (psutil RAM/VRAM/CPU inspection) and transparent recovery from native C++ llama_decode VRAM overflows",
+        "Exposed zero-cost local prompt expansion, log summarization, and embedding workflows over MCP"
+      ],
+      "keywords": ["Python", "FastAPI", "ChromaDB", "SQLite", "SpacetimeDB", "llama.cpp", "GGUF", "CUDA", "MCP"],
+      "startDate": "2025-06-01",
+      "endDate": "",
+      "url": "https://github.com/Mr-Thomas-Snyder",
+      "roles": ["Creator", "Architect"],
+      "entity": "Personal",
+      "type": "application",
+      "tags": ["ai", "mcp", "backend", "open-source"]
     },
     {
       "name": "TalentScout",
-      "description": "A resume-as-code engine with a JSON Resume compiler pipeline (JSON → Markdown → HTML → PDF), a 7-tool MCP server for AI agent interoperability, and a dynamic portfolio landing page.",
+      "description": "Full-stack agentic job discovery platform and Resume-as-Code compiler pipeline (JSON → Markdown/HTML/PDF/DOCX across 7 ATS frameworks including CARL) with a 7-tool MCP server and multi-audience AI tailoring engine.",
       "highlights": [
-        "Compiler pipeline with ATS adapters for Greenhouse and Workday",
-        "MCP server exposing get_basics, get_experience, get_skills, search_capabilities, and generate_ats_profile tools",
-        "29/29 automated tests passing with Vitest",
-        "Playwright-based job scraper with SQLite deduplication and FastAPI dashboard"
+        "Built zero-dependency Playwright stealth anti-bot evasion, per-domain HTTP 429 circuit breakers, and semantic DOM selector drift self-healing",
+        "Implemented multi-ATS resume compilation (Standard, CARL, CAR, STAR, LPS, ELITE, WHO), Greenhouse/Workday adapters, and audience-targeted cover letter generation (JD-Informed, HR, CTO, CEO)",
+        "Authored deterministic Career Story NLG engine and 7-tool TypeScript MCP server backed by automated Vitest and Pytest verification suites"
       ],
-      "keywords": ["Node.js", "JSON Resume", "MCP", "Playwright", "FastAPI", "SQLite"],
-      "startDate": "2026-07-01",
+      "keywords": ["TypeScript", "Node.js", "Python", "FastAPI", "Playwright", "MCP", "SQLite", "JSON Resume", "Vitest"],
+      "startDate": "2026-01-01",
       "endDate": "",
       "url": "https://github.com/Mr-Thomas-Snyder?tab=repositories",
-      "roles": ["Creator"],
+      "roles": ["Creator", "Architect"],
       "entity": "Personal",
       "type": "application",
-      "tags": ["automation", "ai", "qa", "open-source"]
+      "tags": ["automation", "ai", "mcp", "qa", "open-source"]
     }
   ]
 }
