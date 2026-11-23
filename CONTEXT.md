@@ -79,7 +79,13 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
   - **Offline Inverted Index API Search**: Fast token-level lookup via `/search/t/{prefix}.json` instantly identifying companies actively hiring for given keywords and their direct careers/ATS search URLs without browser overhead.
   - **Career Directory Mode**: Built-in support for `is_career_directory` configs in `auto_scour.py`, `audit_selectors.py`, and `selector_heuristics.py`.
 - ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
-- ✅ SQLite deduplication and multi-profile persistence
+- ✅ SQLite deduplication and multi-profile persistence (`profile_deliveries` table for per-profile idempotent delta tracking)
+- ✅ **Automated Scheduled Cloud Crawler & SMTP Email Packages**:
+  - `.github/workflows/scheduled-scour.yml`: 3x daily PST schedule (`0 5,15,21 * * *` -> 7 AM, 1 PM, 9 PM PST) + `workflow_dispatch`, GitHub Actions Cache persistence for `job_tracker.db` with `PRAGMA wal_checkpoint(TRUNCATE)`, and GitHub Actions Secrets-only PII hygiene for public repo safety.
+  - `scripts/ci_bootstrap.py`: Idempotent DB/fixture seeding and secret profile syncing (`RECIPIENT_EMAIL` or multi-profile `TALENTSCOUT_PROFILES_JSON`) with masked log output.
+  - `scripts/auto_scour.py`: Supports `--mode <full|fast|ats-only>`, `--profile`, `--time-budget`, and `--max-companies` for predictable cloud execution.
+  - `scripts/package_and_email.py`: Builds per-profile `.zip` packages (`manifest.json`, `jobs_delta.json`, `jobs_summary.csv`, `jobs_digest.md`, `scour_telemetry.json`) and emails HTML+ZIP digests via Python stdlib `smtplib` (STARTTLS/SSL), recording delivery only on SMTP success.
+  - `scripts/import_package.py`: Idempotently imports emailed `.zip` / `jobs_delta.json` packages into local `job_tracker.db`.
 - ✅ Dashboard and Profile Editor UI (`dashboard/profile_editor.html` on port 8088) with home residence & job search location controls, and Markdown output
 
 ### Resume-as-Code (`resume/`)

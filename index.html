@@ -416,6 +416,133 @@
       font-style: italic;
     }
 
+    /* ─── Cloud Automation Breakdown ────────────────────────────────── */
+    .automation-intro {
+      color: #8b949e;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin: -0.75rem 0 1.5rem;
+    }
+
+    .automation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .automation-card {
+      background: rgba(22, 27, 34, 0.75);
+      border: 1px solid rgba(48, 54, 61, 0.9);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .automation-card:hover {
+      border-color: rgba(88, 166, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .automation-card-eyebrow {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #58a6ff;
+      margin-bottom: 0.4rem;
+    }
+
+    .automation-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .automation-card p {
+      margin: 0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #8b949e;
+    }
+
+    .automation-card code {
+      background: rgba(110, 118, 129, 0.2);
+      padding: 0.12em 0.35em;
+      border-radius: 4px;
+      color: #e6edf3;
+      font-size: 0.8em;
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
+    }
+
+    .portability-panel {
+      background: rgba(22, 27, 34, 0.55);
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      border-radius: 12px;
+      padding: 1.35rem 1.5rem;
+      overflow-x: auto;
+    }
+
+    .portability-panel h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .portability-panel p {
+      margin: 0 0 1rem;
+      font-size: 0.875rem;
+      color: #8b949e;
+      line-height: 1.55;
+    }
+
+    .portability-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.835rem;
+      min-width: 620px;
+    }
+
+    .portability-table th,
+    .portability-table td {
+      border: 1px solid rgba(48, 54, 61, 0.85);
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      vertical-align: top;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    .portability-table th {
+      background: rgba(13, 17, 23, 0.85);
+      color: #e6edf3;
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .portability-table code {
+      background: rgba(110, 118, 129, 0.2);
+      padding: 0.1em 0.32em;
+      border-radius: 4px;
+      font-size: 0.82em;
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
+    }
+
+    .portability-callout {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      border-left: 3px solid #58a6ff;
+      background: rgba(88, 166, 255, 0.06);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.84rem;
+      color: #c9d1d9;
+      line-height: 1.55;
+    }
+
     /* ─── Responsive ────────────────────────────────────────────────── */
     @media (max-width: 640px) {
       .nav-brand { display: none; }
@@ -486,12 +613,12 @@
 
         <div class="project-stats">
           <div class="stat-card">
-            <span class="stat-value">19</span>
+            <span class="stat-value">20</span>
             <div class="stat-label">Features</div>
           </div>
           <div class="stat-card">
-            <span class="stat-value">29/29</span>
-            <div class="stat-label">Tests Passing</div>
+            <span class="stat-value">3×/Day</span>
+            <div class="stat-label">Cloud Scour</div>
           </div>
           <div class="stat-card">
             <span class="stat-value">7</span>
@@ -502,7 +629,7 @@
             <div class="stat-label">ATS Adapters</div>
           </div>
           <div class="stat-card">
-            <span class="stat-value">8</span>
+            <span class="stat-value">9</span>
             <div class="stat-label">Subsystems</div>
           </div>
         </div>
@@ -514,6 +641,8 @@
           <span class="tech-badge">🗃️ SQLite</span>
           <span class="tech-badge">🎭 Playwright</span>
           <span class="tech-badge">⚡ FastAPI</span>
+          <span class="tech-badge">⚙️ GitHub Actions</span>
+          <span class="tech-badge">📧 SMTP Digests</span>
           <span class="tech-badge">🔌 MCP Protocol</span>
           <span class="tech-badge">🚀 GitHub Pages</span>
           <span class="tech-badge">🛸 SpacetimeDB</span>
@@ -599,6 +728,17 @@ flowchart TD
         BUILD --> STDB
         VAL --> STDB
     end
+    subgraph CLOUD["Scheduled Cloud Automation & Delivery"]
+        GHA["⚙️ GitHub Actions Cron\n3x Daily PST · Actions Cache"]
+        PKG["📦 Delta Packager\nscripts/package_and_email.py\nZIP: JSON + CSV + MD"]
+        SMTP["📧 SMTP Email Digest\nMulti-Profile Secrets · Zero PII in Git"]
+        IMP["📥 Local Importer\nscripts/import_package.py"]
+        GHA --> SC
+        JT --> PKG
+        PKG --> SMTP
+        SMTP -.->|"email .zip"| IMP
+        IMP --> JT
+    end
     FS -.->|"skills inform job query"| SC
     classDef identity  fill:#4f46e5,color:#fff,stroke:#3730a3
     classDef skill     fill:#0891b2,color:#fff,stroke:#0e7490
@@ -608,6 +748,7 @@ flowchart TD
     classDef hosting   fill:#dc2626,color:#fff,stroke:#b91c1c
     classDef mcp       fill:#9333ea,color:#fff,stroke:#7e22ce
     classDef audit     fill:#475569,color:#fff,stroke:#334155
+    classDef cloud     fill:#0284c7,color:#fff,stroke:#0369a1
     class RS,RP identity
     class SK,BL,FS skill
     class SC,SJ,SB search
@@ -616,7 +757,109 @@ flowchart TD
     class WEB,GHPAGES hosting
     class MCPS mcp
     class STDB audit
+    class GHA,PKG,SMTP,IMP cloud
           </pre>
+        </div>
+      </section>
+
+      <!-- Scheduled Cloud Automation & Delivery Breakdown -->
+      <section class="project-section" aria-labelledby="section-cloud-automation">
+        <h2 class="project-section-title" id="section-cloud-automation">☁️ Scheduled Cloud Crawler &amp; Email Packages</h2>
+        <p class="automation-intro">
+          TalentScout runs autonomously on <strong>GitHub Actions</strong> three times a day without committing any private data to this public repository.
+          Each scheduled run restores deduplication state from runner cache, crawls fresh listings per profile, bundles only newly discovered roles into a portable <code>.zip</code> package, and delivers it over standard SMTP.
+        </p>
+
+        <div class="automation-grid">
+          <article class="automation-card">
+            <div class="automation-card-eyebrow">Schedule · UTC Cron</div>
+            <h3>⏰ 3× Daily PST Windows</h3>
+            <p>
+              Triggered at <code>07:00</code>, <code>13:00</code>, and <code>21:00 PST</code> (<code>cron: '0 5,15,21 * * *'</code>) to match morning, midday, and evening role drops—plus on-demand <code>workflow_dispatch</code> runs with <code>fast</code>, <code>ats-only</code>, or <code>full</code> modes and a 20-minute soft budget.
+            </p>
+          </article>
+
+          <article class="automation-card">
+            <div class="automation-card-eyebrow">Public-Repo Hygiene</div>
+            <h3>🔐 Secrets-Only &amp; Cache State</h3>
+            <p>
+              All SMTP credentials and recipient profiles live exclusively in <strong>GitHub Actions Secrets</strong> (never in Git). Deduplication state (<code>job_tracker.db</code>) persists in private runner cache with <code>PRAGMA wal_checkpoint(TRUNCATE)</code>, and CI logs automatically mask email addresses.
+            </p>
+          </article>
+
+          <article class="automation-card">
+            <div class="automation-card-eyebrow">Delta Packaging</div>
+            <h3>📦 Portable ZIP + Local Import</h3>
+            <p>
+              SQLite <code>profile_deliveries</code> ensures each email contains strictly new roles. Each digest attaches a <code>.zip</code> (<code>jobs_delta.json</code>, <code>jobs_summary.csv</code>, <code>jobs_digest.md</code>, telemetry) ready for 1-command local import via <code>scripts/import_package.py</code> and local LLM tailoring.
+            </p>
+          </article>
+
+          <article class="automation-card">
+            <div class="automation-card-eyebrow">Scalable Transport</div>
+            <h3>👥 Multi-Profile via Stdlib SMTP</h3>
+            <p>
+              Works immediately for a single user via <code>RECIPIENT_EMAIL</code>, or scales to multiple profile users via <code>TALENTSCOUT_PROFILES_JSON</code>. Uses Python's stdlib <code>smtplib</code> (STARTTLS/SSL)—zero third-party email SDKs required.
+            </p>
+          </article>
+        </div>
+
+        <div class="portability-panel">
+          <h3>🔀 Implementing on Non-GitHub Repository Managers</h3>
+          <p>
+            Every step—<code>ci_bootstrap.py</code>, <code>ingest_dreamwork.py</code>, <code>auto_scour.py</code>, and <code>package_and_email.py</code>—is platform-agnostic Python configured by environment variables. Swap GitHub Actions for any CI host or local scheduler by mapping these four pillars:
+          </p>
+          <table class="portability-table">
+            <thead>
+              <tr>
+                <th>Platform / Host</th>
+                <th>Scheduler</th>
+                <th>Secrets Store</th>
+                <th>SQLite State Persistence</th>
+                <th>Key Implementation Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>GitHub Actions</strong> (default)</td>
+                <td><code>on.schedule</code> (<code>0 5,15,21 * * *</code> on <code>main</code>)</td>
+                <td>Actions Repository Secrets</td>
+                <td><code>actions/cache</code> (7-day TTL refreshed 3×/day)</td>
+                <td>Auto-pauses after 60 days without repo commits; keep packages out of public artifacts.</td>
+              </tr>
+              <tr>
+                <td><strong>GitLab CI/CD</strong></td>
+                <td>Pipeline Schedules (native TZ support)</td>
+                <td>CI/CD Variables (Masked + Protected)</td>
+                <td><code>cache:</code> or Generic Package Registry</td>
+                <td>Use <code>mcr.microsoft.com/playwright/python</code> image and set <code>resource_group:</code> to prevent overlaps.</td>
+              </tr>
+              <tr>
+                <td><strong>Bitbucket Pipelines</strong></td>
+                <td>Pipelines Schedules UI</td>
+                <td>Secured Repository Variables</td>
+                <td>Custom cache or S3/R2/B2 sync</td>
+                <td>Use <code>size: 2x</code> for Chromium, or <code>--mode ats-only</code> on <code>1x</code> runners.</td>
+              </tr>
+              <tr>
+                <td><strong>Gitea / Forgejo Actions</strong></td>
+                <td><code>.forgejo/workflows/</code> (near 1:1 YAML)</td>
+                <td>Actions Secrets</td>
+                <td>Self-hosted runner volume mount</td>
+                <td>Bind-mounting a host directory removes cache eviction limits entirely.</td>
+              </tr>
+              <tr>
+                <td><strong>Self-Hosted (cron / Task Scheduler)</strong></td>
+                <td>Local TZ crontab (<code>0 7,13,21 * * *</code>)</td>
+                <td>Restricted <code>.env</code> (<code>chmod 600</code>)</td>
+                <td>Native on-disk <code>job_tracker.db</code></td>
+                <td>Residential IP avoids most cloud datacenter bot blocks; use <code>flock</code> to serialize runs.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="portability-callout">
+            <strong>Universal Checklist for Any Host:</strong> (1) Run <code>PRAGMA wal_checkpoint(TRUNCATE)</code> before caching/uploading <code>job_tracker.db</code> so WAL writes aren't lost; (2) enforce single-run concurrency; (3) never publish personalized digest ZIPs to public build artifacts; and (4) pair cloud datacenter runners with <code>--mode fast</code> or <code>--mode ats-only</code> plus <code>--time-budget 20</code>.
+          </div>
         </div>
       </section>
 
