@@ -48,7 +48,9 @@ concurrency:
 jobs:
   scour-and-deliver:
     name: Scour, Package & Deliver
-    runs-on: ubuntu-latest
+    # Pin to ubuntu-24.04 so Playwright's nativeDeps map cleanly (libasound2t64)
+    # without breaking when ubuntu-latest advances to a newer Ubuntu LTS.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     env:

@@ -1,4 +1,4 @@
-playwright==1.41.2
+playwright>=1.58.0
 requests==2.31.0
 beautifulsoup4==4.12.3
 fastapi==0.109.2
