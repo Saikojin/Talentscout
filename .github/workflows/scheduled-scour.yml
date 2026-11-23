@@ -1,16 +1,20 @@
 name: TalentScout Scheduled Scour & Email Digest
 
-# Runs 3x daily aligned with Pacific Standard Time (UTC-8):
-#   - 07:00 PST (08:00 PDT) -> 15:00 UTC
-#   - 13:00 PST (14:00 PDT) -> 21:00 UTC
-#   - 21:00 PST (22:00 PDT) -> 05:00 UTC (next UTC day)
+# Runs 3x daily aligned with Pacific Standard Time (UTC-8), scheduled on an
+# off-peak minute (:47) rather than :00 to avoid GitHub Actions top-of-the-hour
+# cron queue congestion and dropped triggers:
+#   - ~06:47–07:00 PST (07:47–08:00 PDT) -> 14:47 UTC
+#   - ~12:47–13:00 PST (13:47–14:00 PDT) -> 20:47 UTC
+#   - ~20:47–21:00 PST (21:47–22:00 PDT) -> 04:47 UTC (next UTC day)
 #
 # Note: GitHub Actions only executes `schedule` triggers from the repository's
 # default branch (`main`) and automatically pauses cron schedules after 60 days
 # of repository inactivity.
 on:
   schedule:
-    - cron: '0 5,15,21 * * *'
+    - cron: '47 14 * * *'
+    - cron: '47 20 * * *'
+    - cron: '47 4 * * *'
   workflow_dispatch:
     inputs:
       mode:
