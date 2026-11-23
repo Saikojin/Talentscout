@@ -230,6 +230,12 @@ def test_smtp_delivery_delta_and_failure_safety(isolated_db, tmp_path, monkeypat
         def ehlo(self):
             pass
 
+        def ehlo_or_helo_if_needed(self):
+            pass
+
+        def has_extn(self, name):
+            return False
+
         def starttls(self, context=None):
             pass
 
@@ -265,3 +271,37 @@ def test_auto_scour_ci_cli_args():
     assert parsed.time_budget == 20.0
     assert parsed.max_companies == 100
     assert parsed.dry_run is True
+
+
+def test_smtp_surfaces_gmail_535_instead_of_disconnect():
+    """Reproduce Gmail closing the socket after 535 on AUTH PLAIN so 535 is never masked."""
+    import smtplib
+    from scripts.package_and_email import _smtp_authenticate
+
+    class GmailLikeSMTP:
+        esmtp_features = {"auth": "LOGIN PLAIN XOAUTH2"}
+        user = None
+        password = None
+
+        def ehlo_or_helo_if_needed(self):
+            pass
+
+        def has_extn(self, name):
+            return name == "auth"
+
+        def auth_plain(self, challenge=None):
+            return f"\0{self.user}\0{self.password}"
+
+        def auth_login(self, challenge=None):
+            return self.user
+
+        def auth(self, method, handler, initial_response_ok=True):
+            if method == "PLAIN":
+                raise smtplib.SMTPAuthenticationError(535, b"5.7.8 Username and Password not accepted")
+            # Gmail drops the socket after 535, so a second attempt would disconnect
+            raise smtplib.SMTPServerDisconnected("Connection unexpectedly closed")
+
+    with pytest.raises(smtplib.SMTPAuthenticationError) as exc_info:
+        _smtp_authenticate(GmailLikeSMTP(), "user@gmail.com", "wrong-or-non-app-pass")
+    assert exc_info.value.smtp_code == 535
+

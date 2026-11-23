@@ -346,6 +346,47 @@ def load_smtp_config_from_env() -> dict:
     }
 
 
+def _smtp_authenticate(server: smtplib.SMTP, username: str, password: str) -> None:
+    """
+    Authenticate against an SMTP server without letting smtplib.SMTP.login() mask
+    a real 534/535 SMTPAuthenticationError behind SMTPServerDisconnected when the
+    server (notably Gmail) closes the socket immediately after rejecting AUTH PLAIN.
+    """
+    server.ehlo_or_helo_if_needed()
+    if not server.has_extn("auth"):
+        # Fallback for stub/mock servers in unit tests that implement login() directly
+        server.login(username, password)
+        return
+
+    advertised = server.esmtp_features.get("auth", "").split()
+    authlist = [m for m in ("CRAM-MD5", "PLAIN", "LOGIN") if m in advertised]
+    if not authlist:
+        raise smtplib.SMTPException(f"No supported SMTP AUTH mechanism advertised ({advertised}).")
+
+    server.user, server.password = username, password
+    last_auth_error: Optional[smtplib.SMTPAuthenticationError] = None
+
+    for method in authlist:
+        handler = getattr(server, "auth_" + method.lower().replace("-", "_"))
+        try:
+            code, resp = server.auth(method, handler, initial_response_ok=True)
+            if code in (235, 503):
+                return
+        except smtplib.SMTPAuthenticationError as exc:
+            last_auth_error = exc
+            # Definitive credential / policy rejections (534, 535) should surface immediately;
+            # Gmail drops the TCP socket right after 535 so retrying LOGIN causes a misleading disconnect.
+            if exc.smtp_code in (534, 535):
+                raise
+        except smtplib.SMTPServerDisconnected:
+            if last_auth_error is not None:
+                raise last_auth_error
+            raise
+
+    if last_auth_error is not None:
+        raise last_auth_error
+
+
 def send_email_smtp(msg: EmailMessage, smtp_cfg: dict, timeout: int = 30) -> None:
     """Deliver EmailMessage via SMTP (STARTTLS, SSL, or plain for local test servers)."""
     host = smtp_cfg.get("host")
@@ -357,21 +398,37 @@ def send_email_smtp(msg: EmailMessage, smtp_cfg: dict, timeout: int = 30) -> Non
     if not host:
         raise ValueError("SMTP_HOST is required to send email.")
 
+    print(
+        f"[*] Connecting to SMTP {host}:{port} "
+        f"(security={security}, user={mask_email(username)})..."
+    )
+
     context = ssl.create_default_context()
-    if security == "ssl":
-        with smtplib.SMTP_SSL(host, port, timeout=timeout, context=context) as server:
-            if username and password:
-                server.login(username, password)
-            server.send_message(msg)
-    else:
-        with smtplib.SMTP(host, port, timeout=timeout) as server:
-            server.ehlo()
-            if security == "starttls":
-                server.starttls(context=context)
+    try:
+        if security == "ssl":
+            with smtplib.SMTP_SSL(host, port, timeout=timeout, context=context) as server:
+                if username and password:
+                    _smtp_authenticate(server, username, password)
+                server.send_message(msg)
+        else:
+            with smtplib.SMTP(host, port, timeout=timeout) as server:
                 server.ehlo()
-            if username and password:
-                server.login(username, password)
-            server.send_message(msg)
+                if security == "starttls":
+                    server.starttls(context=context)
+                    server.ehlo()
+                if username and password:
+                    _smtp_authenticate(server, username, password)
+                server.send_message(msg)
+    except smtplib.SMTPAuthenticationError as exc:
+        detail = exc.smtp_error.decode("utf-8", errors="replace") if isinstance(exc.smtp_error, bytes) else str(exc.smtp_error)
+        print(f"[!] SMTP authentication rejected ({exc.smtp_code}): {detail}")
+        if "gmail.com" in host.lower():
+            print(
+                "[!] Gmail hint: Verify SMTP_USER is your full '@gmail.com' address and SMTP_PASS is a "
+                "16-character Google App Password (from https://myaccount.google.com/apppasswords, "
+                "not your regular Gmail login password)."
+            )
+        raise
 
 
 def _resolve_target_profiles(profile_arg: Optional[str]) -> List[dict]:
