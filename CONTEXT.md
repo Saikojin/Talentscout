@@ -81,7 +81,7 @@ A new `resume/` subdirectory integrates a Node.js **resume-as-code engine**:
 - ✅ Bundled Local LLM inference engine (`llmworkbench/`) with UI start/stop controls
 - ✅ SQLite deduplication and multi-profile persistence (`profile_deliveries` table for per-profile idempotent delta tracking)
 - ✅ **Automated Scheduled Cloud Crawler & SMTP Email Packages**:
-  - `.github/workflows/scheduled-scour.yml`: 3x daily PST schedule (`0 5,15,21 * * *` -> 7 AM, 1 PM, 9 PM PST) + `workflow_dispatch`, GitHub Actions Cache persistence for `job_tracker.db` with `PRAGMA wal_checkpoint(TRUNCATE)`, and GitHub Actions Secrets-only PII hygiene for public repo safety.
+  - `.github/workflows/scheduled-scour.yml`: 3x daily off-peak PST schedule (`47 14 * * *`, `47 20 * * *`, `47 4 * * *` -> ~6:47 AM, 12:47 PM, 8:47 PM PST to avoid GitHub `:00` congestion) + `workflow_dispatch`, GitHub Actions Cache persistence for `job_tracker.db` with `PRAGMA wal_checkpoint(TRUNCATE)`, and GitHub Actions Secrets-only PII hygiene for public repo safety.
   - `scripts/ci_bootstrap.py`: Idempotent DB/fixture seeding and secret profile syncing (`RECIPIENT_EMAIL` or multi-profile `TALENTSCOUT_PROFILES_JSON`) with masked log output.
   - `scripts/auto_scour.py`: Supports `--mode <full|fast|ats-only>`, `--profile`, `--time-budget`, and `--max-companies` for predictable cloud execution.
   - `scripts/package_and_email.py`: Builds per-profile `.zip` packages (`manifest.json`, `jobs_delta.json`, `jobs_summary.csv`, `jobs_digest.md`, `scour_telemetry.json`) and emails HTML+ZIP digests via Python stdlib `smtplib` (STARTTLS/SSL), recording delivery only on SMTP success.

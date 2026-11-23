@@ -198,17 +198,17 @@ TalentScout includes a **zero-infrastructure scheduled pipeline** (`.github/work
 
 ### Schedule (3x Daily, PST-Aligned)
 
-Configured in `.github/workflows/scheduled-scour.yml` via `cron: '0 5,15,21 * * *'`:
+Configured in `.github/workflows/scheduled-scour.yml` using off-peak `:47` cron windows (`47 14 * * *`, `47 20 * * *`, `47 4 * * *`) rather than top-of-the-hour `:00` to avoid GitHub Actions' heaviest scheduler congestion and dropped triggers:
 
-| Run Window | Pacific Standard Time (PST, UTC-8) | Pacific Daylight Time (PDT, UTC-7) | UTC Cron Hour |
+| Run Window | Pacific Standard Time (PST, UTC-8) | Pacific Daylight Time (PDT, UTC-7) | UTC Cron |
 | --- | --- | --- | --- |
-| **Morning** | 7:00 AM PST | 8:00 AM PDT | `15:00 UTC` |
-| **Midday** | 1:00 PM PST | 2:00 PM PDT | `21:00 UTC` |
-| **Evening** | 9:00 PM PST | 10:00 PM PDT | `05:00 UTC` |
+| **Morning** | ~6:47–7:00 AM PST | ~7:47–8:00 AM PDT | `47 14 * * *` (`14:47 UTC`) |
+| **Midday** | ~12:47–1:00 PM PST | ~1:47–2:00 PM PDT | `47 20 * * *` (`20:47 UTC`) |
+| **Evening** | ~8:47–9:00 PM PST | ~9:47–10:00 PM PDT | `47 4 * * *` (`04:47 UTC`) |
 
 > **GitHub Actions Operational Notes:**
 > - Scheduled (`cron`) workflows **only execute on the repository's default branch (`main`)**. Merge your feature branch into `main` to activate the schedule.
-> - GitHub Actions cron timing can drift 5–20 minutes during peak UTC hours and automatically disables schedules after **60 days with no repository commits** (re-enable with one click in the Actions tab).
+> - Scheduling on an off-peak minute like `:47` avoids the global `:00` GitHub Actions queue spike (where `:00` jobs can be delayed 45–90+ minutes or dropped). GitHub also automatically disables schedules after **60 days with no repository commits** (re-enable with one click in the Actions tab).
 > - Use **Actions → TalentScout Scheduled Scour & Email Digest → Run workflow** (`workflow_dispatch`) to test immediately with `dry_run: true` or switch between `fast`, `ats-only`, and `full` modes.
 
 ### Configuring GitHub Actions Secrets

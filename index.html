@@ -772,10 +772,10 @@ flowchart TD
 
         <div class="automation-grid">
           <article class="automation-card">
-            <div class="automation-card-eyebrow">Schedule · UTC Cron</div>
+            <div class="automation-card-eyebrow">Schedule · Off-Peak UTC Cron</div>
             <h3>⏰ 3× Daily PST Windows</h3>
             <p>
-              Triggered at <code>07:00</code>, <code>13:00</code>, and <code>21:00 PST</code> (<code>cron: '0 5,15,21 * * *'</code>) to match morning, midday, and evening role drops—plus on-demand <code>workflow_dispatch</code> runs with <code>fast</code>, <code>ats-only</code>, or <code>full</code> modes and a 20-minute soft budget.
+              Triggered at <code>06:47</code>, <code>12:47</code>, and <code>20:47 PST</code> (<code>47 14/20/4 * * *</code> UTC) to avoid GitHub's congested <code>:00</code> queue spikes and land right around morning, midday, and evening role drops—plus on-demand <code>workflow_dispatch</code> runs with <code>fast</code>, <code>ats-only</code>, or <code>full</code> modes and a 20-minute soft budget.
             </p>
           </article>
 
@@ -822,10 +822,10 @@ flowchart TD
             <tbody>
               <tr>
                 <td><strong>GitHub Actions</strong> (default)</td>
-                <td><code>on.schedule</code> (<code>0 5,15,21 * * *</code> on <code>main</code>)</td>
+                <td><code>on.schedule</code> (<code>47 14/20/4 * * *</code> on <code>main</code>)</td>
                 <td>Actions Repository Secrets</td>
                 <td><code>actions/cache</code> (7-day TTL refreshed 3×/day)</td>
-                <td>Auto-pauses after 60 days without repo commits; keep packages out of public artifacts.</td>
+                <td>Uses off-peak <code>:47</code> minutes to avoid <code>:00</code> queue drops; auto-pauses after 60 days without commits.</td>
               </tr>
               <tr>
                 <td><strong>GitLab CI/CD</strong></td>
