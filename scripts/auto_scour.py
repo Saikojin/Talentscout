@@ -6,6 +6,7 @@ import os
 import re
 import socket
 import sys
+import time
 from urllib.parse import urljoin, urlparse
 from playwright.async_api import async_playwright
 
@@ -14,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from scripts.filter_skills import filter_job
     from scripts.scorer import score_job
-    from scripts.profile import get_active_profile, seed_default_profile
+    from scripts.profile import get_active_profile, seed_default_profile, activate_profile, get_profile_by_name
     from scripts.database import is_duplicate, add_job, get_all_search_configs, get_all_companies
     from scripts.cleanup import clean_logs
     from scripts.scour_telemetry import ScourTelemetry, detect_http_block, detect_dom_challenge
@@ -39,13 +40,37 @@ SKILLSET_FILE = "base_skillset.json"
 BLACKLIST_FILE = "blacklist.json"
 
 def parse_args(args=None):
-    """Parse CLI options for pagination, page skipping, telemetry, and dry runs."""
+    """Parse CLI options for pagination, page skipping, telemetry, CI modes, and dry runs."""
     parser = argparse.ArgumentParser(description="TalentScout Automated Job Scraper")
     parser.add_argument("--page", type=int, default=1, help="Target search results page to scrape (default: 1)")
     parser.add_argument("--skip-page-one", action="store_true", help="Ignore page 1 results and scour starting from page 2 (or specified --page)")
     parser.add_argument("--max-pages", type=int, default=1, help="Max number of pages to scour per site (default: 1)")
     parser.add_argument("--detect-pages-only", action="store_true", help="Probe sites to detect available pages and bot blocks without extracting/scoring JDs")
     parser.add_argument("--dry-run", action="store_true", help="Simulate scour and scoring without saving to DB or updating jobs_to_review.md")
+    parser.add_argument(
+        "--mode",
+        choices=["full", "fast", "ats-only"],
+        default="full",
+        help="Crawl scope: 'ats-only' (Phase 0 HTTP ATS APIs only), 'fast' (ATS APIs + Job Boards, skips Phase 1b company crawl), or 'full' (all phases).",
+    )
+    parser.add_argument(
+        "--profile",
+        type=str,
+        default=None,
+        help="Optional profile ID or name to activate before scoring jobs.",
+    )
+    parser.add_argument(
+        "--time-budget",
+        type=float,
+        default=0.0,
+        help="Soft wall-clock time budget in minutes (0 = unlimited). Gracefully drains and flushes results when exceeded.",
+    )
+    parser.add_argument(
+        "--max-companies",
+        type=int,
+        default=0,
+        help="Optional cap on companies processed per run (0 = unlimited).",
+    )
     return parser.parse_args(args)
 
 def load_json(filepath):
@@ -911,6 +936,8 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
     # If we already have the description from the ATS API, use it. Otherwise, fetch it.
     jd_text = job.get("description", "")
     if not jd_text:
+        if context is None:
+            return None
         try:
             jd_text = await asyncio.wait_for(fetch_job_description(context, job["url"], semaphore, blacklist_set=blacklist_set, telemetry=telemetry, throttle=throttle), timeout=45)
         except asyncio.TimeoutError:
@@ -955,7 +982,8 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
             matched_skills,
             score_profile_id=profile_id,
             location=job.get("location"),
-            country=job.get("country") or filter_results.get("detected_country")
+            country=job.get("country") or filter_results.get("detected_country"),
+            description=jd_text,
         )
     else:
         print(f"  [DRY RUN] Would add job: {job['title']} at {job['company']} (Score: {score})")
@@ -966,11 +994,13 @@ async def process_discovered_job(context, job, semaphore, processed_urls, blackl
     return job
 
 
-async def worker(context, queue, semaphore, processed_urls, results, blacklist_set=None, telemetry=None, dry_run=False, throttle=None):
-    """A worker task that drains the job queue."""
+async def worker(context, queue, semaphore, processed_urls, results, blacklist_set=None, telemetry=None, dry_run=False, throttle=None, deadline=None):
+    """A worker task that drains the job queue until empty or soft deadline expires."""
     while not queue.empty():
         job = await queue.get()
         try:
+            if deadline is not None and time.monotonic() >= deadline:
+                continue
             res = await process_discovered_job(
                 context, job, semaphore, processed_urls,
                 blacklist_set=blacklist_set, telemetry=telemetry, dry_run=dry_run, throttle=throttle
@@ -982,6 +1012,22 @@ async def worker(context, queue, semaphore, processed_urls, results, blacklist_s
         finally:
             queue.task_done()
 
+
+def _activate_requested_profile(profile_arg: str) -> None:
+    """Activate a profile specified via --profile (either numeric ID or name)."""
+    if not profile_arg:
+        return
+    if profile_arg.isdigit():
+        if activate_profile(int(profile_arg)):
+            log(f"[*] Activated profile ID {profile_arg}.")
+            return
+        raise ValueError(f"Profile ID '{profile_arg}' not found.")
+    prof = get_profile_by_name(profile_arg)
+    if prof and activate_profile(prof["id"]):
+        log(f"[*] Activated profile '{prof['name']}' (ID: {prof['id']}).")
+        return
+    raise ValueError(f"Profile '{profile_arg}' not found.")
+
 async def main(args=None):
     import aiohttp
     from scripts.ats_adapters.index import route_company
@@ -989,8 +1035,15 @@ async def main(args=None):
     cli_args = parse_args(args)
     telemetry = ScourTelemetry()
     throttle = DomainThrottle()
+    deadline = (time.monotonic() + cli_args.time_budget * 60.0) if cli_args.time_budget and cli_args.time_budget > 0 else None
+    if deadline:
+        log(f"[*] Running in '{cli_args.mode}' mode with {cli_args.time_budget:.1f}m soft time budget.")
+    else:
+        log(f"[*] Running in '{cli_args.mode}' mode.")
     
     seed_default_profile()
+    if cli_args.profile:
+        _activate_requested_profile(cli_args.profile)
     search_configs = get_all_search_configs()
     selectors_cache = load_json(CONFIG_FILE)
     if isinstance(selectors_cache, dict):
@@ -1053,6 +1106,11 @@ async def main(args=None):
             
     if skipped_companies > 0:
         log(f"[*] Pre-filtered {skipped_companies} blacklisted companies upfront ({len(active_ats_companies)} ATS, {len(active_direct_companies)} direct).")
+
+    if cli_args.max_companies and cli_args.max_companies > 0:
+        active_ats_companies = active_ats_companies[:cli_args.max_companies]
+        active_direct_companies = active_direct_companies[:cli_args.max_companies]
+        log(f"[*] Capped companies per --max-companies={cli_args.max_companies} ({len(active_ats_companies)} ATS, {len(active_direct_companies)} direct).")
     
     all_discovered = []
     
@@ -1077,167 +1135,182 @@ async def main(args=None):
                             job["priority"] = 0
                             all_discovered.append(job)
             log(f"[*] ATS API discovery complete. Found {len([j for j in all_discovered if j.get('priority') == 0])} jobs.")
-    
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        # Initialize with evasive stealth browser context
-        context = await create_stealth_context(browser)
-        
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT_PAGES)
-        processed_urls = set()
-        
-        # 1. DISCOVERY PHASE (Tiered)
-        log("\n=== Phase 1a: Discovering Jobs (Job Boards) ===")
-        site_tasks = []
-        for config in active_search_configs:
-            task = asyncio.wait_for(discover_jobs_from_config(
-                context, config, semaphore, blacklist_set,
-                telemetry=telemetry,
-                target_page=cli_args.page,
-                skip_page_one=cli_args.skip_page_one,
-                max_pages=cli_args.max_pages,
-                detect_pages_only=cli_args.detect_pages_only,
-                throttle=throttle
-            ), timeout=900)
-            site_tasks.append(task)
-            
-        site_results_raw = await asyncio.gather(*site_tasks, return_exceptions=True)
-        
-        for i, res in enumerate(site_results_raw):
-            if isinstance(res, Exception):
-                log(f"[!] Phase 1a Site {i} failed or timed out: {res}")
-            else:
-                all_discovered.extend(res)
-        
-        log(f"\n[*] Job Board discovery complete. Found {len(all_discovered)} potential jobs.")
 
-        if not cli_args.detect_pages_only and (not cli_args.skip_page_one or cli_args.page == 1):
-            log("\n=== Phase 1b: Discovering Jobs (Company Careers) ===")
-            company_tasks = []
-            for company in active_direct_companies:
-                task = asyncio.wait_for(discover_jobs_from_company(
-                    context, company, semaphore, blacklist_set,
-                    telemetry=telemetry, throttle=throttle
-                ), timeout=120)
-                company_tasks.append(task)
-                
-            company_results_raw = await asyncio.gather(*company_tasks, return_exceptions=True)
-            
-            company_count = 0
-            for i, res in enumerate(company_results_raw):
-                if isinstance(res, Exception):
-                    continue
-                else:
-                    all_discovered.extend(res)
-                    company_count += len(res)
-            
-            log(f"[*] Company discovery complete. Found {company_count} potential jobs.")
+    need_browser = (
+        cli_args.mode in ("full", "fast")
+        or cli_args.detect_pages_only
+        or any(not j.get("description") for j in all_discovered)
+    )
 
-        log(f"\n[*] Total Discovery complete. Found {len(all_discovered)} potential jobs.")
-        
-        if cli_args.detect_pages_only:
-            await browser.close()
-            telemetry.record_throttle_metrics(throttle.get_metrics())
-            telemetry.print_summary()
-            telemetry.save_json("logs/scour_summary_latest.json")
-            return
+    semaphore = asyncio.Semaphore(MAX_CONCURRENT_PAGES)
+    processed_urls = set()
 
-        # 2. PROCESSING PHASE (Prioritized Queue)
+    async def _run_phase_2(context):
         log("\n=== Phase 2: Fetching Descriptions and Filtering (Prioritized Queue) ===")
-        
         telemetry.record_job_discovered(len(all_discovered))
         all_discovered.sort(key=lambda x: x.get("priority", 1))
-        
+
         job_queue = asyncio.Queue()
         for job in all_discovered:
             job_queue.put_nowait(job)
-            
+
         log(f"[*] Processing {len(all_discovered)} jobs with {MAX_CONCURRENT_PAGES} workers...")
-        
+
         results = []
         worker_tasks = []
         for _ in range(MAX_CONCURRENT_PAGES):
             task = asyncio.create_task(worker(
                 context, job_queue, semaphore, processed_urls, results,
-                blacklist_set=blacklist_set, telemetry=telemetry, dry_run=cli_args.dry_run, throttle=throttle
+                blacklist_set=blacklist_set, telemetry=telemetry, dry_run=cli_args.dry_run,
+                throttle=throttle, deadline=deadline
             ))
             worker_tasks.append(task)
-            
+
         await job_queue.join()
-        
+
         for task in worker_tasks:
             task.cancel()
-            
-        all_results = results
-        telemetry.record_job_processed(len(all_results))
-        
-        await browser.close()
-        
-        # Attach throttle metrics to telemetry
-        telemetry.record_throttle_metrics(throttle.get_metrics())
-        telemetry.print_summary()
-        
-        # Save to logs
-        os.makedirs("logs", exist_ok=True)
-        telemetry.save_json("logs/scour_summary_latest.json")
-        timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        telemetry.save_json(f"logs/scour_summary_{timestamp_str}.json")
-        
-        with open("logs/auto_scour_results.json", "w", encoding="utf-8") as f:
-            json.dump(all_results, f, indent=2)
-        log("\n[*] Results saved to logs/auto_scour_results.json and logs/scour_summary_latest.json")
-        
-        if cli_args.dry_run:
-            log("[*] [DRY RUN] Skipping updates to jobs_to_review.md and SQLite database.")
-            return
 
-        # Update Markdown
-        md_updates_passed = []
-        md_updates_failed = []
-        
-        for job in all_results:
-            fr = job.get("filter_results", {})
-            if fr.get("is_disqualified"):
-                reason = "/".join(fr.get("disqualified_by", ["Unknown"]))
-                md_updates_failed.append(f"- {job['title']} ({job['company']}) - **{reason}**")
-            else:
-                score = fr.get("score", 75)
-                title = job['title']
-                company = job['company']
-                url = job['url']
-                missing_str = ", ".join(fr.get("missing_skills", [])[:3]) if fr.get("missing_skills") else "None"
-                
-                md_updates_passed.append(f"| {score} | {title} | {company} | AutoScour | {missing_str} | [Apply]({url}) |")
-        
-        if os.path.exists("jobs_to_review.md"):
-            with open("jobs_to_review.md", "r", encoding="utf-8") as f:
-                md_content = f.read()
-                
-            if md_updates_passed or md_updates_failed:
-                split_md = md_content.split("## Disqualified Jobs")
-                table_part = split_md[0].rstrip()
-                disq_part = split_md[1] if len(split_md) > 1 else ""
-                
-                if md_updates_passed:
-                    for line in md_updates_passed:
-                        job_url_match = re.search(r'\[Apply\]\((.*?)\)', line)
-                        if job_url_match:
-                            job_url = job_url_match.group(1)
-                            if job_url not in table_part:
-                                table_part += "\n" + line
-                
-                new_md = table_part + "\n\n## Disqualified Jobs"
-                
-                if md_updates_failed:
-                    for line in md_updates_failed:
-                        if line not in disq_part:
-                            disq_part += "\n" + line
-                
-                new_md += disq_part
-                
-                with open("jobs_to_review.md", "w", encoding="utf-8") as f:
-                    f.write(new_md)
-            log(f"[*] Updated jobs_to_review.md")
+        return results
+
+    if need_browser:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            # Initialize with evasive stealth browser context
+            context = await create_stealth_context(browser)
+
+            # 1. DISCOVERY PHASE (Tiered)
+            if cli_args.mode in ("full", "fast") or cli_args.detect_pages_only:
+                if deadline is None or time.monotonic() < deadline:
+                    log("\n=== Phase 1a: Discovering Jobs (Job Boards) ===")
+                    site_tasks = []
+                    for config in active_search_configs:
+                        task = asyncio.wait_for(discover_jobs_from_config(
+                            context, config, semaphore, blacklist_set,
+                            telemetry=telemetry,
+                            target_page=cli_args.page,
+                            skip_page_one=cli_args.skip_page_one,
+                            max_pages=cli_args.max_pages,
+                            detect_pages_only=cli_args.detect_pages_only,
+                            throttle=throttle
+                        ), timeout=900)
+                        site_tasks.append(task)
+
+                    site_results_raw = await asyncio.gather(*site_tasks, return_exceptions=True)
+
+                    for i, res in enumerate(site_results_raw):
+                        if isinstance(res, Exception):
+                            log(f"[!] Phase 1a Site {i} failed or timed out: {res}")
+                        else:
+                            all_discovered.extend(res)
+
+                    log(f"\n[*] Job Board discovery complete. Found {len(all_discovered)} potential jobs.")
+
+            if cli_args.mode == "full" and not cli_args.detect_pages_only and (not cli_args.skip_page_one or cli_args.page == 1):
+                if deadline is None or time.monotonic() < deadline:
+                    log("\n=== Phase 1b: Discovering Jobs (Company Careers) ===")
+                    company_tasks = []
+                    for company in active_direct_companies:
+                        task = asyncio.wait_for(discover_jobs_from_company(
+                            context, company, semaphore, blacklist_set,
+                            telemetry=telemetry, throttle=throttle
+                        ), timeout=120)
+                        company_tasks.append(task)
+
+                    company_results_raw = await asyncio.gather(*company_tasks, return_exceptions=True)
+
+                    company_count = 0
+                    for i, res in enumerate(company_results_raw):
+                        if isinstance(res, Exception):
+                            continue
+                        else:
+                            all_discovered.extend(res)
+                            company_count += len(res)
+
+                    log(f"[*] Company discovery complete. Found {company_count} potential jobs.")
+
+            log(f"\n[*] Total Discovery complete. Found {len(all_discovered)} potential jobs.")
+
+            if cli_args.detect_pages_only:
+                await browser.close()
+                telemetry.record_throttle_metrics(throttle.get_metrics())
+                telemetry.print_summary()
+                telemetry.save_json("logs/scour_summary_latest.json")
+                return
+
+            all_results = await _run_phase_2(context)
+            telemetry.record_job_processed(len(all_results))
+            await browser.close()
+    else:
+        log("\n[*] Skipping browser launch (ats-only mode with inline descriptions).")
+        all_results = await _run_phase_2(None)
+        telemetry.record_job_processed(len(all_results))
+
+    # Attach throttle metrics to telemetry
+    telemetry.record_throttle_metrics(throttle.get_metrics())
+    telemetry.print_summary()
+
+    # Save to logs
+    os.makedirs("logs", exist_ok=True)
+    telemetry.save_json("logs/scour_summary_latest.json")
+    timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    telemetry.save_json(f"logs/scour_summary_{timestamp_str}.json")
+
+    with open("logs/auto_scour_results.json", "w", encoding="utf-8") as f:
+        json.dump(all_results, f, indent=2)
+    log("\n[*] Results saved to logs/auto_scour_results.json and logs/scour_summary_latest.json")
+
+    if cli_args.dry_run:
+        log("[*] [DRY RUN] Skipping updates to jobs_to_review.md and SQLite database.")
+        return
+
+    # Update Markdown
+    md_updates_passed = []
+    md_updates_failed = []
+
+    for job in all_results:
+        fr = job.get("filter_results", {})
+        if fr.get("is_disqualified"):
+            reason = "/".join(fr.get("disqualified_by", ["Unknown"]))
+            md_updates_failed.append(f"- {job['title']} ({job['company']}) - **{reason}**")
+        else:
+            score = fr.get("score", 75)
+            title = job['title']
+            company = job['company']
+            url = job['url']
+            missing_str = ", ".join(fr.get("missing_skills", [])[:3]) if fr.get("missing_skills") else "None"
+
+            md_updates_passed.append(f"| {score} | {title} | {company} | AutoScour | {missing_str} | [Apply]({url}) |")
+
+    if os.path.exists("jobs_to_review.md"):
+        with open("jobs_to_review.md", "r", encoding="utf-8") as f:
+            md_content = f.read()
+
+        if md_updates_passed or md_updates_failed:
+            split_md = md_content.split("## Disqualified Jobs")
+            table_part = split_md[0].rstrip()
+            disq_part = split_md[1] if len(split_md) > 1 else ""
+
+            if md_updates_passed:
+                for line in md_updates_passed:
+                    job_url_match = re.search(r'\[Apply\]\((.*?)\)', line)
+                    if job_url_match:
+                        job_url = job_url_match.group(1)
+                        if job_url not in table_part:
+                            table_part += "\n" + line
+
+            new_md = table_part + "\n\n## Disqualified Jobs"
+
+            if md_updates_failed:
+                for line in md_updates_failed:
+                    if line not in disq_part:
+                        disq_part += "\n" + line
+
+            new_md += disq_part
+
+            with open("jobs_to_review.md", "w", encoding="utf-8") as f:
+                f.write(new_md)
+        log(f"[*] Updated jobs_to_review.md")
 
 if __name__ == "__main__":
     asyncio.run(main())

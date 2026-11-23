@@ -88,6 +88,14 @@ def default_config() -> dict:
                 "openrouter": "",
                 "custom": ""
             }
+        },
+        "delivery": {
+            "enabled": False,
+            "recipient_email": "",
+            "min_score": 40,
+            "max_jobs": 50,
+            "include_formats": ["json", "csv", "md"],
+            "send_empty_digest": False
         }
     }
 
@@ -141,6 +149,30 @@ def validate_config(config: dict) -> dict:
         if key_name not in llm_cfg["api_keys"]:
             llm_cfg["api_keys"][key_name] = ""
     merged["llm"] = llm_cfg
+
+    # Validate delivery block
+    deliv_cfg = merged.get("delivery", {})
+    if not isinstance(deliv_cfg, dict):
+        deliv_cfg = {}
+    deliv_cfg["enabled"] = bool(deliv_cfg.get("enabled", False))
+    deliv_cfg["recipient_email"] = str(deliv_cfg.get("recipient_email", "") or "").strip()
+    try:
+        deliv_cfg["min_score"] = max(0, min(100, int(deliv_cfg.get("min_score", 40))))
+    except (TypeError, ValueError):
+        deliv_cfg["min_score"] = 40
+    try:
+        deliv_cfg["max_jobs"] = max(1, min(500, int(deliv_cfg.get("max_jobs", 50))))
+    except (TypeError, ValueError):
+        deliv_cfg["max_jobs"] = 50
+    raw_formats = deliv_cfg.get("include_formats", ["json", "csv", "md"])
+    if not isinstance(raw_formats, list):
+        raw_formats = ["json", "csv", "md"]
+    allowed_formats = ("json", "csv", "md")
+    clean_formats = [f.lower() for f in raw_formats if isinstance(f, str) and f.lower() in allowed_formats]
+    deliv_cfg["include_formats"] = clean_formats or ["json", "csv", "md"]
+    deliv_cfg["send_empty_digest"] = bool(deliv_cfg.get("send_empty_digest", False))
+    merged["delivery"] = deliv_cfg
+
     return merged
 
 def get_user_location(profile_or_id: Optional[Any] = None) -> dict:
@@ -382,3 +414,128 @@ def delete_profile(profile_id: int) -> bool:
         return cursor.rowcount > 0
     finally:
         conn.close()
+
+
+def get_profile_by_name(name: str) -> Optional[dict]:
+    """Fetch a profile by exact (case-insensitive) name."""
+    if not name:
+        return None
+    conn = create_connection()
+    if not conn:
+        return None
+    try:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM profiles WHERE LOWER(name) = LOWER(?)", (name.strip(),))
+        row = cursor.fetchone()
+        if row:
+            res = dict(row)
+            res["config"] = validate_config(json.loads(res["config"]))
+            return res
+        return None
+    finally:
+        conn.close()
+
+
+def upsert_profile_from_dict(entry: dict) -> int:
+    """
+    Idempotently create or update a profile from a dictionary (e.g. from CI secrets).
+    Supports either nested `config` or top-level overrides (`meta`, `search`, `scoring`,
+    `location`, `llm`, `delivery`, plus shorthand `recipient_email`).
+    """
+    if not isinstance(entry, dict) or not entry.get("name"):
+        raise ValueError("Profile entry must be a dict with a non-empty 'name'.")
+
+    name = str(entry["name"]).strip()
+    description = str(entry.get("description", "Synced from environment profile config"))
+
+    existing = get_profile_by_name(name)
+    base_cfg = existing["config"] if existing else default_config()
+
+    override_cfg = dict(entry.get("config", {}) or {})
+    for section in ("meta", "search", "scoring", "location", "llm", "delivery"):
+        if section in entry and isinstance(entry[section], dict):
+            override_cfg[section] = _deep_merge(override_cfg.get(section, {}), entry[section])
+
+    # Shorthand: top-level recipient_email enables delivery automatically unless explicitly disabled
+    if entry.get("recipient_email"):
+        deliv = dict(override_cfg.get("delivery", {}))
+        deliv["recipient_email"] = str(entry["recipient_email"]).strip()
+        deliv.setdefault("enabled", True)
+        override_cfg["delivery"] = deliv
+
+    merged = validate_config(_deep_merge(base_cfg, override_cfg))
+
+    if existing:
+        update_profile(existing["id"], name, description, merged)
+        return existing["id"]
+    return create_profile(name, description, merged)
+
+
+def sync_profiles_from_env() -> List[dict]:
+    """
+    Sync private profile definitions and email delivery targets from environment secrets
+    (e.g. GitHub Actions Secrets) into SQLite without committing PII to a public repo.
+
+    Supported env vars:
+      - TALENTSCOUT_PROFILES_JSON: JSON list (or single object) of profile definitions.
+      - RECIPIENT_EMAIL: Single-user shortcut that enables email delivery on the active profile.
+      - DELIVERY_MIN_SCORE / DELIVERY_MAX_JOBS: Optional integer overrides for RECIPIENT_EMAIL mode.
+    """
+    seed_default_profile()
+    synced: List[dict] = []
+
+    raw_profiles = os.environ.get("TALENTSCOUT_PROFILES_JSON", "").strip()
+    if raw_profiles:
+        parsed = json.loads(raw_profiles)
+        if isinstance(parsed, dict):
+            parsed = [parsed]
+        if not isinstance(parsed, list):
+            raise ValueError("TALENTSCOUT_PROFILES_JSON must decode to a JSON object or array.")
+        for item in parsed:
+            pid = upsert_profile_from_dict(item)
+            prof = get_profile(pid)
+            if prof:
+                synced.append(prof)
+
+    recipient_email = os.environ.get("RECIPIENT_EMAIL", "").strip()
+    if recipient_email and not any(
+        p["config"].get("delivery", {}).get("enabled") and p["config"].get("delivery", {}).get("recipient_email")
+        for p in get_delivery_enabled_profiles()
+    ):
+        active = get_active_profile()
+        cfg = dict(active["config"])
+        deliv = dict(cfg.get("delivery", {}))
+        deliv["enabled"] = True
+        deliv["recipient_email"] = recipient_email
+        if os.environ.get("DELIVERY_MIN_SCORE", "").strip():
+            try:
+                deliv["min_score"] = int(os.environ["DELIVERY_MIN_SCORE"])
+            except ValueError:
+                pass
+        if os.environ.get("DELIVERY_MAX_JOBS", "").strip():
+            try:
+                deliv["max_jobs"] = int(os.environ["DELIVERY_MAX_JOBS"])
+            except ValueError:
+                pass
+        cfg["delivery"] = deliv
+        update_profile(active["id"], active["name"], active.get("description", "Default Profile"), cfg)
+        refreshed = get_profile(active["id"])
+        if refreshed:
+            synced.append(refreshed)
+
+    return synced
+
+
+def get_delivery_enabled_profiles() -> List[dict]:
+    """Return all profiles configured with delivery.enabled=True and a non-empty recipient_email."""
+    results: List[dict] = []
+    for summary in list_profiles():
+        full = get_profile(summary["id"])
+        if not full:
+            continue
+        deliv = full.get("config", {}).get("delivery", {})
+        if deliv.get("enabled") and deliv.get("recipient_email"):
+            results.append(full)
+    return results
+

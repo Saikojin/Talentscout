@@ -136,7 +136,23 @@ def init_db():
             for new_col in ['website', 'ats_type', 'ats_url', 'tech_stack', 'industry_category', 'countries', 'location_selector']:
                 if new_col not in comp_columns:
                     cursor.execute(f"ALTER TABLE companies ADD COLUMN {new_col} TEXT")
-            
+
+            # Create profile_deliveries table for idempotent per-profile email delta tracking
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS profile_deliveries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    profile_id INTEGER NOT NULL,
+                    job_id INTEGER NOT NULL,
+                    run_id TEXT NOT NULL,
+                    delivered_at TEXT NOT NULL,
+                    UNIQUE(profile_id, job_id)
+                )
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_profile_deliveries_lookup
+                ON profile_deliveries(profile_id, job_id)
+            """)
+
             # Enable WAL mode for better concurrency
             cursor.execute("PRAGMA journal_mode=WAL")
                 
@@ -173,8 +189,8 @@ def is_duplicate(url, title=None, company=None):
             conn.close()
     return False
 
-def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None, location=None, country=None):
-    """Add a new job to the database if it doesn't exist."""
+def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None, location=None, country=None, description=None):
+    """Add a new job to the database if it doesn't exist. Returns inserted job id or None."""
     conn = create_connection()
     if conn is not None:
         try:
@@ -188,14 +204,16 @@ def add_job(title, company, url, site_source, score=None, missing_skills=None, m
                 matched_skills = json.dumps(matched_skills)
                 
             cursor.execute("""
-                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id, location, country)
-                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)
-            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id, location, country))
+                INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id, location, country, description)
+                VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id, location, country, description))
             conn.commit()
+            return cursor.lastrowid if cursor.rowcount > 0 else None
         except sqlite3.Error as e:
             print(f"Error adding job: {e}")
         finally:
             conn.close()
+    return None
 
 # Initialize DB on import
 init_db()
@@ -587,4 +605,92 @@ def clean_blacklisted_companies_from_db(blacklist_file="blacklist.json"):
         conn.close()
         
     return deleted_count
+
+
+# --- Profile Delivery Tracking Methods ---
+
+def get_undelivered_jobs_for_profile(profile_id, min_score=0, limit=50, include_unscoped=True):
+    """
+    Fetch 'new' jobs that have not yet been delivered to `profile_id` and meet `min_score`.
+    When `include_unscoped=True`, includes jobs whose `score_profile_id` matches `profile_id`
+    or is NULL (legacy/shared rows).
+    """
+    conn = create_connection()
+    jobs = []
+    if conn is not None:
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            if include_unscoped:
+                profile_clause = "(j.score_profile_id = ? OR j.score_profile_id IS NULL)"
+            else:
+                profile_clause = "j.score_profile_id = ?"
+            cursor.execute(f"""
+                SELECT j.*
+                FROM jobs j
+                WHERE j.status = 'new'
+                  AND COALESCE(j.score, 0) >= ?
+                  AND {profile_clause}
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM profile_deliveries pd
+                      WHERE pd.profile_id = ? AND pd.job_id = j.id
+                  )
+                ORDER BY COALESCE(j.score, 0) DESC, j.id DESC
+                LIMIT ?
+            """, (int(min_score), int(profile_id), int(profile_id), int(limit)))
+            jobs = [dict(row) for row in cursor.fetchall()]
+        except sqlite3.Error as e:
+            print(f"Error fetching undelivered jobs for profile {profile_id}: {e}")
+        finally:
+            conn.close()
+    return jobs
+
+
+def record_profile_deliveries(profile_id, job_ids, run_id):
+    """Idempotently record delivered job IDs for a profile. Returns count of newly inserted rows."""
+    if not job_ids:
+        return 0
+    conn = create_connection()
+    inserted = 0
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            for jid in job_ids:
+                cursor.execute("""
+                    INSERT OR IGNORE INTO profile_deliveries (profile_id, job_id, run_id, delivered_at)
+                    VALUES (?, ?, ?, ?)
+                """, (int(profile_id), int(jid), str(run_id), now))
+                inserted += cursor.rowcount
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Error recording profile deliveries: {e}")
+        finally:
+            conn.close()
+    return inserted
+
+
+def get_profile_delivery_stats(profile_id):
+    """Return total delivered count and latest delivery timestamp for a profile."""
+    conn = create_connection()
+    stats = {"delivered_count": 0, "last_delivered_at": None}
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT COUNT(*), MAX(delivered_at)
+                FROM profile_deliveries
+                WHERE profile_id = ?
+            """, (int(profile_id),))
+            row = cursor.fetchone()
+            if row:
+                stats["delivered_count"] = row[0] or 0
+                stats["last_delivered_at"] = row[1]
+        except sqlite3.Error as e:
+            print(f"Error fetching delivery stats: {e}")
+        finally:
+            conn.close()
+    return stats
+
 
