@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
 
-from scripts.database import add_job, init_db
+from scripts.database import add_job, canonicalize_job_url, init_db, job_exists
 from scripts.profile import get_active_profile, get_profile, get_profile_by_name
 
 
@@ -62,15 +62,26 @@ def import_package(
         target_profile_id = active.get("id")
 
     imported = 0
-    skipped = 0
+    skipped_duplicate = 0
+    skipped_invalid = 0
+    seen_in_batch = set()
 
     for job in jobs:
         url = (job.get("url") or "").strip()
         title = (job.get("title") or "").strip()
         company = (job.get("company") or "").strip()
         if not url or not title:
-            skipped += 1
+            skipped_invalid += 1
             continue
+
+        clean_url = canonicalize_job_url(url) or url
+        batch_key = (clean_url, title.lower(), company.lower())
+        if clean_url in seen_in_batch or batch_key in seen_in_batch or job_exists(clean_url, title=title, company=company):
+            skipped_duplicate += 1
+            continue
+
+        seen_in_batch.add(clean_url)
+        seen_in_batch.add(batch_key)
 
         if dry_run:
             imported += 1
@@ -79,7 +90,7 @@ def import_package(
         inserted_id = add_job(
             title=title,
             company=company or "Unknown",
-            url=url,
+            url=clean_url,
             site_source=job.get("site_source") or "EmailPackage",
             score=job.get("score"),
             missing_skills=job.get("missing_skills"),
@@ -92,7 +103,7 @@ def import_package(
         if inserted_id is not None:
             imported += 1
         else:
-            skipped += 1
+            skipped_duplicate += 1
 
     return {
         "package": os.path.basename(package_path),
@@ -100,7 +111,9 @@ def import_package(
         "profile_id": target_profile_id,
         "total_in_package": len(jobs),
         "imported": imported,
-        "skipped_existing_or_invalid": skipped,
+        "skipped_duplicate": skipped_duplicate,
+        "skipped_invalid": skipped_invalid,
+        "skipped_existing_or_invalid": skipped_duplicate + skipped_invalid,
         "dry_run": dry_run,
     }
 
