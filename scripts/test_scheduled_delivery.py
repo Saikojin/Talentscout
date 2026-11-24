@@ -305,3 +305,106 @@ def test_smtp_surfaces_gmail_535_instead_of_disconnect():
         _smtp_authenticate(GmailLikeSMTP(), "user@gmail.com", "wrong-or-non-app-pass")
     assert exc_info.value.smtp_code == 535
 
+
+def test_canonicalize_job_url_strips_tracking_preserves_job_ids():
+    li_morning = (
+        "https://www.linkedin.com/jobs/view/agentic-qa-developer-at-fractal-4483812329"
+        "?position=13&pageNum=0&refId=P0Ts6EZFRTCmzVWR%2BAr5pg%3D%3D&trackingId=abHzzVH8Nx4jsq8%2BrxJEzA%3D%3D"
+    )
+    li_afternoon = (
+        "https://www.linkedin.com/jobs/view/agentic-qa-developer-at-fractal-4483812329"
+        "?position=8&pageNum=0&refId=OvzF22bdQa5wMOnSfcgecw%3D%3D&trackingId=athzHAAGLYwTaG6rvrlATg%3D%3D"
+    )
+    assert db_mod.canonicalize_job_url(li_morning) == "https://www.linkedin.com/jobs/view/agentic-qa-developer-at-fractal-4483812329"
+    assert db_mod.canonicalize_job_url(li_morning) == db_mod.canonicalize_job_url(li_afternoon)
+
+    # Meaningful ID query parameters must be preserved while utm_* / gh_src are stripped
+    indeed = "http://www.indeed.com/viewjob?jk=abc123&utm_source=email&ref=foo#apply"
+    assert db_mod.canonicalize_job_url(indeed) == "https://www.indeed.com/viewjob?jk=abc123"
+    gh = "https://boards.greenhouse.io/acme/jobs?gh_jid=98765&gh_src=abcd"
+    assert db_mod.canonicalize_job_url(gh) == "https://boards.greenhouse.io/acme/jobs?gh_jid=98765"
+
+
+def test_dedup_across_rotated_linkedin_urls_delivery_and_import(isolated_db, tmp_path):
+    active = profile_mod.get_active_profile()
+    pid = active["id"]
+
+    url_run1 = (
+        "https://www.linkedin.com/jobs/view/agentic-qa-developer-at-fractal-4483812329"
+        "?position=13&pageNum=0&refId=AAA&trackingId=111"
+    )
+    url_run2 = (
+        "https://www.linkedin.com/jobs/view/agentic-qa-developer-at-fractal-4483812329"
+        "?position=5&pageNum=0&refId=BBB&trackingId=222"
+    )
+
+    # Insert from Run 1 (status='new') — canonicalized automatically
+    jid1 = db_mod.add_job(
+        title="Agentic QA Developer",
+        company="Fractal",
+        url=url_run1,
+        site_source="LinkedIn",
+        score=62,
+        score_profile_id=pid,
+    )
+    assert jid1 is not None
+
+    # Even while status='new', rotated URL or same (title, company) must be treated as duplicate
+    assert db_mod.is_duplicate(url_run2, "Agentic QA Developer", "Fractal") is True
+    assert db_mod.add_job(
+        title="Agentic QA Developer",
+        company="Fractal",
+        url=url_run2,
+        site_source="LinkedIn",
+        score=62,
+        score_profile_id=pid,
+    ) is None
+
+    # Simulate legacy cached DB row inserted before canonicalization existed + already delivered
+    conn = db_mod.create_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO jobs (title, company, url, site_source, status, date_added, score, score_profile_id) "
+        "VALUES (?, ?, ?, ?, 'new', '2026-11-23T17:00:00', 60, ?)",
+        ("Senior Quality Engineer", "Paradigm", url_run1 + "_legacy", "LinkedIn", pid),
+    )
+    legacy_id = cur.lastrowid
+    cur.execute(
+        "INSERT INTO jobs (title, company, url, site_source, status, date_added, score, score_profile_id) "
+        "VALUES (?, ?, ?, ?, 'new', '2026-11-23T23:00:00', 60, ?)",
+        ("Senior Quality Engineer", "Paradigm", url_run2 + "_legacy2", "LinkedIn", pid),
+    )
+    conn.commit()
+    conn.close()
+
+    db_mod.record_profile_deliveries(pid, [jid1, legacy_id], "run-morning")
+    undelivered = db_mod.get_undelivered_jobs_for_profile(pid, min_score=40, limit=50)
+    assert undelivered == []
+
+    # Import package containing 1 rotated LinkedIn duplicate + 1 genuinely new role
+    pkg_json = tmp_path / "jobs_delta.json"
+    pkg_json.write_text(
+        json.dumps({
+            "run_id": "run-afternoon",
+            "jobs": [
+                {"title": "Agentic QA Developer", "company": "Fractal", "url": url_run2, "score": 62},
+                {"title": "Automation Engineer", "company": "ALTEN Technology USA", "url": "https://job-boards.greenhouse.io/altentechnologyusa/jobs/5174154007", "score": 48},
+            ],
+        }),
+        encoding="utf-8",
+    )
+
+    dry = import_package(str(pkg_json), dry_run=True)
+    assert dry["imported"] == 1
+    assert dry["skipped_duplicate"] == 1
+
+    real = import_package(str(pkg_json), dry_run=False)
+    assert real["imported"] == 1
+    assert real["skipped_duplicate"] == 1
+
+    # Re-running import is 100% idempotent
+    again = import_package(str(pkg_json), dry_run=False)
+    assert again["imported"] == 0
+    assert again["skipped_duplicate"] == 2
+
+

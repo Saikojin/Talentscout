@@ -1,8 +1,106 @@
 import sqlite3
 import os
 import datetime
+import re
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "job_tracker.db")
+
+_VOLATILE_QUERY_PARAMS = frozenset({
+    "refid", "trackingid", "position", "pagenum", "ebp", "trk", "trkinfo",
+    "currentjobid", "origin", "originalreferer", "midtoken", "midsig",
+    "lipi", "lici", "f_tpr", "gclid", "fbclid", "gh_src", "lever-source",
+    "lever-origin", "ashby_jid_source", "source", "src", "ref", "referrer",
+})
+_VOLATILE_QUERY_PREFIXES = ("utm_", "rx_")
+_PLACEHOLDER_STRINGS = frozenset({"", "unknown", "unknown title", "unknown company", "n/a", "none"})
+
+
+def canonicalize_job_url(url):
+    """
+    Normalize a job URL by stripping volatile tracking/session query parameters
+    (e.g., LinkedIn refId/trackingId/position, utm_*, rx_*) and URL fragments while
+    preserving meaningful job-identifying query parameters (e.g., jk, gh_jid, jobId).
+    """
+    if not url or not isinstance(url, str):
+        return ""
+    raw = url.strip()
+    if not raw:
+        return ""
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return raw
+
+    if not parsed.scheme or not parsed.netloc:
+        return raw
+
+    scheme = "https" if parsed.scheme.lower() in ("http", "https") else parsed.scheme.lower()
+    netloc = parsed.netloc.lower().strip()
+    path = parsed.path or ""
+    if path != "/" and path.endswith("/"):
+        path = path.rstrip("/")
+
+    # LinkedIn job view URLs uniquely identify the posting in the path; all query params are tracking noise.
+    if netloc.endswith("linkedin.com") and "/jobs/view/" in path.lower():
+        query = ""
+    else:
+        kept = []
+        for k, v in parse_qsl(parsed.query, keep_blank_values=False):
+            kl = k.lower()
+            if kl in _VOLATILE_QUERY_PARAMS or any(kl.startswith(p) for p in _VOLATILE_QUERY_PREFIXES):
+                continue
+            kept.append((k, v))
+        kept.sort()
+        query = urlencode(kept, doseq=True)
+
+    return urlunparse((scheme, netloc, path, "", query, ""))
+
+
+def _normalize_title_company(title, company):
+    t = re.sub(r"\s+", " ", (title or "").strip()).lower()
+    c = re.sub(r"\s+", " ", (company or "").strip()).lower()
+    if t in _PLACEHOLDER_STRINGS or c in _PLACEHOLDER_STRINGS:
+        return None
+    return (t, c)
+
+
+def _job_exists_on_cursor(cursor, url, title=None, company=None):
+    """Check whether a job already exists in `jobs` (any status) by canonical URL or (title, company)."""
+    raw_url = (url or "").strip()
+    canon_url = canonicalize_job_url(raw_url)
+
+    if raw_url:
+        cursor.execute("SELECT 1 FROM jobs WHERE url = ? LIMIT 1", (raw_url,))
+        if cursor.fetchone() is not None:
+            return True
+
+    if canon_url and canon_url != raw_url:
+        cursor.execute("SELECT 1 FROM jobs WHERE url = ? LIMIT 1", (canon_url,))
+        if cursor.fetchone() is not None:
+            return True
+
+    # Check legacy rows stored with tracking query params on the same host+path
+    if canon_url:
+        parsed = urlparse(canon_url)
+        if parsed.netloc and parsed.path and parsed.path != "/":
+            host_path = f"{parsed.netloc}{parsed.path}"
+            cursor.execute("SELECT url FROM jobs WHERE LOWER(url) LIKE ?", (f"%{host_path.lower()}%",))
+            for (existing_url,) in cursor.fetchall():
+                if canonicalize_job_url(existing_url) == canon_url:
+                    return True
+
+    norm_tc = _normalize_title_company(title, company)
+    if norm_tc is not None:
+        t_norm, c_norm = norm_tc
+        cursor.execute(
+            "SELECT 1 FROM jobs WHERE LOWER(TRIM(title)) = ? AND LOWER(TRIM(company)) = ? LIMIT 1",
+            (t_norm, c_norm),
+        )
+        if cursor.fetchone() is not None:
+            return True
+
+    return False
 
 def create_connection():
     """Create a database connection to the SQLite database specified by DB_PATH."""
@@ -162,39 +260,36 @@ def init_db():
         finally:
             conn.close()
 
-def is_duplicate(url, title=None, company=None):
-    """Check if the given URL already exists in the database or if title/company combo exists, and its status is not 'new'."""
+def job_exists(url, title=None, company=None):
+    """Return True if a job already exists in `jobs` (any status) by canonical URL or (title, company)."""
     conn = create_connection()
     if conn is not None:
         try:
             cursor = conn.cursor()
-            # First check by URL
-            cursor.execute("SELECT status FROM jobs WHERE url = ?", (url,))
-            row = cursor.fetchone()
-            if row is not None:
-                return row[0].lower() != 'new'
-            
-            # If URL not found, check by title and company if provided
-            if title and company:
-                cursor.execute("SELECT status FROM jobs WHERE title = ? AND company = ?", (title, company))
-                row = cursor.fetchone()
-                if row is not None:
-                    return row[0].lower() != 'new'
-                    
-            return False
+            return _job_exists_on_cursor(cursor, url, title=title, company=company)
         except sqlite3.Error as e:
-            print(f"Error checking duplicate: {e}")
+            print(f"Error checking existing job: {e}")
             return False
         finally:
             conn.close()
     return False
 
+
+def is_duplicate(url, title=None, company=None):
+    """Check if the given job already exists in the database (canonical URL or title+company, any status)."""
+    return job_exists(url, title=title, company=company)
+
+
 def add_job(title, company, url, site_source, score=None, missing_skills=None, matched_skills=None, score_profile_id=None, location=None, country=None, description=None):
-    """Add a new job to the database if it doesn't exist. Returns inserted job id or None."""
+    """Add a new job to the database if it doesn't already exist (canonical URL or title+company). Returns inserted job id or None."""
     conn = create_connection()
     if conn is not None:
         try:
             cursor = conn.cursor()
+            clean_url = canonicalize_job_url(url) or (url or "").strip()
+            if _job_exists_on_cursor(cursor, clean_url, title=title, company=company):
+                return None
+
             date_added = datetime.datetime.now().isoformat()
             
             import json
@@ -206,7 +301,7 @@ def add_job(title, company, url, site_source, score=None, missing_skills=None, m
             cursor.execute("""
                 INSERT OR IGNORE INTO jobs (title, company, url, site_source, status, date_added, score, missing_skills, matched_skills, score_profile_id, location, country, description)
                 VALUES (?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (title, company, url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id, location, country, description))
+            """, (title, company, clean_url, site_source, date_added, score, missing_skills, matched_skills, score_profile_id, location, country, description))
             conn.commit()
             return cursor.lastrowid if cursor.rowcount > 0 else None
         except sqlite3.Error as e:
@@ -612,8 +707,8 @@ def clean_blacklisted_companies_from_db(blacklist_file="blacklist.json"):
 def get_undelivered_jobs_for_profile(profile_id, min_score=0, limit=50, include_unscoped=True):
     """
     Fetch 'new' jobs that have not yet been delivered to `profile_id` and meet `min_score`.
-    When `include_unscoped=True`, includes jobs whose `score_profile_id` matches `profile_id`
-    or is NULL (legacy/shared rows).
+    Also deduplicates against already-delivered jobs (and within the batch) by canonical URL
+    and normalized (title, company) so rotated tracking query params never cause re-emails.
     """
     conn = create_connection()
     jobs = []
@@ -621,6 +716,24 @@ def get_undelivered_jobs_for_profile(profile_id, min_score=0, limit=50, include_
         try:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
+
+            # Build canonical keys of everything already delivered to this profile
+            cursor.execute("""
+                SELECT j.url, j.title, j.company
+                FROM profile_deliveries pd
+                JOIN jobs j ON j.id = pd.job_id
+                WHERE pd.profile_id = ?
+            """, (int(profile_id),))
+            seen_urls = set()
+            seen_tc = set()
+            for row in cursor.fetchall():
+                cu = canonicalize_job_url(row["url"])
+                if cu:
+                    seen_urls.add(cu)
+                tc = _normalize_title_company(row["title"], row["company"])
+                if tc:
+                    seen_tc.add(tc)
+
             if include_unscoped:
                 profile_clause = "(j.score_profile_id = ? OR j.score_profile_id IS NULL)"
             else:
@@ -637,9 +750,21 @@ def get_undelivered_jobs_for_profile(profile_id, min_score=0, limit=50, include_
                       WHERE pd.profile_id = ? AND pd.job_id = j.id
                   )
                 ORDER BY COALESCE(j.score, 0) DESC, j.id DESC
-                LIMIT ?
-            """, (int(min_score), int(profile_id), int(profile_id), int(limit)))
-            jobs = [dict(row) for row in cursor.fetchall()]
+            """, (int(min_score), int(profile_id), int(profile_id)))
+
+            for row in cursor.fetchall():
+                item = dict(row)
+                cu = canonicalize_job_url(item.get("url"))
+                tc = _normalize_title_company(item.get("title"), item.get("company"))
+                if (cu and cu in seen_urls) or (tc and tc in seen_tc):
+                    continue
+                if cu:
+                    seen_urls.add(cu)
+                if tc:
+                    seen_tc.add(tc)
+                jobs.append(item)
+                if len(jobs) >= int(limit):
+                    break
         except sqlite3.Error as e:
             print(f"Error fetching undelivered jobs for profile {profile_id}: {e}")
         finally:
